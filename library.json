@@ -1,0 +1,32 @@
+{
+    "name": "MotorMixers",
+    "description": "MotorMixers",
+    "keywords": "motors mixers",
+    "authors": {
+        "name": "Martin Budden",
+        "url": "https://github.com/martinbudden"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/martinbudden/Library-MotorMixers.git"
+    },
+    "dependencies": [
+        {
+            "name": "martinbudden/VectorQuaternionMatrix",
+            "version": "^0.4.3"
+        },
+        {
+            "name": "martinbudden/Filters",
+            "version": "^0.9.3"
+        },
+        {
+            "name": "martinbudden/PIDF",
+            "version": "^0.4.0"
+        }
+    ],
+    "license": "MIT",
+    "version": "0.0.1",
+    "frameworks": "*",
+    "platforms": "*",
+    "headers": ["Debug.h", "DShotCodec.h", "DynamicIdleController.h", "ESC_DShot.h", "ESC_DShotBitbang.h", "ESC_DShotBitbangIRQ.h", "Mixers.h", "MotorMixerBase.h", "MotorMixerOctoBase.h", "MotorMixerQuadBase.h", "MotorMixerQuadX_DShot.h", "MotorMixerQuadX_DShotBitbang.h", "MotorMixerQuadX_PWM.h", "RPM_Filters.h"]
+}
