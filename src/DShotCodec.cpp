@@ -212,9 +212,9 @@ uint32_t DShotCodec::eRPM_to_GCR20(uint16_t value)
 {
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
     uint32_t ret = nibbleToQuintet[value & 0x1F];
-    ret |= nibbleToQuintet[(value >> 4) & 0x1F] << 5;
-    ret |= nibbleToQuintet[(value >> 8) & 0x1F] << 10;
-    ret |= nibbleToQuintet[(value >> 12) & 0x1F] << 15;
+    ret |= static_cast<uint32_t>(nibbleToQuintet[(value >> 4) & 0x1F]) << 5;
+    ret |= static_cast<uint32_t>(nibbleToQuintet[(value >> 8) & 0x1F]) << 10;
+    ret |= static_cast<uint32_t>(nibbleToQuintet[(value >> 12) & 0x1F]) << 15;
     return ret;
     // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
 }

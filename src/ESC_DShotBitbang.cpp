@@ -428,7 +428,7 @@ uint32_t ESC_DShotBitbang::samples_to_GCR21(const uint32_t* samples, uint32_t mo
         // then look for changes in bits values and compute BDSHOT bits:
         const uint32_t value = samples[i] & motorMask; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         if (value != previous_value) {
-            const uint32_t rlen = (i - previous_i) / RESPONSE_OVERSAMPLING;
+            const uint32_t rlen = static_cast<uint32_t>(i - previous_i) / RESPONSE_OVERSAMPLING;
             const uint32_t len = (rlen > 1) ? rlen : 1; // how many bits had the same value
             bitCount += len;
             gcr21 <<= len;
