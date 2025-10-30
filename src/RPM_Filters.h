@@ -85,7 +85,7 @@ private:
     struct state_t {
         state_e state;
         size_t motorIndex;
-        motor_state_t motorStates[MAX_MOTOR_COUNT];
+        std::array<motor_state_t, MAX_MOTOR_COUNT> motorStates;
     };
     state_t _state {};
 

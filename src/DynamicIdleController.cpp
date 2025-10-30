@@ -17,7 +17,7 @@ void DynamicIdleController::setConfig(const config_t& config)
     _minimumAllowedMotorHz = static_cast<float>(config.dyn_idle_min_rpm_100) * 100.0F / 60.0F;
     _PID.setSetpoint(_minimumAllowedMotorHz);
 
-    // use Betaflight multipliers for compatibility with Betaflight Configurator
+    // use Betaflight multiplier for compatibility with Betaflight Configurator
     _PID.setP(static_cast<float>(config.dyn_idle_p_gain) * 0.00015F);
 
     const float deltaT = static_cast<float>(_taskIntervalMicroseconds) * 0.000001F;

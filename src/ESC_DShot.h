@@ -53,14 +53,14 @@ protected:
     uint32_t _useHighOrderBits = 0;
     uint32_t _wrapCycleCount {};
 #if defined(FRAMEWORK_RPI_PICO)
-#if defined(USE_DSHOT_RPI_PICO_PIO)
+#if defined(LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO)
     PIO _pio {};
     uint _pioStateMachine {};
     uint _pioOffset {};
 #else
     enum { START_IMMEDIATELY = true, DONT_START_YET = false };
     uint32_t _dmaChannel {};
-#endif // USE_DSHOT_RPI_PICO_PIO
+#endif // LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO
 #endif
     uint32_t _dataHighPulseWidth {};
     uint32_t _dataLowPulseWidth {};

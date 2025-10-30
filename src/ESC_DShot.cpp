@@ -52,7 +52,7 @@ void ESC_DShot::init(uint16_t pin)
     _pin = pin;
 
 #if defined(FRAMEWORK_RPI_PICO)
-#if defined(USE_DSHOT_RPI_PICO_PIO)
+#if defined(LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO)
     if (_protocol == ESC_PROTOCOL_DSHOT300) {
         const bool success = pio_claim_free_sm_and_add_program_for_gpio_range(&dshot_bidir_300_program, &_pio, &_pioStateMachine, &_pioOffset, pin, 1, true);
         hard_assert(success);
@@ -107,7 +107,7 @@ void ESC_DShot::init(uint16_t pin)
         0, // transfer count, set when DMA is started
         DONT_START_YET
     );
-#endif // USE_DSHOT_RPI_PICO_PIO
+#endif // LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO
 #elif defined(FRAMEWORK_ESPIDF)
 #elif defined(FRAMEWORK_STM32_CUBE)
 #elif defined(FRAMEWORK_TEST)
@@ -202,7 +202,7 @@ void ESC_DShot::setProtocol(protocol_e protocol)
         break;
     }
 
-#if defined(FRAMEWORK_RPI_PICO) && !defined(USE_DSHOT_RPI_PICO_PIO)
+#if defined(FRAMEWORK_RPI_PICO) && !defined(LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO)
     if (_pin != PIN_NOT_SET) {
         // the pin has already been set, so we need to re-set the wrap value
         const uint32_t slice = pwm_gpio_to_slice_num(_pin);
@@ -235,7 +235,7 @@ On Raspberry Pi Pico we can use the Programmable IO (PIO) for this bit-banging.
 */
 void ESC_DShot::write(uint16_t value) // NOLINT(readability-make-member-function-const)
 {
-#if defined(USE_DSHOT_RPI_PICO_PIO)
+#if defined(LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO)
     // use the value to create a bidirectional DShot frame and send it to the PIO state machine
     value = DShotCodec::frameBidirectional(value);
     pio_sm_put(_pio, _pioStateMachine, value);
@@ -266,7 +266,7 @@ void ESC_DShot::write(uint16_t value) // NOLINT(readability-make-member-function
 #else // defaults to FRAMEWORK_ARDUINO
 #endif // FRAMEWORK
 
-#endif // USE_DSHOT_RPI_PICO_PIO
+#endif // LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO
 }
 
 bool ESC_DShot::read()
@@ -274,7 +274,7 @@ bool ESC_DShot::read()
     DShotCodec::telemetry_type_e telemetryType {};
     uint32_t value {};
 
-#if defined(USE_DSHOT_RPI_PICO_PIO)
+#if defined(LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO)
     const int32_t fifoCount = pio_sm_get_rx_fifo_level(_pio, _pioStateMachine);
     if (fifoCount >= 2) {
         // get DShot telemetry value from the PIO
@@ -325,7 +325,7 @@ bool ESC_DShot::read()
 void ESC_DShot::end()
 {
 #if defined(FRAMEWORK_RPI_PICO)
-#if defined(USE_DSHOT_RPI_PICO_PIO)
+#if defined(LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO)
     if (_protocol == ESC_PROTOCOL_DSHOT300) {
         pio_remove_program_and_unclaim_sm(&dshot_bidir_300_program, _pio, _pioStateMachine, _pioOffset);
     } else {
