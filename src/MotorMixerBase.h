@@ -26,6 +26,7 @@ public:
     };
 public:
     static uint8_t motorCount(type_e type) { return (type == QUAD_X) ? 4 : (type == HEX_X) ? 6 : 8; }
+    virtual ~MotorMixerBase() = default;
     MotorMixerBase(uint32_t motorCount, Debug& debug) : _motorCount(motorCount), _debug(debug) {}
     inline size_t getMotorCount() const { return _motorCount; }
     inline bool motorsIsOn() const { return _motorsIsOn; }
