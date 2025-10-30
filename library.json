@@ -25,7 +25,7 @@
         }
     ],
     "license": "MIT",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "frameworks": "*",
     "platforms": "*",
     "headers": ["Debug.h", "DShotCodec.h", "DynamicIdleController.h", "ESC_DShot.h", "ESC_DShotBitbang.h", "ESC_DShotBitbangIRQ.h", "Mixers.h", "MotorMixerBase.h", "MotorMixerOctoBase.h", "MotorMixerQuadBase.h", "MotorMixerQuadX_DShot.h", "MotorMixerQuadX_DShotBitbang.h", "MotorMixerQuadX_PWM.h", "RPM_Filters.h"]
