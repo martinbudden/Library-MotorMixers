@@ -27,8 +27,10 @@ public:
 public:
     static uint8_t motorCount(type_e type) { return (type == QUAD_X) ? 4 : (type == HEX_X) ? 6 : 8; }
     virtual ~MotorMixerBase() = default;
-    MotorMixerBase(uint32_t motorCount, Debug& debug) : _motorCount(motorCount), _debug(debug) {}
+    MotorMixerBase(uint32_t motorCount, uint32_t servoCount, Debug& debug) : _motorCount(motorCount), _servoCount(servoCount), _debug(debug) {}
+    MotorMixerBase(uint32_t motorCount, Debug& debug) : MotorMixerBase(motorCount, 0, debug) {}
     inline size_t getMotorCount() const { return _motorCount; }
+    inline size_t getServoCount() const { return _servoCount; }
     inline bool motorsIsOn() const { return _motorsIsOn; }
     inline void motorsSwitchOn() { _motorsIsOn = true; }
     inline void motorsSwitchOff() { _motorsIsOn = false; }
@@ -49,6 +51,7 @@ public:
     virtual void setDynamicIdlerControllerConfig(const DynamicIdleController::config_t& config) { (void)config; }
 protected:
     const size_t _motorCount;
+    const size_t _servoCount;
     Debug& _debug;
     float _motorOutputMin {0.0F}; //!< minimum motor output, typically set to 5.5% to avoid ESC desynchronization, may be set to zero if using dynamic idle control
     bool _motorsIsOn {false};
