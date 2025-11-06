@@ -35,6 +35,7 @@ public:
 public:
     enum { DSHOT_BIT_COUNT = 16 };
     void setProtocol(protocol_e protocol);
+    void setMotorPoleCount(uint16_t motorPoleCount) { _motorPoleCount = motorPoleCount; }
     void write(uint16_t value); // value should be in the DShot range [47,2047]
     bool read();
 

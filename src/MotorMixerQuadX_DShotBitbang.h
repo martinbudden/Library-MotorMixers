@@ -14,6 +14,7 @@ class MotorMixerQuadX_DShotBitbang : public MotorMixerQuadBase {
 public:
     MotorMixerQuadX_DShotBitbang(uint32_t taskIntervalMicroseconds, uint32_t outputToMotorsDenominator, Debug& debug, const stm32_motor_pins_t& pins);
 public:
+    virtual void setMotorConfig(const motorConfig_t& motorConfig) override;
     virtual void outputToMotors(commands_t& commands, float deltaT, uint32_t tickCount) override;
     virtual void rpmFilterSetFrequencyHzIterationStep() override;
     virtual RPM_Filters* getRPM_Filters() override;
@@ -22,9 +23,10 @@ public:
     virtual void setDynamicIdlerControllerConfig(const DynamicIdleController::config_t& config) override;
     float calculateSlowestMotorHz() const;
 protected:
-    enum { DEFAULT_MOTOR_POLE_COUNT = 14 };
-    uint16_t _motorPoleCount {DEFAULT_MOTOR_POLE_COUNT}; //!< number of poles the motor has, used to calculate RPM from telemetry data
-    float _eRPMtoHz {};
+    static constexpr float SECONDS_PER_MINUTE = 60.0F;
+    static constexpr float DEFAULT_MOTOR_POLE_COUNT = 14.0F; //!< number of poles the motor has, used to calculate RPM from telemetry data
+    float _eRPMtoHz { 2.0F * (100.0F / SECONDS_PER_MINUTE) / DEFAULT_MOTOR_POLE_COUNT };
+
     DynamicIdleController _dynamicIdleController;
     RPM_Filters _rpmFilters;
     size_t _rpmFilterIterationCount {};

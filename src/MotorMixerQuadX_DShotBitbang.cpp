@@ -13,8 +13,6 @@ MotorMixerQuadX_DShotBitbang::MotorMixerQuadX_DShotBitbang(uint32_t taskInterval
     _rpmFilters(_motorCount, static_cast<float>(taskIntervalMicroseconds) * 0.000001F)
 {
     (void)pins; // !!TODO: set pins
-    static constexpr float SECONDS_PER_MINUTE = 60.0F;
-    _eRPMtoHz = 2.0F * (100.0F / SECONDS_PER_MINUTE) / static_cast<float>(_motorPoleCount);
 
     // There are a maximum of 12 rpmFilter iterations: 4 motors and up to 3 harmonics for each motor.
     // We want to complete all 12 iterations in less than 1000 microseconds.
@@ -45,6 +43,12 @@ float MotorMixerQuadX_DShotBitbang::calculateSlowestMotorHz() const
         slowestMotorHz = motorHz;
     }
     return slowestMotorHz;
+}
+
+void MotorMixerQuadX_DShotBitbang::setMotorConfig(const motorConfig_t& motorConfig)
+{
+    _motorConfig = motorConfig;
+    _eRPMtoHz = 2.0F * (100.0F / SECONDS_PER_MINUTE) / static_cast<float>(motorConfig.motorPoleCount);
 }
 
 RPM_Filters* MotorMixerQuadX_DShotBitbang::getRPM_Filters()

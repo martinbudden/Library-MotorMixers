@@ -45,6 +45,14 @@ float MotorMixerQuadX_DShot::calculateSlowestMotorHz() const
     return slowestMotorHz;
 }
 
+void MotorMixerQuadX_DShot::setMotorConfig(const motorConfig_t& motorConfig)
+{
+    _motorConfig = motorConfig;
+    for (auto& motor : _motors) {
+        motor.setMotorPoleCount(motorConfig.motorPoleCount);
+    }
+}
+
 RPM_Filters* MotorMixerQuadX_DShot::getRPM_Filters()
 {
     return &_rpmFilters;

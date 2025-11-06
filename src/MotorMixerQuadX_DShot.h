@@ -13,6 +13,7 @@ class MotorMixerQuadX_DShot : public MotorMixerQuadBase {
 public:
     MotorMixerQuadX_DShot(uint32_t taskIntervalMicroseconds, uint32_t outputToMotorsDenominator, Debug& debug, const motor_pins_t& pins);
 public:
+    virtual void setMotorConfig(const motorConfig_t& motorConfig) override;
     virtual void outputToMotors(commands_t& commands, float deltaT, uint32_t tickCount) override;
     virtual void rpmFilterSetFrequencyHzIterationStep() override;
     virtual RPM_Filters* getRPM_Filters() override;
