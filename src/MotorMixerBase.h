@@ -10,7 +10,7 @@ class DynamicIdleController;
 
 class MotorMixerBase {
 public:
-    enum type_e { QUAD_X, HEX_X, OCTO_X };
+    enum type_e { QUAD_X, TRICOPTER, HEX_X, OCTO_X, FLYING_WING_SINGLE_PROPELLER, AIRPLANE_SINGLE_PROPELLER };
     struct commands_t {
         float throttle;
         float roll;
@@ -31,11 +31,9 @@ public:
         uint8_t motorPoleCount; // Number of motor poles, used to calculate actual RPM from eRPM
     };
 public:
-    static uint8_t motorCount(type_e type) { return (type == QUAD_X) ? 4 : (type == HEX_X) ? 6 : 8; }
-
     virtual ~MotorMixerBase() = default;
-    MotorMixerBase(uint32_t motorCount, uint32_t servoCount, Debug& debug) : _motorCount(motorCount), _servoCount(servoCount), _debug(debug) {}
-    MotorMixerBase(uint32_t motorCount, Debug& debug) : MotorMixerBase(motorCount, 0, debug) {}
+    MotorMixerBase(type_e type, size_t motorCount, size_t servoCount, Debug& debug) :
+        _type(type), _motorCount(motorCount), _servoCount(servoCount), _debug(debug) {}
 
     inline size_t getMotorCount() const { return _motorCount; }
     inline size_t getServoCount() const { return _servoCount; }
@@ -62,6 +60,7 @@ public:
     virtual const DynamicIdleController* getDynamicIdleController() const { return nullptr; }
     virtual void setDynamicIdlerControllerConfig(const DynamicIdleController::config_t& config) { (void)config; }
 protected:
+    const type_e _type;
     const size_t _motorCount;
     const size_t _servoCount;
     Debug& _debug;

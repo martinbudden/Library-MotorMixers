@@ -18,7 +18,7 @@
 
 
 MotorMixerQuadX_PWM::MotorMixerQuadX_PWM(Debug& debug, const stm32_motor_pins_t& pins) :
-    MotorMixerQuadBase(debug)
+    MotorMixerQuadBase(QUAD_X, debug)
 {
 #if defined(FRAMEWORK_STM32_CUBE) && !defined(FRAMEWORK_ARDUINO_STM32)
     if (pins.m0.pin != 0xFF) {
@@ -51,7 +51,7 @@ MotorMixerQuadX_PWM::MotorMixerQuadX_PWM(Debug& debug, const stm32_motor_pins_t&
 }
 
 MotorMixerQuadX_PWM::MotorMixerQuadX_PWM(Debug& debug, const motor_pins_t& pins) :
-    MotorMixerQuadBase(debug)
+    MotorMixerQuadBase(QUAD_X, debug)
 #if !defined(FRAMEWORK_STM32_CUBE)
     ,_pins({pins.m0,pins.m1,pins.m2,pins.m3})
 #endif

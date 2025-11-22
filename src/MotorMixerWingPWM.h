@@ -42,7 +42,7 @@ public:
     void writeMotor(uint8_t motorIndex, float motorOutput);
 protected:
     float _pwmScale {255.0F};
-    std::array<pwm_pin_t, MOTOR_COUNT> _pins {};
+    std::array<pwm_pin_t, MOTOR_COUNT + SERVO_COUNT> _pins {};
 #if defined(FRAMEWORK_STM32_CUBE)
     std::array<TIM_HandleTypeDef, MOTOR_COUNT> _htims {};
 #endif
