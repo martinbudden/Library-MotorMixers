@@ -87,7 +87,7 @@ MotorMixerWingPWM::MotorMixerWingPWM(Debug& debug, const motor_pins_t& pins) :
         ledcAttachPin(pins.s0, S0);
     }
     if (pins.s1 != 0xFF) {
-        ledcSetup(M2, frequency, resolution);
+        ledcSetup(S1, frequency, resolution);
         ledcAttachPin(pins.s1, S1);
     }
 #else

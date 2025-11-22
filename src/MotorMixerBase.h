@@ -10,7 +10,7 @@ class DynamicIdleController;
 
 class MotorMixerBase {
 public:
-    enum type_e { QUAD_X, TRICOPTER, HEX_X, OCTO_X, FLYING_WING_SINGLE_PROPELLER, AIRPLANE_SINGLE_PROPELLER };
+    enum type_e { BICOPTER, TRICOPTER, QUAD_X, HEX_X, OCTO_X, FLYING_WING_SINGLE_PROPELLER, AIRPLANE_SINGLE_PROPELLER };
     struct commands_t {
         float throttle;
         float roll;
