@@ -2,6 +2,56 @@
 #include <algorithm>
 
 
+float mixWing(std::array<float, 3>& motorOutputs, const MotorMixerBase::commands_t& commands)
+{
+    enum { THROTTLE, LEFT_FLAPERON, RIGHT_FLAPERON };
+
+    motorOutputs[THROTTLE]       =  commands.throttle;
+    motorOutputs[LEFT_FLAPERON]  =  commands.roll + commands.pitch;
+    motorOutputs[RIGHT_FLAPERON] = -commands.roll + commands.pitch;
+
+    return commands.throttle;
+}
+
+float mixAirplane(std::array<float, 5>& motorOutputs, const MotorMixerBase::commands_t& commands)
+{
+    enum { THROTTLE, LEFT_AILERON, RIGHT_AILERON, ELEVATOR, RUDDER };
+
+    motorOutputs[THROTTLE]      =  commands.throttle;
+    motorOutputs[LEFT_AILERON]  =  commands.roll;
+    motorOutputs[RIGHT_AILERON] = -commands.roll;
+    motorOutputs[ELEVATOR]      =  commands.pitch;
+    motorOutputs[RUDDER]        =  commands.yaw;
+
+    return commands.throttle;
+}
+
+float mixTricopter(std::array<float, 4>& motorOutputs, const MotorMixerBase::commands_t& commands, float motorOutputMin)
+{
+    float undershoot = 0.0F;
+    float overshoot = 0.0F;
+    return mixTricopter(motorOutputs, commands, motorOutputMin, undershoot, overshoot);
+}
+
+float mixTricopter(std::array<float, 4>& motorOutputs, const MotorMixerBase::commands_t& commands, float motorOutputMin, float& undershoot, float& overshoot)
+{
+    (void)motorOutputMin;
+    (void)undershoot;
+    (void)overshoot;
+
+    enum { FL = 0, FR = 1, REAR = 2, S0 = 3};
+
+    const float throttle = commands.throttle;
+
+    motorOutputs[FL]   = throttle + commands.roll - 0.666667F*commands.pitch;
+    motorOutputs[FR]   = throttle - commands.roll - 0.666667F*commands.pitch;
+    motorOutputs[REAR] = throttle                 + 1.333333F*commands.pitch;
+
+    motorOutputs[S0] = commands.yaw;
+
+    return throttle;
+}
+
 /*!
 Calculate the "mix" for the QuadX motor configuration.
 Motor rotation is "propellers out".
@@ -19,8 +69,6 @@ float mixQuadX(std::array<float, 4>& motorOutputs, const MotorMixerBase::command
 
 float mixQuadX(std::array<float, 4>& motorOutputs, const MotorMixerBase::commands_t& commands, float motorOutputMin, float& undershoot, float& overshoot) // NOLINT(readability-function-cognitive-complexity)
 {
-    (void)motorOutputMin;
-
     enum { MOTOR_COUNT = 4 };
 
     // calculate the motor outputs without yaw applied
