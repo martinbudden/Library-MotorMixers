@@ -26,6 +26,20 @@ float mixAirplane(std::array<float, 5>& motorOutputs, const MotorMixerBase::comm
     return commands.throttle;
 }
 
+float mixBicopter(std::array<float, 4>& motorOutputs, const MotorMixerBase::commands_t& commands, float motorOutputMin)
+{
+    (void)motorOutputMin;
+    enum { MOTOR_LEFT, MOTOR_RIGHT, SERVO_LEFT, SERVO_RIGHT };
+
+    const float throttle = commands.throttle;
+    motorOutputs[MOTOR_LEFT]   =  throttle + commands.roll;
+    motorOutputs[MOTOR_RIGHT]  =  throttle - commands.roll;
+    motorOutputs[SERVO_LEFT]   =  commands.pitch - commands.yaw;
+    motorOutputs[SERVO_RIGHT]  =  commands.pitch + commands.yaw;
+
+    return throttle;
+}
+
 float mixTricopter(std::array<float, 4>& motorOutputs, const MotorMixerBase::commands_t& commands, float motorOutputMin)
 {
     float undershoot = 0.0F;
