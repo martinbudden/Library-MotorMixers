@@ -84,14 +84,14 @@ float mixQuadX(std::array<float, 4>& motorOutputs, const MotorMixerBase::command
 float mixQuadX(std::array<float, 4>& motorOutputs, const MotorMixerBase::commands_t& commands, float motorOutputMin, float& undershoot, float& overshoot) // NOLINT(readability-function-cognitive-complexity)
 {
     enum { MOTOR_COUNT = 4 };
-    enum { BR = 0, FR = 1, BL = 2, FL = 3 };
+    enum { BACK_RIGHT = 0, FRONT_RIGHT = 1, BACK_LEFT = 2, FRONT_LEFT = 3 };
 
     // calculate the motor outputs without yaw applied
     float throttle = commands.throttle;
-    motorOutputs[BR] = throttle - commands.roll + commands.pitch;// + commands.yaw; // back right
-    motorOutputs[FR] = throttle - commands.roll - commands.pitch;// - commands.yaw; // front right
-    motorOutputs[BL] = throttle + commands.roll + commands.pitch;// - commands.yaw; // back left
-    motorOutputs[FL] = throttle + commands.roll - commands.pitch;// + commands.yaw; // front left
+    motorOutputs[BACK_RIGHT]  = throttle - commands.roll + commands.pitch;// + commands.yaw;
+    motorOutputs[FRONT_RIGHT] = throttle - commands.roll - commands.pitch;// - commands.yaw;
+    motorOutputs[BACK_LEFT]   = throttle + commands.roll + commands.pitch;// - commands.yaw;
+    motorOutputs[FRONT_LEFT]  = throttle + commands.roll - commands.pitch;// + commands.yaw;
 
     // deal with yaw undershoot and overshoot
     // High values of yaw can cause motor outputs to go outside range [motorOutputMin, motorOutputMax]
@@ -149,10 +149,10 @@ float mixQuadX(std::array<float, 4>& motorOutputs, const MotorMixerBase::command
         }
     }
 
-    motorOutputs[BR] += commandYaw;
-    motorOutputs[FR] -= commandYaw;
-    motorOutputs[BL] -= commandYaw;
-    motorOutputs[FL] += commandYaw;
+    motorOutputs[BACK_RIGHT]  += commandYaw;
+    motorOutputs[FRONT_RIGHT] -= commandYaw;
+    motorOutputs[BACK_LEFT]   -= commandYaw;
+    motorOutputs[FRONT_LEFT]  += commandYaw;
 
     float maxOutput = motorOutputs[0];
     float output = motorOutputs[1];
