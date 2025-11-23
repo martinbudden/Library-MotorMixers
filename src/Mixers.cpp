@@ -84,13 +84,14 @@ float mixQuadX(std::array<float, 4>& motorOutputs, const MotorMixerBase::command
 float mixQuadX(std::array<float, 4>& motorOutputs, const MotorMixerBase::commands_t& commands, float motorOutputMin, float& undershoot, float& overshoot) // NOLINT(readability-function-cognitive-complexity)
 {
     enum { MOTOR_COUNT = 4 };
+    enum { BR = 0, FR = 1, BL = 2, FL = 3 };
 
     // calculate the motor outputs without yaw applied
     float throttle = commands.throttle;
-    motorOutputs[0] = throttle - commands.roll + commands.pitch;// + commands.yaw; // back right
-    motorOutputs[1] = throttle - commands.roll - commands.pitch;// - commands.yaw; // front right
-    motorOutputs[2] = throttle + commands.roll + commands.pitch;// - commands.yaw; // back left
-    motorOutputs[3] = throttle + commands.roll - commands.pitch;// + commands.yaw; // front left
+    motorOutputs[BR] = throttle - commands.roll + commands.pitch;// + commands.yaw; // back right
+    motorOutputs[FR] = throttle - commands.roll - commands.pitch;// - commands.yaw; // front right
+    motorOutputs[BL] = throttle + commands.roll + commands.pitch;// - commands.yaw; // back left
+    motorOutputs[FL] = throttle + commands.roll - commands.pitch;// + commands.yaw; // front left
 
     // deal with yaw undershoot and overshoot
     // High values of yaw can cause motor outputs to go outside range [motorOutputMin, motorOutputMax]
@@ -148,10 +149,10 @@ float mixQuadX(std::array<float, 4>& motorOutputs, const MotorMixerBase::command
         }
     }
 
-    motorOutputs[0] += commandYaw;
-    motorOutputs[1] -= commandYaw;
-    motorOutputs[2] -= commandYaw;
-    motorOutputs[3] += commandYaw;
+    motorOutputs[BR] += commandYaw;
+    motorOutputs[FR] -= commandYaw;
+    motorOutputs[BL] -= commandYaw;
+    motorOutputs[FL] += commandYaw;
 
     float maxOutput = motorOutputs[0];
     float output = motorOutputs[1];

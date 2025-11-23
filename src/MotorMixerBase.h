@@ -51,8 +51,16 @@ public:
     virtual void outputToMotors(commands_t& commands, float deltaT, uint32_t tickCount) { (void)commands; (void)deltaT; (void)tickCount; }
     virtual float getMotorOutput(size_t motorIndex) const { (void)motorIndex; return 0.0F; }
 
+    virtual void resetEncoderToZero(size_t motorIndex) { (void)motorIndex; }
+    virtual void readEncoder(size_t motorIndex) { (void)motorIndex; }
+    virtual int32_t getEncoder(size_t motorIndex) const { (void)motorIndex; return 0; }
+    virtual uint32_t getStepsPerRevolution(size_t motorIndex) const { (void)motorIndex; return 0; }
+
     virtual int32_t getMotorRPM(size_t motorIndex) const { (void)motorIndex; return 0; }
     virtual float getMotorFrequencyHz(size_t motorIndex) const { (void)motorIndex; return 0; }
+    //bool canAccuratelyEstimateSpeed(size_t motorIndex) const;
+    //float getSpeed(size_t motorIndex) const;
+
     virtual void rpmFilterSetFrequencyHzIterationStep() {};
     virtual RPM_Filters* getRPM_Filters() { return nullptr; }
     virtual const RPM_Filters* getRPM_Filters() const { return nullptr; }

@@ -79,17 +79,17 @@ void MotorMixerQuadX_DShotBitbang::outputToMotors(commands_t& commands, float de
         const float throttleIncrease = (_dynamicIdleController.getMinimumAllowedMotorHz() == 0.0F) ? 0.0F : _dynamicIdleController.calculateSpeedIncrease(calculateSlowestMotorHz(), deltaT);
         commands.throttle += throttleIncrease;
         // set the throttle to value returned by the mixer
-        commands.throttle = mixQuadX(_motorOutputs, commands, _motorOutputMin);
+        commands.throttle = mixQuadX(_outputs, commands, _motorOutputMin);
     } else {
-        _motorOutputs = { 0.0F, 0.0F, 0.0F, 0.0F };
+        _outputs = { 0.0F, 0.0F, 0.0F, 0.0F };
     }
 
     // convert motor output to DShot range [47, 2047]
     _escDShot.outputToMotors(
-        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_motorOutputs[M0], _motorOutputMin, 1.0F)) + 47),
-        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_motorOutputs[M1], _motorOutputMin, 1.0F)) + 47),
-        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_motorOutputs[M2], _motorOutputMin, 1.0F)) + 47),
-        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_motorOutputs[M3], _motorOutputMin, 1.0F)) + 47)
+        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M0], _motorOutputMin, 1.0F)) + 47),
+        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M1], _motorOutputMin, 1.0F)) + 47),
+        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M2], _motorOutputMin, 1.0F)) + 47),
+        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M3], _motorOutputMin, 1.0F)) + 47)
     );
 
     // read the motor RPMs

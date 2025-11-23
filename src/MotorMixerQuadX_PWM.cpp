@@ -181,13 +181,13 @@ void MotorMixerQuadX_PWM::outputToMotors(commands_t& commands, float deltaT, uin
 
     if (motorsIsOn()) {
         // set the throttle to value returned by the mixer
-        commands.throttle = mixQuadX(_motorOutputs, commands, _motorOutputMin);
+        commands.throttle = mixQuadX(_outputs, commands, _motorOutputMin);
     } else {
-        _motorOutputs = { 0.0F, 0.0F, 0.0F, 0.0F };
+        _outputs = { 0.0F, 0.0F, 0.0F, 0.0F };
     }
 
-    writeMotor(M0, _motorOutputs[M0]);
-    writeMotor(M1, _motorOutputs[M1]);
-    writeMotor(M2, _motorOutputs[M2]);
-    writeMotor(M3, _motorOutputs[M3]);
+    writeMotor(M0, _outputs[M0]);
+    writeMotor(M1, _outputs[M1]);
+    writeMotor(M2, _outputs[M2]);
+    writeMotor(M3, _outputs[M3]);
 }
