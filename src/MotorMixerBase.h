@@ -11,6 +11,7 @@ class DynamicIdleController;
 class MotorMixerBase {
 public:
     enum type_e { BICOPTER, TRICOPTER, QUAD_X, HEX_X, OCTO_X, FLYING_WING_SINGLE_PROPELLER, AIRPLANE_SINGLE_PROPELLER };
+    static constexpr float RPMtoDPS { 360.0F / 60.0F };
     struct commands_t {
         float throttle;
         float roll;
@@ -51,16 +52,17 @@ public:
     virtual void outputToMotors(commands_t& commands, float deltaT, uint32_t tickCount) { (void)commands; (void)deltaT; (void)tickCount; }
     virtual float getMotorOutput(size_t motorIndex) const { (void)motorIndex; return 0.0F; }
 
+    virtual bool canReportPosition(size_t motorIndex) const { (void)motorIndex; return false; }
     virtual void resetEncoderToZero(size_t motorIndex) { (void)motorIndex; }
     virtual void readEncoder(size_t motorIndex) { (void)motorIndex; }
     virtual int32_t getEncoder(size_t motorIndex) const { (void)motorIndex; return 0; }
     virtual uint32_t getStepsPerRevolution(size_t motorIndex) const { (void)motorIndex; return 0; }
 
+    virtual bool canReportSpeed(size_t motorIndex) const { (void)motorIndex; return false; }
     virtual int32_t getMotorRPM(size_t motorIndex) const { (void)motorIndex; return 0; }
+    float getMotorSpeedDPS(size_t motorIndex) const { return static_cast<float>(getMotorRPM(motorIndex)) * RPMtoDPS; }
     virtual float getMotorFrequencyHz(size_t motorIndex) const { (void)motorIndex; return 0; }
-    //bool canAccuratelyEstimateSpeed(size_t motorIndex) const;
-    //float getSpeed(size_t motorIndex) const;
-
+    
     virtual void rpmFilterSetFrequencyHzIterationStep() {};
     virtual RPM_Filters* getRPM_Filters() { return nullptr; }
     virtual const RPM_Filters* getRPM_Filters() const { return nullptr; }
