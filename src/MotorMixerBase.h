@@ -53,8 +53,8 @@ public:
     virtual float getMotorOutput(size_t motorIndex) const { (void)motorIndex; return 0.0F; }
 
     virtual bool canReportPosition(size_t motorIndex) const { (void)motorIndex; return false; }
-    virtual void resetEncoderToZero(size_t motorIndex) { (void)motorIndex; }
     virtual void readEncoder(size_t motorIndex) { (void)motorIndex; }
+    virtual void resetAllEncoders() {}
     virtual int32_t getEncoder(size_t motorIndex) const { (void)motorIndex; return 0; }
     virtual uint32_t getStepsPerRevolution(size_t motorIndex) const { (void)motorIndex; return 0; }
 
