@@ -16,7 +16,7 @@ public:
         QUAD_P, QUAD_X,
         BICOPTER,
         GIMBAL,
-        Y6, HEX,
+        Y6, HEX_P,
         FLYING_WING_SINGLE_PROPELLER,
         Y4, HEX_X,
         OCTO_X, OCTO_FLAT_P, OCTO_FLAT_X,
