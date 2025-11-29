@@ -10,7 +10,18 @@ class DynamicIdleController;
 
 class MotorMixerBase {
 public:
-    enum type_e { BICOPTER, TRICOPTER, QUAD_X, HEX_X, OCTO_X, FLYING_WING_SINGLE_PROPELLER, AIRPLANE_SINGLE_PROPELLER };
+    // ordering compatible with Betaflight mixerMode_e enums.
+    enum type_e {
+        TRICOPTER = 1,
+        QUAD_P, QUAD_X,
+        BICOPTER,
+        GIMBAL,
+        Y6, HEX,
+        FLYING_WING_SINGLE_PROPELLER,
+        Y4, HEX_X,
+        OCTO_X, OCTO_FLAT_P, OCTO_FLAT_X,
+        AIRPLANE_SINGLE_PROPELLER,
+    };
     static constexpr float RPMtoDPS { 360.0F / 60.0F };
     struct commands_t {
         float throttle;
@@ -36,6 +47,7 @@ public:
     MotorMixerBase(type_e type, size_t motorCount, size_t servoCount, Debug& debug) :
         _type(type), _motorCount(motorCount), _servoCount(servoCount), _debug(debug) {}
 
+    inline type_e getType() const { return _type; }
     inline size_t getMotorCount() const { return _motorCount; }
     inline size_t getServoCount() const { return _servoCount; }
     inline bool motorsIsOn() const { return _motorsIsOn; }
