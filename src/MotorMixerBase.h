@@ -32,7 +32,7 @@ public:
         CUSTOM = 23,
         CUSTOM_AIRPLANE = 24,
         CUSTOM_TRI = 25,
-        QUADX_1234 = 26,
+        QUAD_X_1234 = 26,
         OCTO_XP = 27
     };
     enum protocol_family_e {
@@ -51,7 +51,7 @@ public:
         MOTOR_PROTOCOL_DSHOT600,
         MOTOR_PROTOCOL_PROSHOT1000,
         MOTOR_PROTOCOL_DISABLED,
-        MOTOR_PROTOCOL_MAX
+        MOTOR_PROTOCOL_COUNT
     };
     static constexpr float RPMtoDPS { 360.0F / 60.0F };
     struct commands_t {
@@ -66,8 +66,9 @@ public:
         uint8_t timer;
         uint8_t channel;
     };
-    struct config_t {
+    struct mixer_config_t {
         uint8_t type;
+        uint8_t yaw_motors_reversed;
     };
     struct motor_device_config_t {
         uint16_t motorPWM_Rate;          // The update rate of motor outputs (50-498Hz)
@@ -98,6 +99,9 @@ public:
     inline void motorsSwitchOn() { _motorsIsOn = true; }
     inline void motorsSwitchOff() { _motorsIsOn = false; }
     inline bool motorsIsDisabled() const { return _motorsIsDisabled; }
+
+    virtual void setMixerConfig(const mixer_config_t& mixerConfig) { _mixerConfig.type = mixerConfig.type; }
+    const mixer_config_t& getMixerConfig() const { return _mixerConfig; }
 
     virtual void setMotorConfig(const motor_config_t& motorConfig) { _motorConfig = motorConfig; }
     const motor_config_t& getMotorConfig() const { return _motorConfig; }
@@ -131,6 +135,10 @@ protected:
     const size_t _servoCount;
     Debug& _debug;
     float _motorOutputMin {0.0F}; //!< minimum motor output, typically set to 5.5% to avoid ESC desynchronization, may be set to zero if using dynamic idle control
+    mixer_config_t _mixerConfig {
+        .type = QUAD_X,
+        .yaw_motors_reversed = true, // only supports "props out", which is "yaw_motors_reversed" in Betaflight
+    };
     motor_config_t _motorConfig {
         .device = {
             .motorPWM_Rate = 480, // 16000 for brushed
