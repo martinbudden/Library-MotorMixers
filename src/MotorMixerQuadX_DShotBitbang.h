@@ -14,7 +14,7 @@ class MotorMixerQuadX_DShotBitbang : public MotorMixerQuadBase {
 public:
     MotorMixerQuadX_DShotBitbang(uint32_t taskIntervalMicroseconds, uint32_t outputToMotorsDenominator, Debug& debug, const stm32_motor_pins_t& pins);
 public:
-    virtual void setMotorConfig(const motorConfig_t& motorConfig) override;
+    virtual void setMotorConfig(const motor_config_t& motorConfig) override;
     virtual void outputToMotors(commands_t& commands, float deltaT, uint32_t tickCount) override;
     virtual void rpmFilterSetFrequencyHzIterationStep() override;
     virtual RPM_Filters* getRPM_Filters() override;

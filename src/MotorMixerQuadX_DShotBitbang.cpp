@@ -45,7 +45,7 @@ float MotorMixerQuadX_DShotBitbang::calculateSlowestMotorHz() const
     return slowestMotorHz;
 }
 
-void MotorMixerQuadX_DShotBitbang::setMotorConfig(const motorConfig_t& motorConfig)
+void MotorMixerQuadX_DShotBitbang::setMotorConfig(const motor_config_t& motorConfig)
 {
     _motorConfig = motorConfig;
     _eRPMtoHz = 2.0F * (100.0F / SECONDS_PER_MINUTE) / static_cast<float>(motorConfig.motorPoleCount);

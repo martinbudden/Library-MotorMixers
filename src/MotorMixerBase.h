@@ -35,6 +35,24 @@ public:
         QUADX_1234 = 26,
         OCTO_XP = 27
     };
+    enum protocol_family_e {
+        PROTOCOL_FAMILY_UNKNOWN = 0,
+        PROTOCOL_FAMILY_PWM,
+        PROTOCOL_FAMILY_DSHOT,
+    };
+    enum motor_protocol_e {
+        MOTOR_PROTOCOL_PWM = 0,
+        MOTOR_PROTOCOL_ONESHOT125,
+        MOTOR_PROTOCOL_ONESHOT42,
+        MOTOR_PROTOCOL_MULTISHOT,
+        MOTOR_PROTOCOL_BRUSHED,
+        MOTOR_PROTOCOL_DSHOT150,
+        MOTOR_PROTOCOL_DSHOT300,
+        MOTOR_PROTOCOL_DSHOT600,
+        MOTOR_PROTOCOL_PROSHOT1000,
+        MOTOR_PROTOCOL_DISABLED,
+        MOTOR_PROTOCOL_MAX
+    };
     static constexpr float RPMtoDPS { 360.0F / 60.0F };
     struct commands_t {
         float throttle;
@@ -51,7 +69,17 @@ public:
     struct config_t {
         uint8_t type;
     };
-    struct motorConfig_t {
+    struct motor_device_config_t {
+        uint16_t motorPWM_Rate;          // The update rate of motor outputs (50-498Hz)
+        uint8_t  motorProtocol;
+        uint8_t  motorInversion;        // Active-High vs Active-Low. Useful for brushed FCs converted for brushless operation
+        uint8_t  useContinuousUpdate;
+        uint8_t  useBurstDshot;
+        uint8_t  useDshotTelemetry;
+        uint8_t  useDshotEDT;
+    };
+    struct motor_config_t {
+        motor_device_config_t device;
         uint16_t motorIdle;     // percentage of the motor range added to the disarmed value to give the idle value
         uint16_t maxthrottle;   // value of throttle at full power, can be set up to 2000
         uint16_t mincommand;    // value for ESCs when they are not armed. For some specific ESCs this value must be lowered to 900
@@ -71,8 +99,8 @@ public:
     inline void motorsSwitchOff() { _motorsIsOn = false; }
     inline bool motorsIsDisabled() const { return _motorsIsDisabled; }
 
-    virtual void setMotorConfig(const motorConfig_t& motorConfig) { _motorConfig = motorConfig; }
-    const motorConfig_t& getMotorConfig() const { return _motorConfig; }
+    virtual void setMotorConfig(const motor_config_t& motorConfig) { _motorConfig = motorConfig; }
+    const motor_config_t& getMotorConfig() const { return _motorConfig; }
 
     inline void setMotorOutputMin(float motorOutputMin) { _motorOutputMin = motorOutputMin; }
     inline float getMotorOutputMin() const { return _motorOutputMin; }
@@ -103,7 +131,22 @@ protected:
     const size_t _servoCount;
     Debug& _debug;
     float _motorOutputMin {0.0F}; //!< minimum motor output, typically set to 5.5% to avoid ESC desynchronization, may be set to zero if using dynamic idle control
-    motorConfig_t _motorConfig { .motorIdle = 550, .maxthrottle = 2000, .mincommand = 1000, .kv = 1960, .motorPoleCount = 14 };
+    motor_config_t _motorConfig {
+        .device = {
+            .motorPWM_Rate = 480, // 16000 for brushed
+            .motorProtocol = MOTOR_PROTOCOL_DSHOT300,
+            .motorInversion = false,
+            .useContinuousUpdate = true,
+            .useBurstDshot = 0,
+            .useDshotTelemetry = 0,
+            .useDshotEDT = 0,
+        },
+        .motorIdle = 550, // 700 for brushed
+        .maxthrottle = 2000, 
+        .mincommand = 1000, 
+        .kv = 1960, 
+        .motorPoleCount = 14
+    };
     bool _motorsIsOn {false};
     bool _motorsIsDisabled {false};
 };
