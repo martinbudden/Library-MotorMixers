@@ -87,6 +87,18 @@ public:
         uint16_t kv;            // Motor constant estimate RPM under no load
         uint8_t motorPoleCount; // Number of motor poles, used to calculate actual RPM from eRPM
     };
+    struct servo_device_config_t {
+        // PWM values, in milliseconds, common range is 1000-2000 (1ms to 2ms)
+        uint16_t servoCenterPulse;  // This is the value for servos when they should be in the middle. e.g. 1500.
+        uint16_t servoPWM_Rate;      // The update rate of servo outputs (50-498Hz)
+    };
+    typedef struct servo_config_t {
+        servo_device_config_t device;
+        uint16_t servo_lowpass_freq;            // lowpass servo filter frequency selection; 1/1000ths of loop freq
+        uint8_t tri_unarmed_servo;              // send tail servo correction pulses even when unarmed
+        uint8_t channelForwardingStartChannel;
+    } servoConfig_t;
+
 public:
     virtual ~MotorMixerBase() = default;
     MotorMixerBase(type_e type, size_t motorCount, size_t servoCount, Debug& debug) :

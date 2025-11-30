@@ -40,26 +40,41 @@ float mixBicopter(std::array<float, 4>& motorOutputs, const MotorMixerBase::comm
     return throttle;
 }
 
-float mixTricopter(std::array<float, 4>& motorOutputs, const MotorMixerBase::commands_t& commands, float motorOutputMin)
+float mixTricopter(std::array<float, 4>& motorOutputs, const MotorMixerBase::commands_t& commands, float maxServoAngleRadians, float motorOutputMin)
 {
     float undershoot = 0.0F;
     float overshoot = 0.0F;
-    return mixTricopter(motorOutputs, commands, motorOutputMin, undershoot, overshoot);
+    return mixTricopter(motorOutputs, commands, maxServoAngleRadians, motorOutputMin, undershoot, overshoot);
 }
 
-float mixTricopter(std::array<float, 4>& motorOutputs, const MotorMixerBase::commands_t& commands, float motorOutputMin, float& undershoot, float& overshoot)
+float mixTricopter(std::array<float, 4>& motorOutputs, const MotorMixerBase::commands_t& commands, float maxServoAngleRadians, float motorOutputMin, float& undershoot, float& overshoot)
 {
-    (void)motorOutputMin;
-    (void)undershoot;
-    (void)overshoot;
-
     enum { FL = 0, FR = 1, REAR = 2, S0 = 3};
+    constexpr float TWO_THIRDS = 2.0F / 3.0F;
+    constexpr float FOUR_THIRDS = 4.0F / 3.0F;
 
     const float throttle = commands.throttle;
+    motorOutputs[FL]   = throttle + commands.roll - TWO_THIRDS*commands.pitch;
+    motorOutputs[FR]   = throttle - commands.roll - TWO_THIRDS*commands.pitch;
+    motorOutputs[REAR] = (throttle + FOUR_THIRDS*commands.pitch)/cosf(commands.yaw*maxServoAngleRadians);
 
-    motorOutputs[FL]   = throttle + commands.roll - 0.666667F*commands.pitch;
-    motorOutputs[FR]   = throttle - commands.roll - 0.666667F*commands.pitch;
-    motorOutputs[REAR] = throttle                 + 1.333333F*commands.pitch;
+    constexpr float motorOutputMax = 1.0F;
+    // check for rear overshoot, front motors unlikely to overshoot since there are two of them and there is no yaw-related attenuation
+    overshoot = motorOutputs[REAR] - motorOutputMax;
+    if (overshoot > 0.0F) {
+        // rear motor is saturated, so reduce its output to motorOutputMax and reduce front motors similarly
+        motorOutputs[REAR] = motorOutputMax;
+        motorOutputs[FL] = std::max(motorOutputMin, motorOutputs[FL] - overshoot);
+        motorOutputs[FR] = std::max(motorOutputMin, motorOutputs[FR] - overshoot);
+    }
+
+    // check for front undershoot
+    undershoot = motorOutputMin - std::min(motorOutputs[FL], motorOutputs[FR]);
+    if (undershoot > 0.0F) {
+        motorOutputs[REAR] = motorOutputMin;
+        motorOutputs[FL] = std::min(motorOutputMax, motorOutputs[FL] + undershoot);
+        motorOutputs[FR] = std::min(motorOutputMax, motorOutputs[FR] + undershoot);
+    }
 
     motorOutputs[S0] = commands.yaw;
 
