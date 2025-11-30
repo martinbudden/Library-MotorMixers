@@ -145,9 +145,9 @@ protected:
             .motorProtocol = MOTOR_PROTOCOL_DSHOT300,
             .motorInversion = false,
             .useContinuousUpdate = true,
-            .useBurstDshot = 0,
-            .useDshotTelemetry = 0,
-            .useDshotEDT = 0,
+            .useBurstDshot = false,
+            .useDshotTelemetry = false,
+            .useDshotEDT = false,
         },
         .motorIdle = 550, // 700 for brushed
         .maxthrottle = 2000, 
