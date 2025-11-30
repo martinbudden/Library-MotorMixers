@@ -13,14 +13,27 @@ public:
     // ordering compatible with Betaflight mixerMode_e enums.
     enum type_e {
         TRICOPTER = 1,
-        QUAD_P, QUAD_X,
-        BICOPTER,
-        GIMBAL,
-        Y6, HEX_P,
-        FLYING_WING_SINGLE_PROPELLER,
-        Y4, HEX_X,
-        OCTO_X, OCTO_FLAT_P, OCTO_FLAT_X,
-        AIRPLANE_SINGLE_PROPELLER,
+        QUAD_P = 2, QUAD_X = 3,
+        BICOPTER = 4,
+        GIMBAL = 5,
+        Y6 = 6, HEX_P = 7,
+        FLYING_WING_SINGLE_PROPELLER = 8,
+        Y4 = 9, HEX_X = 10,
+        OCTO_X = 11, OCTO_FLAT_P = 12, OCTO_FLAT_X = 13,
+        AIRPLANE_SINGLE_PROPELLER = 14,
+        HELI_120_CCPM = 15,
+        HELI_90_DEG = 16,
+        VTAIL4 = 17,
+        HEX_H = 18,
+        PPM_TO_SERVO = 19, // PPM -> servo relay
+        DUALCOPTER = 20,
+        SINGLECOPTER = 21,
+        ATAIL4 = 22,
+        CUSTOM = 23,
+        CUSTOM_AIRPLANE = 24,
+        CUSTOM_TRI = 25,
+        QUADX_1234 = 26,
+        OCTO_XP = 27
     };
     static constexpr float RPMtoDPS { 360.0F / 60.0F };
     struct commands_t {
@@ -34,6 +47,9 @@ public:
         uint8_t pin;
         uint8_t timer;
         uint8_t channel;
+    };
+    struct config_t {
+        uint8_t type;
     };
     struct motorConfig_t {
         uint16_t motorIdle;     // percentage of the motor range added to the disarmed value to give the idle value
