@@ -151,7 +151,9 @@ public:
     virtual int32_t getMotorRPM(size_t motorIndex) const { (void)motorIndex; return 0; }
     virtual float getMotorSpeedDPS(size_t motorIndex) const { return static_cast<float>(getMotorRPM(motorIndex)) * RPMtoDPS; }
     virtual float getMotorFrequencyHz(size_t motorIndex) const { (void)motorIndex; return 0; }
-    
+
+    virtual float getMixerThrottleCommand() const { return 0.0F; } // for blackbox recording
+
     virtual void rpmFilterSetFrequencyHzIterationStep() {};
     virtual RPM_Filters* getRPM_Filters() { return nullptr; }
     virtual const RPM_Filters* getRPM_Filters() const { return nullptr; }
