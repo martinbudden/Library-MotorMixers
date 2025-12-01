@@ -54,6 +54,7 @@ public:
         MOTOR_PROTOCOL_COUNT
     };
     static constexpr float RPMtoDPS { 360.0F / 60.0F };
+    static constexpr float DPStoRPM { 60.0F / 360.0F };
     struct commands_t {
         float throttle;
         float roll;
