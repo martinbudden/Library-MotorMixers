@@ -162,7 +162,7 @@ void MotorMixerWingPWM::outputToMotors(commands_t& commands, float deltaT, uint3
 
     if (motorsIsOn()) {
         // set the throttle to value returned by the mixer
-        commands.throttle = mixWing(_outputs, commands);
+        commands.throttle = mixWing(_outputs, commands, _mixParameters);
     } else {
         _outputs = { 0.0F, 0.0F, 0.0F };
     }

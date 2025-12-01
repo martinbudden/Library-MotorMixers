@@ -81,26 +81,26 @@ void MotorMixerQuadX_DShot::outputToMotors(commands_t& commands, float deltaT, u
         const float throttleIncrease = (_dynamicIdleController.getMinimumAllowedMotorHz() == 0.0F) ? 0.0F : _dynamicIdleController.calculateSpeedIncrease(calculateSlowestMotorHz(), deltaT);
         commands.throttle += throttleIncrease;
         // set the throttle to value returned by the mixer
-        commands.throttle = mixQuadX(_outputs, commands, _motorOutputMin);
+        commands.throttle = mixQuadX(_outputs, commands, _mixParameters);
     } else {
         _outputs = { 0.0F, 0.0F, 0.0F, 0.0F };
     }
 
     // Output to the motors, reading the motor RPM
     // Motor outputs are converted to DShot range [47,2047]
-    _motors[M0].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M0], _motorOutputMin, 1.0F)) + 47)),
+    _motors[M0].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M0], _mixParameters.motorOutputMin, 1.0F)) + 47)),
     _motors[M0].read();
     _rpmFilters.setFrequencyHzIterationStart(M0, _motors[M0].getMotorHz());
 
-    _motors[M1].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M1], _motorOutputMin, 1.0F)) + 47)),
+    _motors[M1].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M1], _mixParameters.motorOutputMin, 1.0F)) + 47)),
     _motors[M1].read();
     _rpmFilters.setFrequencyHzIterationStart(M1, _motors[M1].getMotorHz());
 
-    _motors[M2].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M2], _motorOutputMin, 1.0F)) + 47)),
+    _motors[M2].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M2], _mixParameters.motorOutputMin, 1.0F)) + 47)),
     _motors[M2].read();
     _rpmFilters.setFrequencyHzIterationStart(M2, _motors[M2].getMotorHz());
 
-    _motors[M3].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M3], _motorOutputMin, 1.0F)) + 47)),
+    _motors[M3].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M3], _mixParameters.motorOutputMin, 1.0F)) + 47)),
     _motors[M3].read();
     _rpmFilters.setFrequencyHzIterationStart(M3, _motors[M3].getMotorHz());
 }

@@ -181,7 +181,7 @@ void MotorMixerQuadX_PWM::outputToMotors(commands_t& commands, float deltaT, uin
 
     if (motorsIsOn()) {
         // set the throttle to value returned by the mixer
-        commands.throttle = mixQuadX(_outputs, commands, _motorOutputMin);
+        commands.throttle = mixQuadX(_outputs, commands, _mixParameters);
     } else {
         _outputs = { 0.0F, 0.0F, 0.0F, 0.0F };
     }

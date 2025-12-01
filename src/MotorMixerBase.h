@@ -19,7 +19,7 @@ public:
         Y6 = 6, HEX_P = 7,
         FLYING_WING_SINGLE_PROPELLER = 8,
         Y4 = 9, HEX_X = 10,
-        OCTO_X = 11, OCTO_FLAT_P = 12, OCTO_FLAT_X = 13,
+        OCTO_QUAD_X = 11, OCTO_FLAT_P = 12, OCTO_FLAT_X = 13,
         AIRPLANE_SINGLE_PROPELLER = 14,
         HELI_120_CCPM = 15,
         HELI_90_DEG = 16,
@@ -59,6 +59,16 @@ public:
         float roll;
         float pitch;
         float yaw;
+    };
+    //! parameters to mix function
+    struct parameters_t {
+        //! minimum motor output, typically set to 5.5% to avoid ESC desynchronization, 
+        //! may be set to zero if using dynamic idle control or brushed motors
+        float motorOutputMin;
+        float motorOutputMax;
+        float maxServoAngleRadians; //! used by tricopter
+        float undershoot; //! used by test code
+        float overshoot; //! used by test code
     };
     struct stm32_motor_pin_t {
         uint8_t port;
@@ -118,8 +128,8 @@ public:
     virtual void setMotorConfig(const motor_config_t& motorConfig) { _motorConfig = motorConfig; }
     const motor_config_t& getMotorConfig() const { return _motorConfig; }
 
-    inline void setMotorOutputMin(float motorOutputMin) { _motorOutputMin = motorOutputMin; }
-    inline float getMotorOutputMin() const { return _motorOutputMin; }
+    inline void setMotorOutputMin(float motorOutputMin) { _mixParameters.motorOutputMin = motorOutputMin; }
+    inline float getMotorOutputMin() const { return _mixParameters.motorOutputMin; }
 
     virtual void outputToMotors(commands_t& commands, float deltaT, uint32_t tickCount) { (void)commands; (void)deltaT; (void)tickCount; }
     virtual float getMotorOutput(size_t motorIndex) const { (void)motorIndex; return 0.0F; }
@@ -146,7 +156,13 @@ protected:
     const size_t _motorCount;
     const size_t _servoCount;
     Debug& _debug;
-    float _motorOutputMin {0.0F}; //!< minimum motor output, typically set to 5.5% to avoid ESC desynchronization, may be set to zero if using dynamic idle control
+    parameters_t _mixParameters {
+        .motorOutputMin = 0.0F,
+        .motorOutputMax = 1.0F,
+        .maxServoAngleRadians = 0.0F,
+        .undershoot = 0.0F,
+        .overshoot = 0.0F,
+    };
     mixer_config_t _mixerConfig {
         .type = QUAD_X,
         .yaw_motors_reversed = true, // only supports "props out", which is "yaw_motors_reversed" in Betaflight
