@@ -111,8 +111,14 @@ public:
 
 public:
     virtual ~MotorMixerBase() = default;
-    MotorMixerBase(type_e type, size_t motorCount, size_t servoCount, Debug& debug) :
-        _type(type), _motorCount(motorCount), _servoCount(servoCount), _debug(debug) {}
+    MotorMixerBase(type_e type, size_t motorCount, size_t servoCount, Debug* debug) :
+        _type(type),
+        _motorCount(motorCount),
+        _servoCount(servoCount), 
+        _debug(debug),
+        _mixerConfig { .type = type, .yaw_motors_reversed = true }
+    {}
+    MotorMixerBase(type_e type, size_t motorCount, size_t servoCount) : MotorMixerBase(type, motorCount, servoCount, nullptr) {}
 
     inline type_e getType() const { return _type; }
     inline size_t getMotorCount() const { return _motorCount; }
@@ -135,14 +141,14 @@ public:
     virtual float getMotorOutput(size_t motorIndex) const { (void)motorIndex; return 0.0F; }
 
     virtual bool canReportPosition(size_t motorIndex) const { (void)motorIndex; return false; }
-    virtual void readEncoder(size_t motorIndex) { (void)motorIndex; }
     virtual void resetAllEncoders() {}
+    virtual void readEncoder(size_t motorIndex) { (void)motorIndex; }
     virtual int32_t getEncoder(size_t motorIndex) const { (void)motorIndex; return 0; }
     virtual uint32_t getStepsPerRevolution(size_t motorIndex) const { (void)motorIndex; return 0; }
 
     virtual bool canReportSpeed(size_t motorIndex) const { (void)motorIndex; return false; }
     virtual int32_t getMotorRPM(size_t motorIndex) const { (void)motorIndex; return 0; }
-    float getMotorSpeedDPS(size_t motorIndex) const { return static_cast<float>(getMotorRPM(motorIndex)) * RPMtoDPS; }
+    virtual float getMotorSpeedDPS(size_t motorIndex) const { return static_cast<float>(getMotorRPM(motorIndex)) * RPMtoDPS; }
     virtual float getMotorFrequencyHz(size_t motorIndex) const { (void)motorIndex; return 0; }
     
     virtual void rpmFilterSetFrequencyHzIterationStep() {};
@@ -155,18 +161,8 @@ protected:
     const type_e _type;
     const size_t _motorCount;
     const size_t _servoCount;
-    Debug& _debug;
-    parameters_t _mixParameters {
-        .motorOutputMin = 0.0F,
-        .motorOutputMax = 1.0F,
-        .maxServoAngleRadians = 0.0F,
-        .undershoot = 0.0F,
-        .overshoot = 0.0F,
-    };
-    mixer_config_t _mixerConfig {
-        .type = QUAD_X,
-        .yaw_motors_reversed = true, // only supports "props out", which is "yaw_motors_reversed" in Betaflight
-    };
+    Debug* _debug;
+    mixer_config_t _mixerConfig;
     motor_config_t _motorConfig {
         .device = {
             .motorPWM_Rate = 480, // 16000 for brushed
@@ -182,6 +178,13 @@ protected:
         .mincommand = 1000, 
         .kv = 1960, 
         .motorPoleCount = 14
+    };
+    parameters_t _mixParameters {
+        .motorOutputMin = 0.0F,
+        .motorOutputMax = 1.0F,
+        .maxServoAngleRadians = 0.0F,
+        .undershoot = 0.0F,
+        .overshoot = 0.0F,
     };
     bool _motorsIsOn {false};
     bool _motorsIsDisabled {false};
