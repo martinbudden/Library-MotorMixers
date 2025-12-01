@@ -74,9 +74,9 @@ float mixTricopter(std::array<float, 4>& motorOutputs, const MotorMixerBase::com
     constexpr float TWO_THIRDS = 2.0F / 3.0F;
     constexpr float FOUR_THIRDS = 4.0F / 3.0F;
 
-    // NOTE: we could increase the yaw authority when rolling by using the yaw value to bias the commands.roll value,
     const float throttle = commands.throttle;
-    motorOutputs[REAR] = (throttle                 - FOUR_THIRDS * commands.pitch) / cosf(commands.yaw*params.maxServoAngleRadians);
+    const float pivotAngleRadians = commands.yaw*params.maxServoAngleRadians;
+    motorOutputs[REAR] = (throttle                 - FOUR_THIRDS * commands.pitch) / cosf(pivotAngleRadians);
     motorOutputs[FR]   =  throttle - commands.roll + TWO_THIRDS  * commands.pitch;
     motorOutputs[FL]   =  throttle + commands.roll + TWO_THIRDS  * commands.pitch;
 
