@@ -166,6 +166,7 @@ void MotorMixerWingPWM::outputToMotors(commands_t& commands, float deltaT, uint3
     } else {
         _outputs = { 0.0F, 0.0F, 0.0F };
     }
+    _throttleCommand = commands.throttle;
 
     writeMotor(M0, _outputs[M0]);
     writeMotor(S0, _outputs[S0]);

@@ -85,6 +85,7 @@ void MotorMixerQuadX_DShot::outputToMotors(commands_t& commands, float deltaT, u
     } else {
         _outputs = { 0.0F, 0.0F, 0.0F, 0.0F };
     }
+    _throttleCommand = commands.throttle;
 
     // Output to the motors, reading the motor RPM
     // Motor outputs are converted to DShot range [47,2047]

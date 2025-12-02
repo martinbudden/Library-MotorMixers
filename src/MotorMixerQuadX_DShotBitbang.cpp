@@ -83,6 +83,7 @@ void MotorMixerQuadX_DShotBitbang::outputToMotors(commands_t& commands, float de
     } else {
         _outputs = { 0.0F, 0.0F, 0.0F, 0.0F };
     }
+    _throttleCommand = commands.throttle;
 
     // convert motor output to DShot range [47, 2047]
     _escDShot.outputToMotors(
