@@ -17,7 +17,7 @@
 #endif // FRAMEWORK
 
 
-MotorMixerWingPWM::MotorMixerWingPWM(Debug* debug, const stm32_motor_pins_t& pins) :
+MotorMixerWingPWM::MotorMixerWingPWM(const stm32_motor_pins_t& pins, Debug* debug) :
     MotorMixerWingBase(debug)
 {
 #if defined(FRAMEWORK_STM32_CUBE) && !defined(FRAMEWORK_ARDUINO_STM32)
@@ -44,7 +44,7 @@ MotorMixerWingPWM::MotorMixerWingPWM(Debug* debug, const stm32_motor_pins_t& pin
 #endif
 }
 
-MotorMixerWingPWM::MotorMixerWingPWM(Debug* debug, const motor_pins_t& pins) :
+MotorMixerWingPWM::MotorMixerWingPWM(const motor_pins_t& pins, Debug* debug) :
     MotorMixerWingBase(debug)
 #if !defined(FRAMEWORK_STM32_CUBE)
     ,_pins({pins.m0,pins.s0,pins.s1})

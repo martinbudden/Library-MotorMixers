@@ -7,7 +7,7 @@
 #include <cmath>
 
 
-MotorMixerQuadX_DShotBitbang::MotorMixerQuadX_DShotBitbang(uint32_t taskIntervalMicroseconds, uint32_t outputToMotorsDenominator, Debug& debug, const stm32_motor_pins_t& pins) :
+MotorMixerQuadX_DShotBitbang::MotorMixerQuadX_DShotBitbang(uint32_t taskIntervalMicroseconds, uint32_t outputToMotorsDenominator, const stm32_motor_pins_t& pins, Debug& debug) :
     MotorMixerQuadBase(QUAD_X, &debug),
     _dynamicIdleController(taskIntervalMicroseconds/outputToMotorsDenominator, debug),
     _rpmFilters(_motorCount, static_cast<float>(taskIntervalMicroseconds) * 0.000001F)

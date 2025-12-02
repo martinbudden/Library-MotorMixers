@@ -7,6 +7,7 @@
 class MotorMixerHexBase : public MotorMixerBase {
 public:
     enum { M0=0, M1=1, M2=2, M3=3, M4=4, M5=5, MOTOR_COUNT=6, SERVO_COUNT=0 };
+
     explicit MotorMixerHexBase(Debug* debug) : MotorMixerBase(HEX_X, MOTOR_COUNT, SERVO_COUNT, debug) {}
     virtual float getMotorOutput(size_t motorIndex) const override { return _outputs[motorIndex]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 public:

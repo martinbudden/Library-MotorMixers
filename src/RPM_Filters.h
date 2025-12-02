@@ -43,6 +43,8 @@ for 3-bladed propellors.
 */
 class RPM_Filters {
 public:
+    RPM_Filters(size_t motorCount, float looptimeSeconds) : _motorCount(motorCount), _looptimeSeconds(looptimeSeconds) {}
+public:
     enum { RPM_FILTER_HARMONICS_COUNT = 3 };
     struct config_t {
         uint16_t rpm_filter_fade_range_hz;  // range in which notch filters fade down to minHz
@@ -60,7 +62,6 @@ public:
     enum { MAX_MOTOR_COUNT = 4 };
 #endif
 public:
-    RPM_Filters(size_t motorCount, float looptimeSeconds) : _motorCount(motorCount), _looptimeSeconds(looptimeSeconds) {}
     void setConfig(const config_t& config);
     const config_t& getConfig() const { return _config; }
     void setFrequencyHzIterationStart(size_t motorIndex, float frequencyHz); // called from the motor mixer

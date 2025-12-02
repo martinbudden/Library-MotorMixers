@@ -35,6 +35,17 @@ public:
         QUAD_X_1234 = 26,
         OCTO_XP = 27
     };
+public:
+    virtual ~MotorMixerBase() = default;
+    MotorMixerBase(type_e type, size_t motorCount, size_t servoCount, Debug* debug) :
+        _type(type),
+        _motorCount(motorCount),
+        _servoCount(servoCount), 
+        _debug(debug),
+        _mixerConfig { .type = type, .yaw_motors_reversed = true }
+    {}
+    MotorMixerBase(type_e type, size_t motorCount, size_t servoCount) : MotorMixerBase(type, motorCount, servoCount, nullptr) {}
+public:
     enum protocol_family_e {
         PROTOCOL_FAMILY_UNKNOWN = 0,
         PROTOCOL_FAMILY_PWM,
@@ -109,18 +120,7 @@ public:
         uint8_t tri_unarmed_servo;              // send tail servo correction pulses even when unarmed
         uint8_t channelForwardingStartChannel;
     } servoConfig_t;
-
 public:
-    virtual ~MotorMixerBase() = default;
-    MotorMixerBase(type_e type, size_t motorCount, size_t servoCount, Debug* debug) :
-        _type(type),
-        _motorCount(motorCount),
-        _servoCount(servoCount), 
-        _debug(debug),
-        _mixerConfig { .type = type, .yaw_motors_reversed = true }
-    {}
-    MotorMixerBase(type_e type, size_t motorCount, size_t servoCount) : MotorMixerBase(type, motorCount, servoCount, nullptr) {}
-
     inline type_e getType() const { return _type; }
     inline size_t getMotorCount() const { return _motorCount; }
     inline size_t getServoCount() const { return _servoCount; }

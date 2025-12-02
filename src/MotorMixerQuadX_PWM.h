@@ -23,6 +23,9 @@
 
 class MotorMixerQuadX_PWM : public MotorMixerQuadBase {
 public:
+    MotorMixerQuadX_PWM(const motor_pins_t& pins, Debug* debug);
+    MotorMixerQuadX_PWM(const stm32_motor_pins_t& pins, Debug* debug);
+public:
 #if defined(FRAMEWORK_STM32_CUBE)
     struct pwm_pin_t {
         TIM_HandleTypeDef* htim;
@@ -34,9 +37,6 @@ public:
         uint8_t pin;
     };
 #endif
-public:
-    MotorMixerQuadX_PWM(Debug* debug, const motor_pins_t& pins);
-    MotorMixerQuadX_PWM(Debug* debug, const stm32_motor_pins_t& pins);
 public:
     virtual void outputToMotors(commands_t& commands, float deltaT, uint32_t tickCount) override;
     void writeMotor(uint8_t motorIndex, float motorOutput);

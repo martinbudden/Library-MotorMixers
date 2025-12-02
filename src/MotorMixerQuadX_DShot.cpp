@@ -5,7 +5,7 @@
 #include <RPM_Filters.h>
 
 
-MotorMixerQuadX_DShot::MotorMixerQuadX_DShot(uint32_t taskIntervalMicroseconds, uint32_t outputToMotorsDenominator, Debug& debug, const motor_pins_t& pins) :
+MotorMixerQuadX_DShot::MotorMixerQuadX_DShot(uint32_t taskIntervalMicroseconds, uint32_t outputToMotorsDenominator, const motor_pins_t& pins, Debug& debug) :
     MotorMixerQuadBase(QUAD_X, &debug),
     _dynamicIdleController(taskIntervalMicroseconds/outputToMotorsDenominator, debug),
     _rpmFilters(_motorCount, static_cast<float>(taskIntervalMicroseconds) * 0.000001F)
