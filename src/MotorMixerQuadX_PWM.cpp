@@ -86,7 +86,33 @@ MotorMixerQuadX_PWM::MotorMixerQuadX_PWM(const motor_pins_t& pins, Debug* debug)
     static constexpr int frequency = 150000;
     // PWM Resolution
     static constexpr int resolution = 8;
-#if defined(ESPRESSIF32_6_11_0)
+
+/*
+https://docs.espressif.com/projects/arduino-esp32/en/latest/migration_guides/2.x_to_3.0.html
+
+Removed:
+
+ledcSetup
+ledcAttachPin
+
+Added:
+ledcAttach used to set up the LEDC pin (merged ledcSetup and ledcAttachPin functions).
+
+*/
+#if defined(LIBRARY_MOTOR_MIXERS_USE_LEDC_ATTACH)
+    if (pins.m0 != 0xFF) {
+        ledcAttach(pins.m0, frequency, resolution);
+    }
+    if (pins.m1 != 0xFF) {
+        ledcAttach(pins.m1, frequency, resolution);
+    }
+    if (pins.m2 != 0xFF) {
+        ledcAttach(pins.m2, frequency, resolution);
+    }
+    if (pins.m3 != 0xFF) {
+        ledcAttach(pins.m3, frequency, resolution);
+    }
+#else
     if (pins.m0 != 0xFF) {
         ledcSetup(M0, frequency, resolution);
         ledcAttachPin(pins.m0, M0);
@@ -102,19 +128,6 @@ MotorMixerQuadX_PWM::MotorMixerQuadX_PWM(const motor_pins_t& pins, Debug* debug)
     if (pins.m3 != 0xFF) {
         ledcSetup(M3, frequency, resolution);
         ledcAttachPin(pins.m3, M3);
-    }
-#else
-    if (pins.m0 != 0xFF) {
-        ledcAttach(pins.m0, frequency, resolution);
-    }
-    if (pins.m1 != 0xFF) {
-        ledcAttach(pins.m1, frequency, resolution);
-    }
-    if (pins.m2 != 0xFF) {
-        ledcAttach(pins.m2, frequency, resolution);
-    }
-    if (pins.m3 != 0xFF) {
-        ledcAttach(pins.m3, frequency, resolution);
     }
 #endif
 #else // defaults to FRAMEWORK_ARDUINO
@@ -157,7 +170,7 @@ void MotorMixerQuadX_PWM::writeMotor(uint8_t motorIndex, float motorOutput) // N
 #else // defaults to FRAMEWORK_ARDUINO
 #if defined(FRAMEWORK_ARDUINO_ESP32)
     if (pin.pin != 0xFF) {
-#if defined(ESPRESSIF32_6_11_0)
+#if defined(LIBRARY_MOTOR_MIXERS_USE_ESPRESSIF32_6_11_0)
         ledcWrite(motorIndex, output);
 #else
         ledcWrite(pin.pin, output);

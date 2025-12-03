@@ -77,7 +77,17 @@ MotorMixerWingPWM::MotorMixerWingPWM(const motor_pins_t& pins, Debug* debug) :
     static constexpr int frequency = 150000;
     // PWM Resolution
     static constexpr int resolution = 8;
-#if defined(ESPRESSIF32_6_11_0)
+#if defined(LIBRARY_MOTOR_MIXERS_USE_LEDC_ATTACH)
+    if (pins.m0 != 0xFF) {
+        ledcAttach(pins.m0, frequency, resolution);
+    }
+    if (pins.s0 != 0xFF) {
+        ledcAttach(pins.s0, frequency, resolution);
+    }
+    if (pins.s1 != 0xFF) {
+        ledcAttach(pins.s1, frequency, resolution);
+    }
+#else
     if (pins.m0 != 0xFF) {
         ledcSetup(M0, frequency, resolution);
         ledcAttachPin(pins.m0, M0);
@@ -89,16 +99,6 @@ MotorMixerWingPWM::MotorMixerWingPWM(const motor_pins_t& pins, Debug* debug) :
     if (pins.s1 != 0xFF) {
         ledcSetup(S1, frequency, resolution);
         ledcAttachPin(pins.s1, S1);
-    }
-#else
-    if (pins.m0 != 0xFF) {
-        ledcAttach(pins.m0, frequency, resolution);
-    }
-    if (pins.s0 != 0xFF) {
-        ledcAttach(pins.s0, frequency, resolution);
-    }
-    if (pins.s1 != 0xFF) {
-        ledcAttach(pins.s1, frequency, resolution);
     }
 #endif
 #else // defaults to FRAMEWORK_ARDUINO
@@ -138,7 +138,7 @@ void MotorMixerWingPWM::writeMotor(uint8_t motorIndex, float motorOutput) // NOL
 #else // defaults to FRAMEWORK_ARDUINO
 #if defined(FRAMEWORK_ARDUINO_ESP32)
     if (pin.pin != 0xFF) {
-#if defined(ESPRESSIF32_6_11_0)
+#if defined(LIBRARY_MOTOR_MIXERS_USE_ESPRESSIF32_6_11_0)
         ledcWrite(motorIndex, output);
 #else
         ledcWrite(pin.pin, output);

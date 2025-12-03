@@ -41,7 +41,7 @@ uint32_t DShotCodec::decodeERPM(uint16_t value)
     }
     const uint16_t m = value & 0x01FF;
     const uint16_t e = (value & 0xFE00) >> 9;
-    value = m << e;
+    value = static_cast<uint16_t>(m << e);
     if (value == 0) {
         return TELEMETRY_INVALID;
     }
@@ -60,7 +60,7 @@ uint32_t DShotCodec::decodeTelemetryFrame(uint16_t value, telemetry_type_e& tele
         telemetryType = TELEMETRY_TYPE_ERPM;
         const uint16_t m = value & 0x01FF;
         const uint16_t e = (value & 0xFE00) >> 9;
-        value = m << e;
+        value = static_cast<uint16_t>(m << e);
         if (value == 0) {
             return TELEMETRY_INVALID;
         }
@@ -145,7 +145,7 @@ uint32_t DShotCodec::decodeSamples(uint64_t value, telemetry_type_e& telemetryTy
         telemetryType = TELEMETRY_INVALID;
         return 0;
     }
-    return decodeTelemetryFrame(result >> 4, telemetryType);
+    return decodeTelemetryFrame(static_cast<uint16_t>(result >> 4), telemetryType);
 }
 
 
@@ -194,7 +194,7 @@ uint32_t DShotCodec::decodeSamples(const uint32_t* samples, uint32_t count, tele
         telemetryType = TELEMETRY_INVALID;
         return 0;
     }
-    return decodeTelemetryFrame(result >> 4, telemetryType);
+    return decodeTelemetryFrame(static_cast<uint16_t>(result >> 4), telemetryType);
 }
 
 uint16_t DShotCodec::GCR20_to_eRPM(uint32_t value)

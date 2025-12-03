@@ -114,8 +114,8 @@ void ESC_DShot::init(uint16_t pin)
 
 #else // defaults to FRAMEWORK_ARDUINO
 #if !defined(UNIT_TEST_BUILD)
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, LOW);
+    pinMode(static_cast<uint8_t>(pin), OUTPUT);
+    digitalWrite(static_cast<uint8_t>(pin), LOW);
 #endif
 
 #endif // FRAMEWORK
@@ -247,12 +247,12 @@ void ESC_DShot::write(uint16_t value) // NOLINT(readability-make-member-function
     if (_useHighOrderBits) {
         for (auto& item : _dmaBuffer) {
             item = ((frame & maskBit) ? _dataHighPulseWidth : _dataLowPulseWidth) << 16;
-            maskBit >>= 1U;
+            maskBit = static_cast<uint16_t>(maskBit >> 1);
         }
     } else {
         for (auto& item : _dmaBuffer) {
             item = (frame & maskBit) ? _dataHighPulseWidth : _dataLowPulseWidth;
-            maskBit >>= 1U;
+            maskBit = static_cast<uint16_t>(maskBit >> 1);
         }
     }
     _dmaBuffer[DMA_BUFFER_SIZE - 1] = 0; // zero last value,  array size is DSHOT_BIT_COUNT + 1
@@ -338,7 +338,7 @@ void ESC_DShot::end()
 #elif defined(FRAMEWORK_TEST)
 #else // defaults to FRAMEWORK_ARDUINO
 #if !defined(UNIT_TEST)
-    digitalWrite(_pin, LOW);
+    digitalWrite(static_cast<uint8_t>(_pin), LOW);
 #endif
 #endif // FRAMEWORK
 }

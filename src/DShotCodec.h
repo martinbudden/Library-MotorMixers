@@ -55,18 +55,18 @@ public:
 
     // non-inverted Checksum for unidirectional DShot
     static inline uint16_t checksumUnidirectional(uint16_t value) { return (value ^ (value >> 4) ^ (value >> 8)) & 0x0F; }
-    static inline bool checksumUnidirectionalIsOK(uint16_t value) { return checksumUnidirectional(value>>4) == (value & 0x0F); }
+    static inline bool checksumUnidirectionalIsOK(uint16_t value) { return checksumUnidirectional(static_cast<uint16_t>(value>>4)) == (value & 0x0F); }
     // inverted Checksum for bidirectional DShot
     static inline uint16_t checksumBidirectional(uint16_t value) { return(~(value ^ (value >> 4) ^ (value >> 8))) & 0x0F; }
-    static inline bool checksumBidirectionalIsOK(uint16_t value) { return checksumBidirectional(value>>4) == (value & 0x0F); }
+    static inline bool checksumBidirectionalIsOK(uint16_t value) { return checksumBidirectional(static_cast<uint16_t>(value>>4)) == (value & 0x0F); }
 
     static inline uint16_t frameUnidirectional(uint16_t value) {
-        value <<= 1;
-        return (value << 4) | checksumUnidirectional(value);
+        value = static_cast<uint16_t>(value << 1);
+        return static_cast<uint16_t>(value << 4) | checksumUnidirectional(value);
     }
     static inline uint16_t frameBidirectional(uint16_t value) {
-        value <<= 1;
-        return (value << 4) | checksumBidirectional(value);
+        value = static_cast<uint16_t>(value << 1);
+        return static_cast<uint16_t>(value << 4) | checksumBidirectional(value);
     }
 
     static uint32_t decodeERPM(uint16_t value);

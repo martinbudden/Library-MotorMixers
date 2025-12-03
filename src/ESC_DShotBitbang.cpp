@@ -411,7 +411,7 @@ uint32_t ESC_DShotBitbang::samples_to_GCR21(const uint32_t* samples, uint32_t mo
         if (!(samples[i] & motorMask)) { // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
             previous_value = 0;
             previous_i = i;
-            end_i = i + BDSHOT_RESPONSE_LENGTH * RESPONSE_OVERSAMPLING;
+            end_i = static_cast<uint16_t>(i + BDSHOT_RESPONSE_LENGTH * RESPONSE_OVERSAMPLING);
             break;
         }
         i++;
@@ -472,7 +472,7 @@ void ESC_DShotBitbang::update_motors_rpm()
         const uint16_t eRPM = DShotCodec::GCR20_to_eRPM(motorGCR20);
         if (DShotCodec::checksumBidirectionalIsOK(eRPM)) {
             DShotCodec::telemetry_type_e telemetryType {};
-            const auto eRPM_periodMicroseconds = DShotCodec::decodeTelemetryFrame(eRPM >> 4, telemetryType);
+            const auto eRPM_periodMicroseconds = DShotCodec::decodeTelemetryFrame(static_cast<uint16_t>(eRPM >> 4), telemetryType);
             enum { ONE_MINUTE_IN_MICROSECONDS = 60000000 };
             // value is eRPM period in microseconds
             _eRPMs[ii] = static_cast<int32_t>(ONE_MINUTE_IN_MICROSECONDS / eRPM_periodMicroseconds);
