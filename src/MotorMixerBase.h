@@ -143,6 +143,7 @@ public:
 
     virtual bool canReportPosition(size_t motorIndex) const { (void)motorIndex; return false; }
     virtual void resetAllEncoders() {}
+    virtual void readAllEncoders() {}
     virtual void readEncoder(size_t motorIndex) { (void)motorIndex; }
     virtual int32_t getEncoder(size_t motorIndex) const { (void)motorIndex; return 0; }
     virtual uint32_t getStepsPerRevolution(size_t motorIndex) const { (void)motorIndex; return 0; }
