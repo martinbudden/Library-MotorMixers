@@ -2,6 +2,7 @@
 #include "MotorMixerQuadX_PWM.h"
 #include <cmath>
 
+
 #if defined(FRAMEWORK_RPI_PICO)
 #include <hardware/gpio.h>
 #include <hardware/pwm.h>
@@ -10,11 +11,23 @@
 #elif defined(FRAMEWORK_STM32_CUBE)
 #elif defined(FRAMEWORK_TEST)
 #else // defaults to FRAMEWORK_ARDUINO
-#include <Arduino.h>
 #if defined(FRAMEWORK_ARDUINO_ESP32)
 #include <esp32-hal-ledc.h>
+#else
+#include <Arduino.h>
 #endif
 #endif // FRAMEWORK
+
+/*
+https://docs.espressif.com/projects/arduino-esp32/en/latest/migration_guides/2.x_to_3.0.html
+
+Removed:
+ledcSetup
+ledcAttachPin
+
+Added:
+ledcAttach used to set up the LEDC pin (merged ledcSetup and ledcAttachPin functions).
+*/
 
 
 MotorMixerQuadX_PWM::MotorMixerQuadX_PWM(const stm32_motor_pins_t& pins, Debug* debug) :
@@ -74,6 +87,21 @@ MotorMixerQuadX_PWM::MotorMixerQuadX_PWM(const motor_pins_t& pins, Debug* debug)
 
 #elif defined(FRAMEWORK_ESPIDF)
 
+    static constexpr int frequencyHz = 150000; // Motor PWM Frequency
+    static constexpr int resolutionBits = 8; // PWM Resolution
+    if (pins.m0 != 0xFF) {
+        ledcAttach(pins.m0, frequencyHz, resolutionBits);
+    }
+    if (pins.m1 != 0xFF) {
+        ledcAttach(pins.m1, frequencyHz, resolutionBits);
+    }
+    if (pins.m2 != 0xFF) {
+        ledcAttach(pins.m2, frequencyHz, resolutionBits);
+    }
+    if (pins.m3 != 0xFF) {
+        ledcAttach(pins.m3, frequencyHz, resolutionBits);
+    }
+
 #elif defined(FRAMEWORK_STM32_CUBE)
 
     (void)pins;
@@ -82,55 +110,28 @@ MotorMixerQuadX_PWM::MotorMixerQuadX_PWM(const motor_pins_t& pins, Debug* debug)
 
 #else // defaults to FRAMEWORK_ARDUINO
 #if defined(FRAMEWORK_ARDUINO_ESP32)
-    // Motor PWM Frequency
-    static constexpr int frequency = 150000;
-    // PWM Resolution
-    static constexpr int resolution = 8;
 
-/*
-https://docs.espressif.com/projects/arduino-esp32/en/latest/migration_guides/2.x_to_3.0.html
-
-Removed:
-
-ledcSetup
-ledcAttachPin
-
-Added:
-ledcAttach used to set up the LEDC pin (merged ledcSetup and ledcAttachPin functions).
-
-*/
-#if defined(LIBRARY_MOTOR_MIXERS_USE_LEDC_ATTACH)
+    static constexpr int frequencyHz = 150000; // Motor PWM Frequency
+    static constexpr int resolutionBits = 8; // PWM Resolution
     if (pins.m0 != 0xFF) {
-        ledcAttach(pins.m0, frequency, resolution);
-    }
-    if (pins.m1 != 0xFF) {
-        ledcAttach(pins.m1, frequency, resolution);
-    }
-    if (pins.m2 != 0xFF) {
-        ledcAttach(pins.m2, frequency, resolution);
-    }
-    if (pins.m3 != 0xFF) {
-        ledcAttach(pins.m3, frequency, resolution);
-    }
-#else
-    if (pins.m0 != 0xFF) {
-        ledcSetup(M0, frequency, resolution);
+        ledcSetup(M0, frequencyHz, resolutionBits);
         ledcAttachPin(pins.m0, M0);
     }
     if (pins.m1 != 0xFF) {
-        ledcSetup(M1, frequency, resolution);
+        ledcSetup(M1, frequencyHz, resolutionBits);
         ledcAttachPin(pins.m1, M1);
     }
     if (pins.m2 != 0xFF) {
-        ledcSetup(M2, frequency, resolution);
+        ledcSetup(M2, frequencyHz, resolutionBits);
         ledcAttachPin(pins.m2, M2);
     }
     if (pins.m3 != 0xFF) {
-        ledcSetup(M3, frequency, resolution);
+        ledcSetup(M3, frequencyHz, resolutionBits);
         ledcAttachPin(pins.m3, M3);
     }
-#endif
+
 #else // defaults to FRAMEWORK_ARDUINO
+
     if (pins.m0 != 0xFF) {
         pinMode(pins.m0, OUTPUT);
     }
@@ -143,6 +144,7 @@ ledcAttach used to set up the LEDC pin (merged ledcSetup and ledcAttachPin funct
     if (pins.m3 != 0xFF) {
         pinMode(pins.m3, OUTPUT);
     }
+
 #endif
 
 #endif // FRAMEWORK
@@ -151,35 +153,24 @@ ledcAttach used to set up the LEDC pin (merged ledcSetup and ledcAttachPin funct
 void MotorMixerQuadX_PWM::writeMotor(uint8_t motorIndex, float motorOutput) // NOLINT(readability-make-member-function-const_
 {
     const pwm_pin_t& pin = _pins[motorIndex];
+    if (pin.pin == 0xFF) {
+        return;
+    }
     // scale motor output to GPIO range (normally [0,255] or [0, 65535])
     const auto output = static_cast<uint16_t>(roundf(_pwmScale*std::clamp(motorOutput, 0.0F, 1.0F)));
 #if defined(FRAMEWORK_RPI_PICO)
-    if (pin.pin != 0xFF) {
-        pwm_set_gpio_level(pin.pin, output);
-    }
+    pwm_set_gpio_level(pin.pin, output);
 #elif defined(FRAMEWORK_ESPIDF)
-    (void)pin;
-    (void)output;
+    ledcWrite(pin.pin, output);
 #elif defined(FRAMEWORK_STM32_CUBE)
-    if (pin.pin != 0xFF) {
-        __HAL_TIM_SET_COMPARE(pin.htim, pin.channel, output);
-    }
+    __HAL_TIM_SET_COMPARE(pin.htim, pin.channel, output);
 #elif defined(FRAMEWORK_TEST)
-    (void)pin;
     (void)output;
 #else // defaults to FRAMEWORK_ARDUINO
 #if defined(FRAMEWORK_ARDUINO_ESP32)
-    if (pin.pin != 0xFF) {
-#if defined(LIBRARY_MOTOR_MIXERS_USE_ESPRESSIF32_6_11_0)
-        ledcWrite(motorIndex, output);
+    ledcWrite(motorIndex, output);
 #else
-        ledcWrite(pin.pin, output);
-#endif
-    }
-#else
-    if (pin.pin != 0xFF) {
-        analogWrite(pin.pin, output);
-    }
+    analogWrite(pin.pin, output);
 #endif
 #endif // FRAMEWORK
 }

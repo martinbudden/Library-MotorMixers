@@ -24,7 +24,9 @@
 class MotorMixerQuadX_PWM : public MotorMixerQuadBase {
 public:
     MotorMixerQuadX_PWM(const motor_pins_t& pins, Debug* debug);
+    explicit MotorMixerQuadX_PWM(const motor_pins_t& pins) : MotorMixerQuadX_PWM(pins, nullptr) {}
     MotorMixerQuadX_PWM(const stm32_motor_pins_t& pins, Debug* debug);
+    explicit MotorMixerQuadX_PWM(const stm32_motor_pins_t& pins) : MotorMixerQuadX_PWM(pins, nullptr) {}
 public:
 #if defined(FRAMEWORK_STM32_CUBE)
     struct pwm_pin_t {

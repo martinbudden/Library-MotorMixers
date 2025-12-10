@@ -41,6 +41,7 @@
         "hicpp",
         "htim",
         "htims",
+        "insns",
         "KIWIF",
         "ledc",
         "libc",
