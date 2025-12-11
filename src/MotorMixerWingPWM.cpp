@@ -7,6 +7,7 @@
 #include <hardware/pwm.h>
 #elif defined(FRAMEWORK_ESPIDF)
 #include <driver/ledc.h>
+#include <esp32-hal-ledc.h>
 #elif defined(FRAMEWORK_STM32_CUBE)
 #elif defined(FRAMEWORK_TEST)
 #else // defaults to FRAMEWORK_ARDUINO
@@ -88,6 +89,7 @@ MotorMixerWingPWM::MotorMixerWingPWM(const motor_pins_t& pins, Debug* debug) :
     
     static constexpr int frequencyHz = 150000; // Motor PWM Frequency
     static constexpr int resolutionBits = 8; // PWM Resolution
+#if defined(FRAMEWORK_ARDUINO_ESP32_V2)
     if (pins.m0 != 0xFF) {
         ledcSetup(M0, frequencyHz, resolutionBits);
         ledcAttachPin(pins.m0, M0);
@@ -100,6 +102,17 @@ MotorMixerWingPWM::MotorMixerWingPWM(const motor_pins_t& pins, Debug* debug) :
         ledcSetup(S1, frequencyHz, resolutionBits);
         ledcAttachPin(pins.s1, S1);
     }
+#else
+    if (pins.m0 != 0xFF) {
+        ledcAttach(pins.m0, frequencyHz, resolutionBits);
+    }
+    if (pins.s0 != 0xFF) {
+        ledcAttach(pins.s0, frequencyHz, resolutionBits);
+    }
+    if (pins.s1 != 0xFF) {
+        ledcAttach(pins.s1, frequencyHz, resolutionBits);
+    }
+#endif
 #else // defaults to FRAMEWORK_ARDUINO
     if (pins.m0 != 0xFF) {
         pinMode(pins.m0, OUTPUT);
@@ -133,7 +146,11 @@ void MotorMixerWingPWM::writeMotor(uint8_t motorIndex, float motorOutput) // NOL
     (void)output;
 #else // defaults to FRAMEWORK_ARDUINO
 #if defined(FRAMEWORK_ARDUINO_ESP32)
+#if defined(FRAMEWORK_ARDUINO_ESP32_V2)
     ledcWrite(motorIndex, output);
+#else
+    ledcWrite(pin.pin, output);
+#endif
 #else
     analogWrite(pin.pin, output);
 #endif
