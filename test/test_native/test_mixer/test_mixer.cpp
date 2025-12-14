@@ -84,7 +84,7 @@ void test_mixer_quad_x_pitch()
     commands.pitch = 0.3F;
     throttle = mixQuadX(motorOutputs, commands, mixParams);
     TEST_ASSERT_EQUAL_FLOAT(0.0F, mixParams.undershoot);
-    TEST_ASSERT_EQUAL_FLOAT(0.0F, mixParams.overshoot); // pitch overshoot is ignored
+    TEST_ASSERT_EQUAL_FLOAT(0.1F, mixParams.overshoot); // pitch overshoot is ignored
     TEST_ASSERT_EQUAL_FLOAT(0.7F, throttle);
     TEST_ASSERT_EQUAL_FLOAT(0.4F, motorOutputs[0]); // throttle - commands.pitch
     TEST_ASSERT_EQUAL_FLOAT(1.0F, motorOutputs[1]); // throttle + commands.pitch
