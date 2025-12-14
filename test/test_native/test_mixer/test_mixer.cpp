@@ -48,12 +48,23 @@ void test_mixer_quad_x_roll()
     commands.roll = 0.3F;
     throttle = mixQuadX(motorOutputs, commands, mixParams);
     TEST_ASSERT_EQUAL_FLOAT(0.0F, mixParams.undershoot);
-    TEST_ASSERT_EQUAL_FLOAT(0.1F, mixParams.overshoot);
-    TEST_ASSERT_EQUAL_FLOAT(0.7F, throttle);
-    TEST_ASSERT_EQUAL_FLOAT(0.4F, motorOutputs[0]); // throttle - commands.roll
-    TEST_ASSERT_EQUAL_FLOAT(0.4F, motorOutputs[1]); // throttle - commands.roll
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, mixParams.overshoot);
+    TEST_ASSERT_EQUAL_FLOAT(0.8F, throttle);
+    TEST_ASSERT_EQUAL_FLOAT(0.5F, motorOutputs[0]); // throttle - commands.roll
+    TEST_ASSERT_EQUAL_FLOAT(0.5F, motorOutputs[1]); // throttle - commands.roll
     TEST_ASSERT_EQUAL_FLOAT(1.0F, motorOutputs[2]); // throttle + commands.roll
     TEST_ASSERT_EQUAL_FLOAT(1.0F, motorOutputs[3]); // throttle + commands.roll
+
+    commands.throttle = 0.1F;
+    commands.roll = 0.3F;
+    throttle = mixQuadX(motorOutputs, commands, mixParams);
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, mixParams.undershoot);
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, mixParams.overshoot);
+    TEST_ASSERT_EQUAL_FLOAT(0.1F, throttle);
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, motorOutputs[0]); // throttle - commands.roll
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, motorOutputs[1]); // throttle - commands.roll
+    TEST_ASSERT_EQUAL_FLOAT(0.4F, motorOutputs[2]); // throttle + commands.roll
+    TEST_ASSERT_EQUAL_FLOAT(0.4F, motorOutputs[3]); // throttle + commands.roll
 }
 
 void test_mixer_quad_x_pitch()
@@ -84,12 +95,23 @@ void test_mixer_quad_x_pitch()
     commands.pitch = 0.3F;
     throttle = mixQuadX(motorOutputs, commands, mixParams);
     TEST_ASSERT_EQUAL_FLOAT(0.0F, mixParams.undershoot);
-    TEST_ASSERT_EQUAL_FLOAT(0.1F, mixParams.overshoot); // pitch overshoot is ignored
-    TEST_ASSERT_EQUAL_FLOAT(0.7F, throttle);
-    TEST_ASSERT_EQUAL_FLOAT(0.4F, motorOutputs[0]); // throttle - commands.pitch
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, mixParams.overshoot); // pitch overshoot is ignored
+    TEST_ASSERT_EQUAL_FLOAT(0.8F, throttle);
+    TEST_ASSERT_EQUAL_FLOAT(0.5F, motorOutputs[0]); // throttle - commands.pitch
     TEST_ASSERT_EQUAL_FLOAT(1.0F, motorOutputs[1]); // throttle + commands.pitch
-    TEST_ASSERT_EQUAL_FLOAT(0.4F, motorOutputs[2]); // throttle - commands.pitch
+    TEST_ASSERT_EQUAL_FLOAT(0.5F, motorOutputs[2]); // throttle - commands.pitch
     TEST_ASSERT_EQUAL_FLOAT(1.0F, motorOutputs[3]); // throttle + commands.pitch
+
+    commands.throttle = 0.1F;
+    commands.pitch = 0.3F;
+    throttle = mixQuadX(motorOutputs, commands, mixParams);
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, mixParams.undershoot);
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, mixParams.overshoot); // pitch overshoot is ignored
+    TEST_ASSERT_EQUAL_FLOAT(0.1F, throttle);
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, motorOutputs[0]); // throttle - commands.pitch
+    TEST_ASSERT_EQUAL_FLOAT(0.4F, motorOutputs[1]); // throttle + commands.pitch
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, motorOutputs[2]); // throttle - commands.pitch
+    TEST_ASSERT_EQUAL_FLOAT(0.4F, motorOutputs[3]); // throttle + commands.pitch
 }
 
 void test_mixer_quad_x_yaw()
