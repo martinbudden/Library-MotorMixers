@@ -79,7 +79,10 @@ float mixTricopter(std::array<float, 4>& motorOutputs, const MotorMixerBase::com
     motorOutputs[REAR] = (throttle                 - FOUR_THIRDS * commands.pitch) / cosf(pivotAngleRadians);
     motorOutputs[FR]   =  throttle - commands.roll + TWO_THIRDS  * commands.pitch;
     motorOutputs[FL]   =  throttle + commands.roll + TWO_THIRDS  * commands.pitch;
+    motorOutputs[S0]   = commands.yaw;
 
+
+#if !defined(LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING)
     // check for rear params.overshoot, front motors unlikely to params.overshoot since there are two of them and there is no yaw-related attenuation
     params.overshoot = motorOutputs[REAR] - params.motorOutputMax;
     if (params.overshoot > 0.0F) {
@@ -96,8 +99,7 @@ float mixTricopter(std::array<float, 4>& motorOutputs, const MotorMixerBase::com
         motorOutputs[FR] = std::min(params.motorOutputMax, motorOutputs[FR] + params.undershoot);
         motorOutputs[FL] = std::min(params.motorOutputMax, motorOutputs[FL] + params.undershoot);
     }
-
-    motorOutputs[S0] = commands.yaw;
+#endif // LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING)
 
     return throttle;
 }
@@ -136,6 +138,7 @@ float mixQuadX(std::array<float, 4>& motorOutputs, const MotorMixerBase::command
     motorOutputs[BACK_LEFT]   = throttle + commands.roll - commands.pitch - commands.yaw;
     motorOutputs[FRONT_LEFT]  = throttle + commands.roll + commands.pitch + commands.yaw;
 
+#if !defined(LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING)
     // High values of yaw can cause motor outputs to go outside range [motorOutputMin, params.motorOutputMax]
     // If this happens, we reduce the magnitude of the yaw command.
     // This reduces yaw authority, but avoids "yaw jumps"
@@ -185,6 +188,7 @@ float mixQuadX(std::array<float, 4>& motorOutputs, const MotorMixerBase::command
         motorOutputs[2] -= correction;
         motorOutputs[3] -= correction;
     }
+#endif //LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING)
 
     return throttle;
 }
@@ -227,6 +231,7 @@ float mixHexX(std::array<float, 6>& motorOutputs, const MotorMixerBase::commands
     motorOutputs[4] = throttle -       commands.roll                        + commands.yaw; // center right
     motorOutputs[5] = throttle +       commands.roll                        - commands.yaw; // center left
 
+#if !defined(LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING)
     // deal with yaw params.undershoot and params.overshoot
     // High values of yaw can cause motor outputs to go outside range [motorOutputMin, params.motorOutputMax]
     // If this happens, we reduce the magnitude of the yaw command.
@@ -280,6 +285,7 @@ float mixHexX(std::array<float, 6>& motorOutputs, const MotorMixerBase::commands
             motorOutput -= correction; // cppcheck-suppress useStlAlgorithm
         }
     }
+#endif //LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING)
 
     return throttle;
 }
@@ -322,6 +328,7 @@ float mixOctoQuadX(std::array<float, 8>& motorOutputs, const MotorMixerBase::com
     motorOutputs[6] = throttle + commands.roll - commands.pitch - commands.yaw; // under back left
     motorOutputs[7] = throttle + commands.roll + commands.pitch + commands.yaw; // under front left
 
+#if !defined(LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING)
     // deal with yaw params.undershoot and params.overshoot
     // High values of yaw can cause motor outputs to go outside range [motorOutputMin, params.motorOutputMax]
     // If this happens, we reduce the magnitude of the yaw command.
@@ -380,6 +387,7 @@ float mixOctoQuadX(std::array<float, 8>& motorOutputs, const MotorMixerBase::com
             motorOutput -= correction; // cppcheck-suppress useStlAlgorithm
         }
     }
+#endif //LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING)
 
     return throttle;
 }
