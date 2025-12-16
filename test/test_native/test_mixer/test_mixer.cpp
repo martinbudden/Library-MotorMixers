@@ -207,7 +207,7 @@ void test_mixer_tricopter()
 
     commands.throttle = 0.4F;
     throttle = mixTricopter(motorOutputs, commands, mixParams);
-    TEST_ASSERT_EQUAL_FLOAT(-0.3F, mixParams.undershoot);
+    TEST_ASSERT_EQUAL_FLOAT(0.3F, mixParams.undershoot);
     TEST_ASSERT_EQUAL_FLOAT(-0.6F, mixParams.overshoot);
     TEST_ASSERT_EQUAL_FLOAT(0.4F, throttle);
     TEST_ASSERT_EQUAL_FLOAT(0.4F, motorOutputs[FL]);
@@ -218,7 +218,7 @@ void test_mixer_tricopter()
 
     commands.yaw = 0.3F;
     throttle = mixTricopter(motorOutputs, commands, mixParams);
-    TEST_ASSERT_EQUAL_FLOAT(-0.3F, mixParams.undershoot);
+    TEST_ASSERT_EQUAL_FLOAT(0.3F, mixParams.undershoot);
     TEST_ASSERT_EQUAL_FLOAT(-0.5794151F, mixParams.overshoot);
     TEST_ASSERT_EQUAL_FLOAT(0.4F, throttle);
     TEST_ASSERT_EQUAL_FLOAT(0.4F, motorOutputs[FL]);
@@ -228,7 +228,7 @@ void test_mixer_tricopter()
 
     commands.yaw = 1.0F;
     throttle = mixTricopter(motorOutputs, commands, mixParams);
-    TEST_ASSERT_EQUAL_FLOAT(-0.3F, mixParams.undershoot);
+    TEST_ASSERT_EQUAL_FLOAT(0.3F, mixParams.undershoot);
     TEST_ASSERT_EQUAL_FLOAT(-0.2F, mixParams.overshoot);
     TEST_ASSERT_EQUAL_FLOAT(0.4F, throttle);
     TEST_ASSERT_EQUAL_FLOAT(0.4F, motorOutputs[FL]);
