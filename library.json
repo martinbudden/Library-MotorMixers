@@ -13,7 +13,7 @@
     "dependencies": [
         {
             "name": "martinbudden/VectorQuaternionMatrix",
-            "version": "^0.4.6"
+            "version": "^0.4.7"
         },
         {
             "name": "martinbudden/Filters",
@@ -21,7 +21,7 @@
         },
         {
             "name": "martinbudden/PIDF",
-            "version": "^0.4.1"
+            "version": "^0.4.2"
         }
     ],
     "license": "MIT",
