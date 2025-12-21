@@ -309,15 +309,15 @@ void ESC_DShotBitbang::presetDMA_outputBuffers()
     const size_t highOffset = DSHOT_BB_1_LENGTH - 1;
 #else
     // make 2 high frames after Dshot frame:
-    for (auto i = 0; i < DSHOT_BB_FRAME_SECTIONS * 2; i++) {
+    for (size_t i = 0; i < DSHOT_BB_FRAME_SECTIONS * 2; ++i) {
         _portA.dmaOutputBuffer[DSHOT_BUFFER_LENGTH*DSHOT_BB_FRAME_SECTIONS - i - 1] = (GPIO_BSRR_BS_0 << MOTOR_1) | (GPIO_BSRR_BS_0 << MOTOR_4);
         _portB.dmaOutputBuffer[DSHOT_BUFFER_LENGTH*DSHOT_BB_FRAME_SECTIONS - i - 1] = (GPIO_BSRR_BS_0 << MOTOR_2) | (GPIO_BSRR_BS_0 << MOTOR_3);
     }
     const size_t highOffset = 2;
 #endif
 
-    for (auto i = 0; i < DSHOT_BB_BUFFER_LENGTH - 2; i++) { // last 2 bits are always high (logic 0)
-        const auto index = i * DSHOT_BB_FRAME_SECTIONS;
+    for (size_t i = 0; i < DSHOT_BB_BUFFER_LENGTH - 2; ++i) { // last 2 bits are always high (logic 0)
+        const size_t index = i * DSHOT_BB_FRAME_SECTIONS;
         //  first section always lower edge:
         _portA.dmaOutputBuffer[index] = (GPIO_BSRR_BR_0 << MOTOR_1) | (GPIO_BSRR_BR_0 << MOTOR_4);
         _portB.dmaOutputBuffer[index] = (GPIO_BSRR_BR_0 << MOTOR_2) | (GPIO_BSRR_BR_0 << MOTOR_3);
