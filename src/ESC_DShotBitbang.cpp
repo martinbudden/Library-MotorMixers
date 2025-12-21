@@ -1,7 +1,7 @@
 
 #include "ESC_DShotBitbangIRQ.h"
 #include <algorithm>
-#include <array>
+
 
 #if defined(FRAMEWORK_STM32_CUBE) || defined(FRAMEWORK_ARDUINO_STM32)
 void ESC_DShotBitbang::IRQ_Handler(port_t& port)

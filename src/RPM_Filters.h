@@ -69,8 +69,6 @@ public:
     void filter(xyz_t& input, size_t motorIndex);
     bool isActive() const { return _config.rpm_filter_harmonics > 0; }
     size_t getMotorCount() const { return _motorCount; }
-public:
-    static constexpr float M_PI_F = static_cast<float>(M_PI);
 private:
     size_t _motorCount;
     float _looptimeSeconds;

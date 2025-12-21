@@ -1,5 +1,4 @@
 #include "Mixers.h"
-#include <algorithm>
 
 
 float mixWing(std::array<float, 3>& motorOutputs, const MotorMixerBase::commands_t& commands, MotorMixerBase::parameters_t& params)

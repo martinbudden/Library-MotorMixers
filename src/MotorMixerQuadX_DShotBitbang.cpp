@@ -5,7 +5,9 @@
 #include <RPM_Filters.h>
 
 #include <cmath>
+#if (__cplusplus >= 202002L)
 #include <ranges>
+#endif
 
 
 MotorMixerQuadX_DShotBitbang::MotorMixerQuadX_DShotBitbang(uint32_t taskIntervalMicroseconds, uint32_t outputToMotorsDenominator, const stm32_motor_pins_t& pins, Debug& debug) :

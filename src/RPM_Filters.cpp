@@ -1,7 +1,9 @@
 #include "RPM_Filters.h"
 #include <FastTrigonometry.h>
 
+#if (__cplusplus >= 202002L)
 #include <ranges>
+#endif
 
 
 void RPM_Filters::setConfig(const config_t& config)

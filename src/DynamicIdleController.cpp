@@ -1,6 +1,18 @@
 #include "DynamicIdleController.h"
 #include "Debug.h"
 
+#include <algorithm>
+
+
+inline float clamp(float value, float min, float max)
+{
+#if (__cplusplus >= 202002L)
+    return std::clamp(value, min, max);
+#else
+    return (value < min) ? min : (value > max) ? max : value;
+#endif
+}
+
 
 DynamicIdleController::DynamicIdleController(uint32_t taskIntervalMicroseconds, Debug& debug) :
     _taskIntervalMicroseconds(taskIntervalMicroseconds),
@@ -47,7 +59,7 @@ float DynamicIdleController::calculateSpeedIncrease(float slowestMotorHz, float 
     const float slowestMotorHzDeltaFiltered = _DTermFilter.filter(slowestMotorHz - _PID.getPreviousMeasurement());
     float speedIncrease = _PID.updateDelta(slowestMotorHz, slowestMotorHzDeltaFiltered, deltaT);
 
-    speedIncrease = std::clamp(speedIncrease, 0.0F, _maxIncrease);
+    speedIncrease = clamp(speedIncrease, 0.0F, _maxIncrease);
 
     if (_debug.getMode() == DEBUG_DYN_IDLE) {
         const PIDF::error_t error = _PID.getError();

@@ -3,7 +3,9 @@
 #include "MotorMixerQuadX_DShot.h"
 
 #include <RPM_Filters.h>
+#if (__cplusplus >= 202002L)
 #include <ranges>
+#endif
 
 
 MotorMixerQuadX_DShot::MotorMixerQuadX_DShot(uint32_t taskIntervalMicroseconds, uint32_t outputToMotorsDenominator, const motor_pins_t& pins, Debug& debug) :

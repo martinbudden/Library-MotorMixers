@@ -1,7 +1,5 @@
 #include "DShotCodec.h"
-#include <array>
 #include <cstddef>
-#include <cstdint>
 #if defined(FRAMEWORK_STM32_CUBE) || defined(FRAMEWORK_ARDUINO_STM32)
 
 #if defined(FRAMEWORK_STM32_CUBE_F1)

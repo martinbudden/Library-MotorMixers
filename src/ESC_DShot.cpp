@@ -1,8 +1,6 @@
 #include "DShotCodec.h"
 #include "ESC_DShot.h"
 
-#include <array>
-
 #if defined(FRAMEWORK_RPI_PICO)
 
 #include "pio/dshot_bidir_300.pio.h"
