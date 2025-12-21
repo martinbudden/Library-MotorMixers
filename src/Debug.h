@@ -4,10 +4,12 @@
 #include <cstddef>
 #include <cstdint>
 
-
+/*!
+debug modes match Betaflight debug modes, so they can be displayed in Betaflight Blackbox Explorer
+*/
 enum debug_mode_e {
     DEBUG_NONE,
-    DEBUG_CYCLETIME,
+    DEBUG_CYCLE_TIME,
     DEBUG_BATTERY,
     DEBUG_GYRO_FILTERED,
     DEBUG_ACCELEROMETER,
@@ -18,11 +20,11 @@ enum debug_mode_e {
     DEBUG_SCHEDULER,
     DEBUG_STACK,
     DEBUG_ESC_SENSOR_RPM,
-    DEBUG_ESC_SENSOR_TMP,
+    DEBUG_ESC_SENSOR_TEMPERATURE,
     DEBUG_ALTITUDE,
     DEBUG_FFT,
     DEBUG_FFT_TIME,
-    DEBUG_FFT_FREQ,
+    DEBUG_FFT_FREQUENCY,
     DEBUG_RX_FRSKY_SPI,
     DEBUG_RX_SFHSS_SPI,
     DEBUG_GYRO_RAW,
@@ -61,7 +63,7 @@ enum debug_mode_e {
     DEBUG_CRSF_LINK_STATISTICS_UPLINK,
     DEBUG_CRSF_LINK_STATISTICS_PWR,
     DEBUG_CRSF_LINK_STATISTICS_DOWN,
-    DEBUG_BARO,
+    DEBUG_BAROMETER,
     DEBUG_AUTOPILOT_ALTITUDE,
     DEBUG_DYN_IDLE,
     DEBUG_FEEDFORWARD_LIMIT,
@@ -93,7 +95,7 @@ enum debug_mode_e {
     DEBUG_DSHOT_TELEMETRY_COUNTS,
     DEBUG_RPM_LIMIT,
     DEBUG_RC_STATS,
-    DEBUG_MAG_CALIB,
+    DEBUG_MAGNETOMETER_CALIBRATION,
     DEBUG_MAG_TASK_RATE,
     DEBUG_EZLANDING,
     DEBUG_TPA,
@@ -109,7 +111,6 @@ enum debug_mode_e {
 
 class Debug {
 public:
-    // debug modes match Betaflight debug modes, so they can be displayed in Betaflight Blackbox Explorer
     enum { VALUE_COUNT = 8 };
 public:
     Debug() = default;
@@ -124,6 +125,8 @@ public:
 
     void setMode(debug_mode_e mode) { _mode = mode; }
     inline debug_mode_e getMode() const { return _mode; }
+
+    const std::array<int16_t, VALUE_COUNT>& getValues() const { return _debug; }
 private:
     std::array<int16_t, VALUE_COUNT> _debug {};
     debug_mode_e _mode {DEBUG_NONE};

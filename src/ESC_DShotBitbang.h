@@ -54,37 +54,34 @@ dma pin A02 1
 */
 
 
-enum { DSHOT_MODE = 300 };              // 150/300/600/1200
-enum { DSHOT_FRAME_LENGTH = 16 };   // 16 bits of Dshot and 2 for clearing - used when bit-banging dshot used
-enum { BDSHOT_RESPONSE_BITRATE = DSHOT_MODE * 4 / 3 };    // in SymonB's tests this value was not 5/4 * DSHOT_MODE as documentation suggests but 4/3*DSHOT_MODE
-enum { BDSHOT_RESPONSE_LENGTH = 21 };   // number of bits in ESC response, ie length of GRC21 frame
-enum { DSHOT_BUFFER_LENGTH = 18 };      // 16 bits of Dshot and 2 for clearing
+static constexpr uint32_t DSHOT_MODE = 300;              // 150/300/600/1200
+static constexpr uint32_t DSHOT_FRAME_LENGTH = 16;   // 16 bits of Dshot and 2 for clearing - used when bit-banging dshot used
+static constexpr uint32_t BDSHOT_RESPONSE_BITRATE = DSHOT_MODE * 4 / 3;    // in SymonB's tests this value was not 5/4 * DSHOT_MODE as documentation suggests but 4/3*DSHOT_MODE
+static constexpr uint32_t BDSHOT_RESPONSE_LENGTH = 21;   // number of bits in ESC response, ie length of GRC21 frame
+static constexpr uint32_t DSHOT_BUFFER_LENGTH = 18;      // 16 bits of Dshot and 2 for clearing
 
 #if defined(BIT_BANGING_V2)
-    enum { DSHOT_BB_1_LENGTH = 26 };        // number of sections for 0-bit, BITBANG_0_LENGTH
-    enum { DSHOT_BB_0_LENGTH = 13 };        // number of sections for 1-bit, BITBANG_1_LENGTH
-    enum {
-        DSHOT_BB_BUFFER_LENGTH = DSHOT_FRAME_LENGTH + 2,// 16 bits of Dshot and 2 for clearing - used when bit-banging dshot used
-        DSHOT_BB_FRAME_SECTIONS = 3                     // in how many sections is bit frame divided
-    };
-    enum { DSHOT_BB_FRAME_LENGTH = 35 };    // how many counts of the timer gives one bit frame
+    static constexpr uint32_t DSHOT_BB_1_LENGTH = 26;        // number of sections for 0-bit, BITBANG_0_LENGTH
+    static constexpr uint32_t DSHOT_BB_0_LENGTH = 13;        // number of sections for 1-bit, BITBANG_1_LENGTH
+    static constexpr uint32_t DSHOT_BB_BUFFER_LENGTH = DSHOT_FRAME_LENGTH + 2; // 16 bits of Dshot and 2 for clearing - used when bit-banging dshot used
+    static constexpr uint32_t DSHOT_BB_FRAME_SECTIONS = 3;                     // in how many sections is bit frame divided
+    static constexpr uint32_t DSHOT_BB_FRAME_LENGTH = 35;    // how many counts of the timer gives one bit frame
 #else
-    enum { DSHOT_BB_1_LENGTH = 10 };        // number of sections for 1-bit, BITBANG_1_LENGTH
-    enum { DSHOT_BB_0_LENGTH = 4 };         // number of sections for 0-bit, BITBANG_0_LENGTH
-    enum { 
-        DSHOT_BB_BUFFER_LENGTH = DSHOT_FRAME_LENGTH + 2,// 16 bits of Dshot and 2 for clearing - used when bit-banging dshot used
-        DSHOT_BB_FRAME_SECTIONS = 14                    // in how many sections is bit frame divided
-
-    };    enum { DSHOT_BB_FRAME_LENGTH = 140 };   // how many counts of the timer gives one bit frame (must be multiple of DSHOT_BB_FRAME_SECTIONS)
+    static constexpr uint32_t DSHOT_BB_1_LENGTH = 10;        // number of sections for 1-bit, BITBANG_1_LENGTH
+    static constexpr uint32_t DSHOT_BB_0_LENGTH = 4;         // number of sections for 0-bit, BITBANG_0_LENGTH
+    
+    static constexpr uint32_t DSHOT_BB_BUFFER_LENGTH = DSHOT_FRAME_LENGTH + 2; // 16 bits of Dshot and 2 for clearing - used when bit-banging dshot used
+    static constexpr uint32_t DSHOT_BB_FRAME_SECTIONS = 14;                    // in how many sections is bit frame divided
+    static constexpr uint32_t DSHOT_BB_FRAME_LENGTH = 140;   // how many counts of the timer gives one bit frame (must be multiple of DSHOT_BB_FRAME_SECTIONS)
 #endif
 
 class ESC_DShotBitbang {
 public:
-    enum { MOTOR_1 = 3 }; // PA3
-    enum { MOTOR_4 = 2 }; // PA2
-    enum { MOTOR_2 = 0 }; // PB0
-    enum { MOTOR_3 = 1 }; // PB1
-    enum { MOTOR_COUNT = 4 };
+    static constexpr uint32_t MOTOR_1 = 3; // PA3
+    static constexpr uint32_t MOTOR_4 = 2; // PA2
+    static constexpr uint32_t MOTOR_2 = 0; // PB0
+    static constexpr uint32_t MOTOR_3 = 1; // PB1
+    static constexpr uint32_t MOTOR_COUNT = 4;
 
     static constexpr uint16_t RESPONSE_OVERSAMPLING = 3;  // it has to be a factor of DSHOT_BB_FRAME_LENGTH * DSHOT_MODE / BIDIRECTIONAL_DSHOT_RESPONSE_BITRATE
 

@@ -1,6 +1,8 @@
 #include "RPM_Filters.h"
 #include <FastTrigonometry.h>
 
+#include <ranges>
+
 
 void RPM_Filters::setConfig(const config_t& config)
 {
@@ -17,8 +19,13 @@ void RPM_Filters::setConfig(const config_t& config)
     _fadeRangeHz = _config.rpm_filter_fade_range_hz;
 
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
+#if (__cplusplus >= 202002L)
+    for (auto harmonic : std::views::iota(size_t{0}, _config.rpm_filter_harmonics)) {
+        for (auto motor : std::views::iota(size_t{0}, _motorCount)) {
+#else
     for (size_t harmonic = 0; harmonic < _config.rpm_filter_harmonics; ++harmonic) {
         for (size_t motor = 0; motor < _motorCount; ++motor) {
+#endif
             _filters[motor][harmonic].initNotch(_minFrequencyHz * static_cast<float>(harmonic + 1), _looptimeSeconds, _Q);
         }
     }

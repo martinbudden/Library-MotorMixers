@@ -5,6 +5,7 @@
 #include <RPM_Filters.h>
 
 #include <cmath>
+#include <ranges>
 
 
 MotorMixerQuadX_DShotBitbang::MotorMixerQuadX_DShotBitbang(uint32_t taskIntervalMicroseconds, uint32_t outputToMotorsDenominator, const stm32_motor_pins_t& pins, Debug& debug) :
@@ -111,7 +112,11 @@ void MotorMixerQuadX_DShotBitbang::rpmFilterSetFrequencyHzIterationStep()
     // Perform an rpmFilter iteration step for each motor
     // Note that _rpmFilters.setFrequencyHzIterationStep is an expensive calculation and runs off a state machine, setting one motor harmonic per iteration
     // so we want to call it even if we do not write to the motors
+#if (__cplusplus >= 202002L)
+    for ([[maybe_unused]] auto _ : std::views::iota(size_t{0}, _rpmFilterIterationCount)) {
+#else
     for (size_t ii = 0; ii < _rpmFilterIterationCount; ++ii) {
+#endif
         _rpmFilters.setFrequencyHzIterationStep();
     }
 }

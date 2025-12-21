@@ -148,8 +148,7 @@ float mixQuadX(std::array<float, 4>& motorOutputs, const MotorMixerBase::command
     // If there is overshoot, we can just clamp the output, since this will just reduce the magnitude of the command
     // without without affecting the other axes (because of the symmetry of the QuadX).
     for (auto& motorOutput : motorOutputs) {
-        motorOutput = std::min(motorOutput, params.motorOutputMax);
-        motorOutput = std::max(motorOutput, params.motorOutputMin);
+        motorOutput = std::clamp(motorOutput, params.motorOutputMin, params.motorOutputMax);
     }
 #endif // LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING_ROLL_PITCH
 
@@ -160,8 +159,11 @@ float mixQuadX(std::array<float, 4>& motorOutputs, const MotorMixerBase::command
 
 #if !defined(LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING_YAW)
     // Now check if there is overshoot due to yaw
-    // We cannot simply clamp the offending outputs, since this will cause rolling and/or pitching ("yaw jumps")
-    // So instead we reduce the magnitude of the yaw command.
+    // We cannot simply clamp the offending outputs, since this may cause result in a change in the overall
+    // vertical thrust (ie a "yaw jump").
+    // For example, if m1 and m2 have their undershoot clamped without a corresponding clamping of the m0 and m3
+    // then the overall vertical thrust will increase and the quadcopter will "jump" upwards.
+    // So instead of clamping individual motors, we reduce the magnitude of the yaw command.
     if (commands.yaw > 0.0F) {
         // check if m1 or m2 will have output less than params.motorOutputMin
         params.undershoot = std::min(params.undershoot, motorOutputs[1] - params.motorOutputMin);
@@ -245,10 +247,11 @@ float mixHexX(std::array<float, 6>& motorOutputs, const MotorMixerBase::commands
     // Check for overshoot caused by pitch.
     // If there is overshoot, we can just clamp the output, since this will just reduce the magnitude of the command
     // without without affecting the other axes (because of the symmetry of the HexX).
-    for (size_t ii = 0; ii < 4; ++ii) {
-        motorOutputs[ii] = std::min(motorOutputs[ii], params.motorOutputMax);
-        motorOutputs[ii] = std::max(motorOutputs[ii], params.motorOutputMin);
-    }
+    // NOTE: motors motorOutputs[4] and motorOutputs[5] are not clamped, since they have no effect on pitch.
+    motorOutputs[0] = std::clamp(motorOutputs[0], params.motorOutputMin, params.motorOutputMax);
+    motorOutputs[1] = std::clamp(motorOutputs[1], params.motorOutputMin, params.motorOutputMax);
+    motorOutputs[2] = std::clamp(motorOutputs[2], params.motorOutputMin, params.motorOutputMax);
+    motorOutputs[3] = std::clamp(motorOutputs[3], params.motorOutputMin, params.motorOutputMax);
 #endif // LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING_ROLL_PITCH
 
     motorOutputs[0] -= sin30*commands.roll;
@@ -400,8 +403,7 @@ float mixOctoQuadX(std::array<float, 8>& motorOutputs, const MotorMixerBase::com
     // If there is overshoot, we can just clamp the output, since this will just reduce the magnitude of the command
     // without without affecting the other axes (because of the symmetry of the QuadX).
     for (auto& motorOutput : motorOutputs) {
-        motorOutput = std::min(motorOutput, params.motorOutputMax);
-        motorOutput = std::max(motorOutput, params.motorOutputMin);
+        motorOutput = std::clamp(motorOutput, params.motorOutputMin, params.motorOutputMax);
     }
 #endif // LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING_ROLL_PITCH
 
