@@ -124,6 +124,10 @@ public:
     inline void set(size_t index, uint16_t value) { _values[index] = static_cast<int16_t>(value); }
     inline void set(size_t index, int32_t value) { _values[index] = static_cast<int16_t>(value); }
     inline void set(size_t index, uint32_t value) { _values[index] = static_cast<int16_t>(value); }
+    inline void set(size_t index, size_t value) { _values[index] = static_cast<int16_t>(value); }
+#if defined(FRAMEWORK_TEST)
+    inline void set(size_t index, long value) { _values[index] = static_cast<int16_t>(value); }
+#endif
 
     inline void set(debug_mode_e mode, size_t index, int16_t value) {
         if (_mode == mode) {
@@ -136,6 +140,9 @@ public:
     inline void set(debug_mode_e mode, size_t index, int32_t value) { set(mode, index, static_cast<int16_t>(value)); }
     inline void set(debug_mode_e mode, size_t index, uint32_t value) { set(mode, index, static_cast<int16_t>(value)); }
     inline void set(debug_mode_e mode, size_t index, size_t value) { set(mode, index, static_cast<int16_t>(value)); }
+#if defined(FRAMEWORK_TEST)
+    inline void set(debug_mode_e mode, size_t index, long value) { set(mode, index, static_cast<int16_t>(value)); }
+#endif
 
     inline int16_t get(size_t index) const { return _values[index]; }
     const std::array<int16_t, VALUE_COUNT>& getValues() const { return _values; }

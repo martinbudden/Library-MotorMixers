@@ -14,6 +14,7 @@ public:
     MotorMixerQuadX_DShot(uint32_t taskIntervalMicroseconds, uint32_t outputToMotorsDenominator, const motor_pins_t& pins, Debug& debug);
 public:
     virtual void setMotorConfig(const motor_config_t& motorConfig) override;
+    virtual void setMotorsReversed(bool motorsIsReversed) override;
     virtual void outputToMotors(commands_t& commands, float deltaT, uint32_t tickCount) override;
     virtual void rpmFilterSetFrequencyHzIterationStep() override;
     virtual RPM_Filters* getRPM_Filters() override;

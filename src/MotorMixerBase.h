@@ -4,9 +4,9 @@
 #include "RPM_Filters.h"
 #include <cstddef>
 
-
 class Debug;
 class DynamicIdleController;
+
 
 class MotorMixerBase {
 public:
@@ -128,6 +128,7 @@ public:
     inline void motorsSwitchOn() { _motorsIsOn = true; }
     inline void motorsSwitchOff() { _motorsIsOn = false; }
     inline bool motorsIsDisabled() const { return _motorsIsDisabled; }
+    inline bool motorsIsReversed() const { return _motorsIsReversed; }
 
     virtual void setMixerConfig(const mixer_config_t& mixerConfig) { _mixerConfig.type = mixerConfig.type; }
     const mixer_config_t& getMixerConfig() const { return _mixerConfig; }
@@ -138,6 +139,7 @@ public:
     inline void setMotorOutputMin(float motorOutputMin) { _mixParameters.motorOutputMin = motorOutputMin; }
     inline float getMotorOutputMin() const { return _mixParameters.motorOutputMin; }
 
+    virtual void setMotorsReversed(bool motorsIsReversed) { _motorsIsReversed = motorsIsReversed; }
     virtual void outputToMotors(commands_t& commands, float deltaT, uint32_t tickCount) { (void)commands; (void)deltaT; (void)tickCount; }
     virtual float getMotorOutput(size_t motorIndex) const { (void)motorIndex; return 0.0F; }
 
@@ -193,4 +195,5 @@ protected:
     float _throttleCommand {0.0F}; //!< used for blackbox recording
     bool _motorsIsOn {false};
     bool _motorsIsDisabled {false};
+    bool _motorsIsReversed {false}; //!< reversed motors typically used to flip multi-rotor after a crash
 };

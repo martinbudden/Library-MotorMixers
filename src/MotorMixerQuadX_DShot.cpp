@@ -76,6 +76,11 @@ void MotorMixerQuadX_DShot::setDynamicIdlerControllerConfig(const DynamicIdleCon
     _dynamicIdleController.setConfig(config);
 }
 
+void MotorMixerQuadX_DShot::setMotorsReversed(bool motorsIsReversed)
+{
+    _motorsIsReversed = motorsIsReversed;
+}
+
 void MotorMixerQuadX_DShot::outputToMotors(commands_t& commands, float deltaT, uint32_t tickCount)
 {
     (void)tickCount;
