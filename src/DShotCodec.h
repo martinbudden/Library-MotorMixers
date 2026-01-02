@@ -31,10 +31,7 @@ The encoding of the eRPM data is not as straight forward as the one of the throt
 
 where m is the 9-bit mantissa and e is the 3 bit exponent and cccc the checksum.
 The resultant value is the mantissa shifted left by the exponent.
-
-TODO: functions have been directly copied from ESC_DShot and need renaming.
 */
-
 class DShotCodec {
 public:
     enum telemetry_type_e {
@@ -81,9 +78,34 @@ public:
     static inline uint32_t GCR21_to_GCR20(uint32_t value) { return (value ^ (value >> 1U)); }
     static uint16_t GCR20_to_eRPM(uint32_t value);
 public:
-    static const std::array<uint32_t, 17> gcrBitLengths;
-    static const std::array<uint32_t, 6> gcrSetBits;
-
+    static constexpr std::array<uint32_t, 17> gcrBitLengths = {
+        0, // 0 consecutive bits, not a valid lookup
+        1, // 1 consecutive bit
+        1, // 2 consecutive bits
+        1, // 3 consecutive bits
+        2, // 4 consecutive bits
+        2, // 5 consecutive bits
+        2, // 6 consecutive bits
+        3, // 7 consecutive bits
+        3, // 8 consecutive bits
+        3, // 9 consecutive bits
+        3, //10 consecutive bits
+        4, //11 consecutive bits, not valid, but sometimes occurs at the end of the string
+        4, //12 consecutive bits
+        4, //13 consecutive bits
+        5, //14 consecutive bits
+        5, //15 consecutive bits
+        5, //16 consecutive bits
+        // more than 10 consecutive samples: means four 0s or 1s in a row, which is invalid in GCR
+    };
+    static constexpr std::array<uint32_t, 6> gcrSetBits = {
+        0b00000, // 0 consecutive bits, not a valid lookup
+        0b00001, // 1 consecutive bit
+        0b00011, // 2 consecutive bits
+        0b00111, // 3 consecutive bits
+        0b01111, // 4 consecutive bits
+        0b11111  // 5 consecutive bits
+    };
     // array to map 5-bit GCR quintet to 4-bit nibble
     static constexpr std::array<uint32_t, 32> quintetToNibble = {
         0, 0,  0,  0, 0,  0,  0,  0,

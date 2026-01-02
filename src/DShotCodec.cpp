@@ -1,37 +1,5 @@
 #include "DShotCodec.h"
 
-const std::array<uint32_t, 17> DShotCodec::gcrBitLengths = {
-    0, // 0 consecutive bits, not a valid lookup
-    1, // 1 consecutive bits
-    1, // 2 consecutive bits
-    1, // 3 consecutive bits
-    2, // 4 consecutive bits
-    2, // 5 consecutive bits
-    2, // 6 consecutive bits
-    3, // 7 consecutive bits
-    3, // 8 consecutive bits
-    3, // 9 consecutive bits
-    3, //10 consecutive bits
-    4, //11 consecutive bits, not valid, but sometimes occurs at the end of the string
-    4, //12 consecutive bits
-    4, //13 consecutive bits
-    5, //14 consecutive bits
-    5, //15 consecutive bits
-    5, //16 consecutive bits
-    // more than 10 consecutive samples, means 4 0 or 1 in a row is invalid in GCR
-};
-
-const std::array<uint32_t, 6> DShotCodec::gcrSetBits = {
-    0b00000, // 0 consecutive bits, not a valid lookup
-    0b00001, // 1 consecutive bit
-    0b00011, // 2 consecutive bits
-    0b00111, // 3 consecutive bits
-    0b01111, // 4 consecutive bits
-    0b11111  // 5 consecutive bits
-};
-
-
-
 // NOLINTBEGIN(hicpp-signed-bitwise)
 uint32_t DShotCodec::decodeERPM(uint16_t value)
 {
