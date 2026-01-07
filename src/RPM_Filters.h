@@ -3,31 +3,6 @@
 #include <FilterTemplates.h>
 #include <Filters.h>
 
-#if defined(FRAMEWORK_RPI_PICO)
-
-#include <pico/critical_section.h>
-#include <pico/mutex.h>
-
-//#elif defined(FRAMEWORK_USE_FREERTOS)
-#elif defined(FRAMEWORK_USE_FREERTOS) && (defined(FRAMEWORK_ESPIDF) || defined(FRAMEWORK_ARDUINO_ESP32))
-
-#if defined(FRAMEWORK_ESPIDF) || defined(FRAMEWORK_ARDUINO_ESP32)
-#include <freertos/FreeRTOS.h>
-#include <freertos/queue.h>
-#include <freertos/semphr.h>
-#include <freertos/task.h>
-#else
-#if defined(FRAMEWORK_ARDUINO_STM32)
-#include <STM32FreeRTOS.h>
-#endif
-#include <FreeRTOS.h>
-#include <queue.h>
-#include <semphr.h>
-#include <task.h>
-#endif
-
-#endif
-
 #include <xyz_type.h>
 
 
@@ -98,16 +73,4 @@ private:
     BiquadFilterT<xyz_t> _filters[MAX_MOTOR_COUNT][RPM_FILTER_HARMONICS_COUNT]; //!< note this is a template filter that filters all 3 axes
     std::array<PowerTransferFilter1, MAX_MOTOR_COUNT> _motorRPM_Filters {}; //!< filters the motor RPM before it is used to set the filter frequency
     config_t _config {}; //!< configuration data is only changed in setConfig
-#if defined(FRAMEWORK_RPI_PICO)
-    mutable mutex_t _mutex {};
-    inline void LOCK_FILTERS() const { mutex_enter_blocking(&_mutex); }
-    inline void UNLOCK_FILTERS() const { mutex_exit(&_mutex); }
-#elif defined(FRAMEWORK_USE_FREERTOS) && (defined(FRAMEWORK_ESPIDF) || defined(FRAMEWORK_ARDUINO_ESP32))
-    // vTaskSuspendAll suspends the scheduler. This prevents a context switch from occurring but leaves interrupts enabled.
-    inline void LOCK_FILTERS() const { vTaskSuspendAll(); }
-    inline void UNLOCK_FILTERS() const { xTaskResumeAll(); }
-#else
-    inline void LOCK_FILTERS() const {}
-    inline void UNLOCK_FILTERS() const {}
-#endif
 };

@@ -1,6 +1,34 @@
 #include "RPM_Filters.h"
 #include <FastTrigonometry.h>
 
+#if defined(FRAMEWORK_USE_FREERTOS)
+
+#if defined(FRAMEWORK_ESPIDF) || defined(FRAMEWORK_ARDUINO_ESP32)
+#include <freertos/FreeRTOS.h>
+#include <freertos/queue.h>
+#include <freertos/semphr.h>
+#include <freertos/task.h>
+#else
+#if defined(FRAMEWORK_ARDUINO_STM32)
+#include <STM32FreeRTOS.h>
+#endif
+#include <FreeRTOS.h>
+#include <queue.h>
+#include <semphr.h>
+#include <task.h>
+#endif
+
+// vTaskSuspendAll suspends the scheduler. This prevents a context switch from occurring but leaves interrupts enabled.
+inline void LOCK_FILTERS() { vTaskSuspendAll(); }
+inline void UNLOCK_FILTERS() { xTaskResumeAll(); }
+
+#else
+
+inline void LOCK_FILTERS() {}
+inline void UNLOCK_FILTERS() {}
+
+#endif
+
 #if (__cplusplus >= 202002L)
 #include <ranges>
 #endif
