@@ -121,14 +121,14 @@ public:
         uint8_t channelForwardingStartChannel;
     } servoConfig_t;
 public:
-    inline type_e getType() const { return _type; }
-    inline size_t getMotorCount() const { return _motorCount; }
-    inline size_t getServoCount() const { return _servoCount; }
-    inline bool motorsIsOn() const { return _motorsIsOn; }
-    inline void motorsSwitchOn() { _motorsIsOn = true; }
-    inline void motorsSwitchOff() { _motorsIsOn = false; }
-    inline bool motorsIsDisabled() const { return _motorsIsDisabled; }
-    inline bool motorsIsReversed() const { return _motorsIsReversed; }
+    type_e getType() const { return _type; }
+    size_t getMotorCount() const { return _motorCount; }
+    size_t getServoCount() const { return _servoCount; }
+    bool motorsIsOn() const { return _motorsIsOn; }
+    void motorsSwitchOn() { _motorsIsOn = true; }
+    void motorsSwitchOff() { _motorsIsOn = false; }
+    bool motorsIsDisabled() const { return _motorsIsDisabled; }
+    bool motorsIsReversed() const { return _motorsIsReversed; }
 
     virtual void setMixerConfig(const mixer_config_t& mixerConfig) { _mixerConfig.type = mixerConfig.type; }
     const mixer_config_t& getMixerConfig() const { return _mixerConfig; }
@@ -136,8 +136,8 @@ public:
     virtual void setMotorConfig(const motor_config_t& motorConfig) { _motorConfig = motorConfig; }
     const motor_config_t& getMotorConfig() const { return _motorConfig; }
 
-    inline void setMotorOutputMin(float motorOutputMin) { _mixParameters.motorOutputMin = motorOutputMin; }
-    inline float getMotorOutputMin() const { return _mixParameters.motorOutputMin; }
+    void setMotorOutputMin(float motorOutputMin) { _mixParameters.motorOutputMin = motorOutputMin; }
+    float getMotorOutputMin() const { return _mixParameters.motorOutputMin; }
 
     virtual void setMotorsReversed(bool motorsIsReversed) { _motorsIsReversed = motorsIsReversed; }
     virtual void outputToMotors(commands_t& commands, float deltaT, uint32_t tickCount) { (void)commands; (void)deltaT; (void)tickCount; }
