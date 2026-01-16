@@ -67,7 +67,7 @@ static constexpr uint32_t DSHOT_BUFFER_LENGTH = 18;      // 16 bits of Dshot and
 #else
     static constexpr uint32_t DSHOT_BB_1_LENGTH = 10;        // number of sections for 1-bit, BITBANG_1_LENGTH
     static constexpr uint32_t DSHOT_BB_0_LENGTH = 4;         // number of sections for 0-bit, BITBANG_0_LENGTH
-    
+   
     static constexpr uint32_t DSHOT_BB_BUFFER_LENGTH = DSHOT_FRAME_LENGTH + 2; // 16 bits of Dshot and 2 for clearing - used when bit-banging dshot used
     static constexpr uint32_t DSHOT_BB_FRAME_SECTIONS = 14;                    // in how many sections is bit frame divided
     static constexpr uint32_t DSHOT_BB_FRAME_LENGTH = 140;   // how many counts of the timer gives one bit frame (must be multiple of DSHOT_BB_FRAME_SECTIONS)

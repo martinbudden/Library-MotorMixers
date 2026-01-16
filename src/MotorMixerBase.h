@@ -40,7 +40,7 @@ public:
     MotorMixerBase(type_e type, size_t motorCount, size_t servoCount, Debug* debug) :
         _type(type),
         _motorCount(motorCount),
-        _servoCount(servoCount), 
+        _servoCount(servoCount),
         _debug(debug),
         _mixerConfig { .type = type, .yaw_motors_reversed = true }
     {}
@@ -74,7 +74,7 @@ public:
     };
     //! parameters to mix function
     struct parameters_t {
-        //! minimum motor output, typically set to 5.5% to avoid ESC desynchronization, 
+        //! minimum motor output, typically set to 5.5% to avoid ESC desynchronization,
         //! may be set to zero if using dynamic idle control or brushed motors
         float motorOutputMin;
         float motorOutputMax;
@@ -180,9 +180,9 @@ protected:
             .useDshotEDT = false,
         },
         .motorIdle = 550, // 700 for brushed
-        .maxthrottle = 2000, 
-        .mincommand = 1000, 
-        .kv = 1960, 
+        .maxthrottle = 2000,
+        .mincommand = 1000,
+        .kv = 1960,
         .motorPoleCount = 14
     };
     parameters_t _mixParameters {

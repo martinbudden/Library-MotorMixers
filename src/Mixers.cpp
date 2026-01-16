@@ -117,7 +117,7 @@ CC = counter clockwise
         |X|
        /   \
  ^CWv 3     1 vCC^
-    
+
 
 "Mix" calculation
                                         m

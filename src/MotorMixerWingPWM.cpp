@@ -86,7 +86,7 @@ MotorMixerWingPWM::MotorMixerWingPWM(const motor_pins_t& pins, Debug* debug) :
 
 #else // defaults to FRAMEWORK_ARDUINO
 #if defined(FRAMEWORK_ARDUINO_ESP32)
-    
+   
     static constexpr int frequencyHz = 150000; // Motor PWM Frequency
     static constexpr int resolutionBits = 8; // PWM Resolution
 #if defined(FRAMEWORK_ARDUINO_ESP32_V2)
