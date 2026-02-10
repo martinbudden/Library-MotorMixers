@@ -21,12 +21,12 @@
 #endif
 
 
-class MotorMixerQuadX_PWM : public MotorMixerQuadBase {
+class MotorMixerQuadXPwm : public MotorMixerQuadBase {
 public:
-    MotorMixerQuadX_PWM(const motor_pins_t& pins, Debug* debug);
-    explicit MotorMixerQuadX_PWM(const motor_pins_t& pins) : MotorMixerQuadX_PWM(pins, nullptr) {}
-    MotorMixerQuadX_PWM(const stm32_motor_pins_t& pins, Debug* debug);
-    explicit MotorMixerQuadX_PWM(const stm32_motor_pins_t& pins) : MotorMixerQuadX_PWM(pins, nullptr) {}
+    MotorMixerQuadXPwm(const motor_pins_t& pins, Debug* debug);
+    explicit MotorMixerQuadXPwm(const motor_pins_t& pins) : MotorMixerQuadXPwm(pins, nullptr) {}
+    MotorMixerQuadXPwm(const stm32_motor_pins_t& pins, Debug* debug);
+    explicit MotorMixerQuadXPwm(const stm32_motor_pins_t& pins) : MotorMixerQuadXPwm(pins, nullptr) {}
 public:
 #if defined(FRAMEWORK_STM32_CUBE)
     struct pwm_pin_t {
@@ -40,10 +40,10 @@ public:
     };
 #endif
 public:
-    virtual void outputToMotors(commands_t& commands, float deltaT, uint32_t tickCount) override;
-    void writeMotor(uint8_t motorIndex, float motorOutput);
+    virtual void output_to_motors(motor_mixer_commands_t& commands, float delta_t, uint32_t tick_count) override;
+    void write_motor(uint8_t motor_index, float motorOutput);
 protected:
-    float _pwmScale {255.0F};
+    float _pwm_scale {255.0F};
     std::array<pwm_pin_t, MOTOR_COUNT> _pins {};
 #if defined(FRAMEWORK_STM32_CUBE)
     std::array<TIM_HandleTypeDef, MOTOR_COUNT> _htims {};

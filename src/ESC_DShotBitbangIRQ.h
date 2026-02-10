@@ -1,7 +1,7 @@
 #include <ESC_DShotBitbang.h>
 
 
-ESC_DShotBitbang* ESC_DShotBitbang::self; // alias of `this` to be used in ISR
+EscDshotBitbang* EscDshotBitbang::self; // alias of `this` to be used in ISR
 
 #if (defined(FRAMEWORK_STM32_CUBE) || defined(FRAMEWORK_ARDUINO_STM32)) && defined(FRAMEWORK_STM32_CUBE_F4)
 
@@ -13,9 +13,9 @@ void DMA##d##_Stream##s##_IRQHandler(); \
 void DMA##d##_Stream##s##_IRQHandler() { \
     if ( CONCAT(DMA,d)->CONCAT(h,ISR) & CONCAT(DMA_##h##ISR_TCIF,s) ) { \
         CONCAT(DMA,d)->CONCAT(h,IFCR) |= CONCAT(DMA_##h##IFCR_CTCIF,s); \
-        ESC_DShotBitbang::port_t& port = ESC_DShotBitbang::CONCAT(self->getPort,p)(); \
+        EscDshotBitbang::port_t& port = EscDshotBitbang::CONCAT(self->getPort,p)(); \
         if (port.reception) { \
-            ESC_DShotBitbang::IRQ_Handler(port); \
+            EscDshotBitbang::IRQ_Handler(port); \
         } \
         if (CONCAT(DMA,d)->CONCAT(h,ISR) & CONCAT(DMA_##h##ISR_HTIF,s)) { \
             CONCAT(DMA,d)->CONCAT(h,IFCR) |= CONCAT(DMA_##h##IFCR_CHTIF,s); \
@@ -42,9 +42,9 @@ void DMA2_Stream6_IRQHandler()
     // HIFCR: DMA high interrupt flag clear register
     if (DMA2->HISR & DMA_HISR_TCIF6) {
         DMA2->HIFCR |= DMA_HIFCR_CTCIF6;
-        ESC_DShotBitbang::port_t& port = ESC_DShotBitbang::self->getPortA();
+        EscDshotBitbang::port_t& port = EscDshotBitbang::self->getPortA();
         if (port.reception) {
-            ESC_DShotBitbang::IRQ_Handler(port);
+            EscDshotBitbang::IRQ_Handler(port);
         }
     }
     if (DMA2->HISR & DMA_HISR_HTIF6) {
@@ -66,9 +66,9 @@ void DMA2_Stream2_IRQHandler()
     // LIFCR: DMA low interrupt flag clear register
     if (DMA2->LISR & DMA_LISR_TCIF2) {
         DMA2->LIFCR |= DMA_LIFCR_CTCIF2;
-        ESC_DShotBitbang::port_t& port = ESC_DShotBitbang::self->getPortB();
+        EscDshotBitbang::port_t& port = EscDshotBitbang::self->getPortB();
         if (port.reception) {
-            ESC_DShotBitbang::IRQ_Handler(port);
+            EscDshotBitbang::IRQ_Handler(port);
         }
     }
     if (DMA2->LISR & DMA_LISR_HTIF2) {

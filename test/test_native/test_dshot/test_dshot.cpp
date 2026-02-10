@@ -15,7 +15,7 @@ void test_dshot()
 {
     enum { DSHOT_PIN = 4 };
 
-    static ESC_DShot esc(ESC_DShot::ESC_PROTOCOL_DSHOT300);
+    static EscDshot esc(EscDshot::ESC_PROTOCOL_DSHOT300);
     esc.init(DSHOT_PIN);
 /*
     DShot 300 specification is
@@ -26,16 +26,16 @@ void test_dshot()
     TxH+TxL = 3340ns  (T0H + T0L or T1H + T1L)
 */
 
-    TEST_ASSERT_EQUAL(126, esc.nanoSecondsToCycles(840));
-    TEST_ASSERT_EQUAL(187, esc.nanoSecondsToCycles(1250));
-    TEST_ASSERT_EQUAL(313, esc.nanoSecondsToCycles(2090));
-    TEST_ASSERT_EQUAL(375, esc.nanoSecondsToCycles(2500));
-    TEST_ASSERT_EQUAL(750, esc.nanoSecondsToCycles(5000));
-    TEST_ASSERT_EQUAL(1125, esc.nanoSecondsToCycles(7500));
+    TEST_ASSERT_EQUAL(126, esc.nano_seconds_to_cycles(840));
+    TEST_ASSERT_EQUAL(187, esc.nano_seconds_to_cycles(1250));
+    TEST_ASSERT_EQUAL(313, esc.nano_seconds_to_cycles(2090));
+    TEST_ASSERT_EQUAL(375, esc.nano_seconds_to_cycles(2500));
+    TEST_ASSERT_EQUAL(750, esc.nano_seconds_to_cycles(5000));
+    TEST_ASSERT_EQUAL(1125, esc.nano_seconds_to_cycles(7500));
 
-    TEST_ASSERT_EQUAL(350, esc.nanoSecondsToCycles(2333));
-    TEST_ASSERT_EQUAL(700, esc.nanoSecondsToCycles(4666));
-    TEST_ASSERT_EQUAL(1000, esc.nanoSecondsToCycles(6666));
+    TEST_ASSERT_EQUAL(350, esc.nano_seconds_to_cycles(2333));
+    TEST_ASSERT_EQUAL(700, esc.nano_seconds_to_cycles(4666));
+    TEST_ASSERT_EQUAL(1000, esc.nano_seconds_to_cycles(6666));
 
     esc.end();
 }
@@ -44,31 +44,31 @@ void test_dshot_init()
 {
     enum { DSHOT_PIN = 4 };
 
-    static ESC_DShot esc150(ESC_DShot::ESC_PROTOCOL_DSHOT150);
+    static EscDshot esc150(EscDshot::ESC_PROTOCOL_DSHOT150);
     esc150.init(DSHOT_PIN);
-    TEST_ASSERT_EQUAL(750, esc150.getDataHighPulseWidth());
-    TEST_ASSERT_EQUAL(375, esc150.getDataLowPulseWidth());
+    TEST_ASSERT_EQUAL(750, esc150.get_data_high_pulse_width());
+    TEST_ASSERT_EQUAL(375, esc150.get_data_low_pulse_width());
 
-    static ESC_DShot esc300(ESC_DShot::ESC_PROTOCOL_DSHOT300);
+    static EscDshot esc300(EscDshot::ESC_PROTOCOL_DSHOT300);
     esc300.init(DSHOT_PIN);
-    TEST_ASSERT_EQUAL(375, esc300.getDataHighPulseWidth());
-    TEST_ASSERT_EQUAL(187, esc300.getDataLowPulseWidth());
+    TEST_ASSERT_EQUAL(375, esc300.get_data_high_pulse_width());
+    TEST_ASSERT_EQUAL(187, esc300.get_data_low_pulse_width());
 
-    static ESC_DShot esc600(ESC_DShot::ESC_PROTOCOL_DSHOT600);
+    static EscDshot esc600(EscDshot::ESC_PROTOCOL_DSHOT600);
     esc600.init(DSHOT_PIN);
-    TEST_ASSERT_EQUAL(187, esc600.getDataHighPulseWidth());
-    TEST_ASSERT_EQUAL(93, esc600.getDataLowPulseWidth());
+    TEST_ASSERT_EQUAL(187, esc600.get_data_high_pulse_width());
+    TEST_ASSERT_EQUAL(93, esc600.get_data_low_pulse_width());
 }
 
 void test_dshot_write()
 {
     enum { DSHOT_PIN = 4 };
 
-    static ESC_DShot esc(ESC_DShot::ESC_PROTOCOL_DSHOT300);
+    static EscDshot esc(EscDshot::ESC_PROTOCOL_DSHOT300);
     esc.init(DSHOT_PIN);
 
-    const uint32_t HI = esc.getDataHighPulseWidth();
-    const uint32_t LO = esc.getDataLowPulseWidth();
+    const uint32_t HI = esc.get_data_high_pulse_width();
+    const uint32_t LO = esc.get_data_low_pulse_width();
 
     TEST_ASSERT_EQUAL(375, HI);
     TEST_ASSERT_EQUAL(187, LO);
@@ -143,13 +143,13 @@ void test_dshot_write_channel_b()
 {
     enum { DSHOT_PIN = 4 };
 
-    static ESC_DShot esc(ESC_DShot::ESC_PROTOCOL_DSHOT300);
+    static EscDshot esc(EscDshot::ESC_PROTOCOL_DSHOT300);
     esc.init(DSHOT_PIN);
-    esc.setUseHighOrderBits(true);
+    esc.set_use_high_order_bits(true);
 
     // channel B uses high order bits
-    const uint32_t HI = esc.getDataHighPulseWidth() << 16;
-    const uint32_t LO = esc.getDataLowPulseWidth() << 16;
+    const uint32_t HI = esc.get_data_high_pulse_width() << 16;
+    const uint32_t LO = esc.get_data_low_pulse_width() << 16;
 
     const uint16_t dshot1000 = DShotCodec::pwmToDShotClipped(1000);
     esc.write(dshot1000);

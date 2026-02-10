@@ -4,7 +4,7 @@
 
 
 #if defined(FRAMEWORK_STM32_CUBE) || defined(FRAMEWORK_ARDUINO_STM32)
-void ESC_DShotBitbang::IRQ_Handler(port_t& port)
+void EscDshotBitbang::IRQ_Handler(port_t& port)
 {
 #if defined(FRAMEWORK_STM32_CUBE_F4)
     // set GPIOs as inputs:
@@ -15,19 +15,19 @@ void ESC_DShotBitbang::IRQ_Handler(port_t& port)
     port.GPIO->PUPDR |= port.GPIO_PUPDR;
 
     // set timer:
-    port.TIM->ARR = DSHOT_BB_FRAME_LENGTH * DSHOT_MODE / BDSHOT_RESPONSE_BITRATE / ESC_DShotBitbang::RESPONSE_OVERSAMPLING - 1;
-    port.TIM->CCR1 = DSHOT_BB_FRAME_LENGTH * DSHOT_MODE / BDSHOT_RESPONSE_BITRATE / ESC_DShotBitbang::RESPONSE_OVERSAMPLING;
+    port.TIM->ARR = DSHOT_BB_FRAME_LENGTH * DSHOT_MODE / BDSHOT_RESPONSE_BITRATE / EscDshotBitbang::RESPONSE_OVERSAMPLING - 1;
+    port.TIM->CCR1 = DSHOT_BB_FRAME_LENGTH * DSHOT_MODE / BDSHOT_RESPONSE_BITRATE / EscDshotBitbang::RESPONSE_OVERSAMPLING;
 
     // Set DMA to copy GPIOA->IDR register value to the _dmaInputBufferA buffer).
     port.DMA_Stream->CR &= ~(DMA_SxCR_DIR);
     port.DMA_Stream->PAR = reinterpret_cast<uint32_t>(&(GPIOA->IDR)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-    port.DMA_Stream->M0AR = reinterpret_cast<uint32_t>(&ESC_DShotBitbang::self->_portA.dmaInputBuffer[0]); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    port.DMA_Stream->M0AR = reinterpret_cast<uint32_t>(&EscDshotBitbang::self->_portA.dmaInputBuffer[0]); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
     // Main idea:
     // After sending DShot frame to ESC start receiving GPIO values.
     // Capture data (probing longer than ESC response).
     // There is ~33 [us] gap before the response so it is necessary to add more samples:
     // NDTR: number of data register
-    port.DMA_Stream->NDTR = (33 * BDSHOT_RESPONSE_BITRATE / 1000 + BDSHOT_RESPONSE_LENGTH + 1) * ESC_DShotBitbang::RESPONSE_OVERSAMPLING;
+    port.DMA_Stream->NDTR = (33 * BDSHOT_RESPONSE_BITRATE / 1000 + BDSHOT_RESPONSE_LENGTH + 1) * EscDshotBitbang::RESPONSE_OVERSAMPLING;
 
     port.DMA_Stream->CR |= DMA_SxCR_EN;
 #endif
@@ -35,12 +35,12 @@ void ESC_DShotBitbang::IRQ_Handler(port_t& port)
 }
 #endif
 
-ESC_DShotBitbang::ESC_DShotBitbang()
+EscDshotBitbang::EscDshotBitbang()
 {
     self = this;
 }
 
-void ESC_DShotBitbang::init()
+void EscDshotBitbang::init()
 {
     presetDMA_outputBuffers();
 #if (defined(FRAMEWORK_STM32_CUBE) || defined(FRAMEWORK_ARDUINO_STM32))
@@ -88,7 +88,7 @@ APB1 max frequency is 42 [MHz], 84 [MHz] only for timers
 */
 
 #if defined(FRAMEWORK_STM32_CUBE) || defined(FRAMEWORK_ARDUINO_STM32)
-void ESC_DShotBitbang::setupGPIO(GPIO_TypeDef* GPIO, uint32_t GPIOxEN, uint32_t GPIO_OSPEEDER_OSPEEDRn)
+void EscDshotBitbang::setupGPIO(GPIO_TypeDef* GPIO, uint32_t GPIOxEN, uint32_t GPIO_OSPEEDER_OSPEEDRn)
 {
 #if defined(FRAMEWORK_STM32_CUBE_F4)
     // enable GPIOA clock:
@@ -104,7 +104,7 @@ void ESC_DShotBitbang::setupGPIO(GPIO_TypeDef* GPIO, uint32_t GPIOxEN, uint32_t 
 }
 
 #if (defined(FRAMEWORK_STM32_CUBE) || defined(FRAMEWORK_ARDUINO_STM32)) && defined(FRAMEWORK_STM32_CUBE_F4)
-void ESC_DShotBitbang::setupDMA(DMA_Stream_TypeDef* DMA_Stream, uint32_t DMAxEN)
+void EscDshotBitbang::setupDMA(DMA_Stream_TypeDef* DMA_Stream, uint32_t DMAxEN)
 {
     RCC->AHB1ENR |= DMAxEN;
 
@@ -117,7 +117,7 @@ void ESC_DShotBitbang::setupDMA(DMA_Stream_TypeDef* DMA_Stream, uint32_t DMAxEN)
 }
 #endif
 
-void ESC_DShotBitbang::setupTimers(TIM_TypeDef* TIM, uint32_t TIMxEN)
+void EscDshotBitbang::setupTimers(TIM_TypeDef* TIM, uint32_t TIMxEN)
 {
 // TIM - only for generating time basement all outputs are set by GPIOs:
     // enable TIM1 clock:
@@ -157,7 +157,7 @@ void ESC_DShotBitbang::setupTimers(TIM_TypeDef* TIM, uint32_t TIMxEN)
 #endif //FRAMEWORK_STM32
 
 // values should be in the DShot range [47,2047]
-void ESC_DShotBitbang::outputToMotors(uint16_t m1_value, uint16_t m2_value, uint16_t m3_value, uint16_t m4_value)
+void EscDshotBitbang::output_to_motors(uint16_t m1_value, uint16_t m2_value, uint16_t m3_value, uint16_t m4_value)
 {
     update_motors_rpm();
 
@@ -292,7 +292,7 @@ Method 2 uses 3 sections for each bit and variable length sections
 This requires smaller buffers, has lower DMA load, has more precise timing, but requires more timer channels
 */
 
-void ESC_DShotBitbang::presetDMA_outputBuffers()
+void EscDshotBitbang::presetDMA_outputBuffers()
 {
 #if (defined(FRAMEWORK_STM32_CUBE) || defined(FRAMEWORK_ARDUINO_STM32)) && defined(FRAMEWORK_STM32_CUBE_F4)
     // this values are constant so they can be set once here
@@ -329,7 +329,7 @@ void ESC_DShotBitbang::presetDMA_outputBuffers()
 #endif
 }
 
-void ESC_DShotBitbang::setDMA_outputBuffers(uint16_t m1_frame, uint16_t m2_frame, uint16_t m3_frame, uint16_t m4_frame)
+void EscDshotBitbang::setDMA_outputBuffers(uint16_t m1_frame, uint16_t m2_frame, uint16_t m3_frame, uint16_t m4_frame)
 {
 /*
 For each output bit DMA is transfering DSHOT_BB_FRAME_SECTIONS (14) times data into GPIO register.
@@ -398,7 +398,7 @@ In actual received data these may vary because of jitter.
 
 Converts a buffer of samples (obtained from DMA) to a gcr21 value
 */
-uint32_t ESC_DShotBitbang::samples_to_GCR21(const uint32_t* samples, uint32_t motorMask)
+uint32_t EscDshotBitbang::samples_to_GCR21(const uint32_t* samples, uint32_t motorMask)
 {
 
     uint16_t i = 0;
@@ -450,14 +450,14 @@ uint32_t ESC_DShotBitbang::samples_to_GCR21(const uint32_t* samples, uint32_t mo
 /*!
 Converts gcr21 value to a buffer of samples, used for test code
 */
-void ESC_DShotBitbang::GCR21_to_samples(uint32_t* samples, uint32_t motorMask, uint32_t gcr21)
+void EscDshotBitbang::GCR21_to_samples(uint32_t* samples, uint32_t motorMask, uint32_t gcr21)
 {
     *samples = 0;
     (void)motorMask;
     (void)gcr21;
 }
 
-void ESC_DShotBitbang::update_motors_rpm()
+void EscDshotBitbang::update_motors_rpm()
 {
     // BDshot bit banging reads whole GPIO register.
     // Now it's time to create BDshot responses from all motors (made of individual bits).
@@ -469,13 +469,13 @@ void ESC_DShotBitbang::update_motors_rpm()
     };
     for (size_t ii = 0; ii < motorGCR21s.size(); ++ii) {
         const uint32_t motorGCR20 = DShotCodec::GCR21_to_GCR20(motorGCR21s[ii]);
-        const uint16_t eRPM = DShotCodec::GCR20_to_eRPM(motorGCR20);
+        const uint16_t eRPM = DShotCodec::GCR20_to_erpm(motorGCR20);
         if (DShotCodec::checksumBidirectionalIsOK(eRPM)) {
             DShotCodec::telemetry_type_e telemetryType {};
             const auto eRPM_periodMicroseconds = DShotCodec::decodeTelemetryFrame(static_cast<uint16_t>(eRPM >> 4), telemetryType);
             enum { ONE_MINUTE_IN_MICROSECONDS = 60000000 };
             // value is eRPM period in microseconds
-            _eRPMs[ii] = static_cast<int32_t>(ONE_MINUTE_IN_MICROSECONDS / eRPM_periodMicroseconds);
+            _erpms[ii] = static_cast<int32_t>(ONE_MINUTE_IN_MICROSECONDS / eRPM_periodMicroseconds);
         }
     }
 

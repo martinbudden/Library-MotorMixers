@@ -21,10 +21,10 @@
 #endif
 
 
-class MotorMixerWingPWM : public MotorMixerWingBase {
+class MotorMixerWingPwm : public MotorMixerWingBase {
 public:
-    MotorMixerWingPWM(const motor_pins_t& pins, Debug* debug);
-    MotorMixerWingPWM(const stm32_motor_pins_t& pins, Debug* debug);
+    MotorMixerWingPwm(const motor_pins_t& pins, Debug* debug);
+    MotorMixerWingPwm(const stm32_motor_pins_t& pins, Debug* debug);
 public:
 #if defined(FRAMEWORK_STM32_CUBE)
     struct pwm_pin_t {
@@ -38,10 +38,10 @@ public:
     };
 #endif
 public:
-    virtual void outputToMotors(commands_t& commands, float deltaT, uint32_t tickCount) override;
-    void writeMotor(uint8_t motorIndex, float motorOutput);
+    virtual void output_to_motors(motor_mixer_commands_t& commands, float delta_t, uint32_t tick_count) override;
+    void write_motor(uint8_t motor_index, float motorOutput);
 protected:
-    float _pwmScale {255.0F};
+    float _pwm_scale {255.0F};
     std::array<pwm_pin_t, MOTOR_COUNT + SERVO_COUNT> _pins {};
 #if defined(FRAMEWORK_STM32_CUBE)
     std::array<TIM_HandleTypeDef, MOTOR_COUNT> _htims {};

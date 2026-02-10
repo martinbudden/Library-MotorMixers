@@ -76,7 +76,7 @@ public:
     static uint32_t eRPM_to_GCR20(uint16_t value);
     static uint32_t GR20_to_GCR21(uint32_t value);
     static inline uint32_t GCR21_to_GCR20(uint32_t value) { return (value ^ (value >> 1U)); }
-    static uint16_t GCR20_to_eRPM(uint32_t value);
+    static uint16_t GCR20_to_erpm(uint32_t value);
 public:
     static constexpr std::array<uint32_t, 17> gcrBitLengths = {
         0, // 0 consecutive bits, not a valid lookup

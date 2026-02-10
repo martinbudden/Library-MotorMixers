@@ -9,7 +9,7 @@ public:
     explicit MotorMixerWingBase(Debug* debug) : MotorMixerBase(FLYING_WING_SINGLE_PROPELLER, MOTOR_COUNT, SERVO_COUNT, debug) {}
 public:
     enum { M0=0, S0=1, S1=2, MOTOR_COUNT=1, SERVO_COUNT=2 };
-    virtual float getMotorOutput(size_t motorIndex) const override { return _outputs[motorIndex]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    virtual float get_motor_output(size_t motor_index) const override { return _outputs[motor_index]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 public:
     struct motor_pins_t {
         uint8_t m0;

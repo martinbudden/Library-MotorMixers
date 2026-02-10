@@ -10,120 +10,120 @@
 #endif
 
 
-MotorMixerQuadX_DShotBitbang::MotorMixerQuadX_DShotBitbang(uint32_t taskIntervalMicroseconds, uint32_t outputToMotorsDenominator, const stm32_motor_pins_t& pins, Debug& debug) :
+MotorMixerQuadXDshotBitbang::MotorMixerQuadXDshotBitbang(uint32_t task_interval_microseconds, uint32_t output_to_motors_denominator, const stm32_motor_pins_t& pins, Debug& debug) :
     MotorMixerQuadBase(QUAD_X, &debug),
-    _dynamicIdleController(taskIntervalMicroseconds/outputToMotorsDenominator, debug),
-    _rpmFilters(_motorCount, static_cast<float>(taskIntervalMicroseconds) * 0.000001F)
+    _dynamic_idle_controller(task_interval_microseconds/output_to_motors_denominator, debug),
+    _rpm_filters(_motor_count, static_cast<float>(task_interval_microseconds) * 0.000001F)
 {
     (void)pins; // !!TODO: set pins
 
     // There are a maximum of 12 rpmFilter iterations: 4 motors and up to 3 harmonics for each motor.
     // We want to complete all 12 iterations in less than 1000 microseconds.
-    if (taskIntervalMicroseconds >= 1000) {
-        _rpmFilterIterationCount =  12;
-    } else if (taskIntervalMicroseconds >= 500) {
-        _rpmFilterIterationCount =  6;
-    } else if (taskIntervalMicroseconds >= 250) {
-        _rpmFilterIterationCount =  3;
+    if (task_interval_microseconds >= 1000) {
+        _rpm_filter_iteration_count =  12;
+    } else if (task_interval_microseconds >= 500) {
+        _rpm_filter_iteration_count =  6;
+    } else if (task_interval_microseconds >= 250) {
+        _rpm_filter_iteration_count =  3;
     } else {
-        _rpmFilterIterationCount =  2;
+        _rpm_filter_iteration_count =  2;
     }
 }
 
-float MotorMixerQuadX_DShotBitbang::calculateSlowestMotorHz() const
+float MotorMixerQuadXDshotBitbang::calculate_slowest_motor_hz() const
 {
-    float slowestMotorHz = _motorFrequenciesHz[M0];
-    float motorHz = _motorFrequenciesHz[M1];
-    if (motorHz < slowestMotorHz) {
-        slowestMotorHz = motorHz;
+    float slowestMotorHz = _motor_frequencies_hz[M0];
+    float motor_hz = _motor_frequencies_hz[M1];
+    if (motor_hz < slowestMotorHz) {
+        slowestMotorHz = motor_hz;
     }
-    motorHz = _motorFrequenciesHz[M2];
-    if (motorHz < slowestMotorHz) {
-        slowestMotorHz = motorHz;
+    motor_hz = _motor_frequencies_hz[M2];
+    if (motor_hz < slowestMotorHz) {
+        slowestMotorHz = motor_hz;
     }
-    motorHz = _motorFrequenciesHz[M3];
-    if (motorHz < slowestMotorHz) {
-        slowestMotorHz = motorHz;
+    motor_hz = _motor_frequencies_hz[M3];
+    if (motor_hz < slowestMotorHz) {
+        slowestMotorHz = motor_hz;
     }
     return slowestMotorHz;
 }
 
-void MotorMixerQuadX_DShotBitbang::setMotorConfig(const motor_config_t& motorConfig)
+void MotorMixerQuadXDshotBitbang::set_motor_config(const motor_config_t& motor_config)
 {
-    _motorConfig = motorConfig;
-    _eRPMtoHz = 2.0F * (100.0F / SECONDS_PER_MINUTE) / static_cast<float>(motorConfig.motorPoleCount);
+    _motor_config = motor_config;
+    _erpm_to_hz = 2.0F * (100.0F / SECONDS_PER_MINUTE) / static_cast<float>(motor_config.motor_pole_count);
 }
 
-RPM_Filters* MotorMixerQuadX_DShotBitbang::getRPM_Filters()
+RpmFilters* MotorMixerQuadXDshotBitbang::get_rpm_filters()
 {
-    return &_rpmFilters;
+    return &_rpm_filters;
 }
 
-const RPM_Filters* MotorMixerQuadX_DShotBitbang::getRPM_Filters() const
+const RpmFilters* MotorMixerQuadXDshotBitbang::get_rpm_filters() const
 {
-    return &_rpmFilters;
+    return &_rpm_filters;
 }
 
-const DynamicIdleController* MotorMixerQuadX_DShotBitbang::getDynamicIdleController() const
+const DynamicIdleController* MotorMixerQuadXDshotBitbang::get_dynamic_idle_controller() const
 {
-    return &_dynamicIdleController;
+    return &_dynamic_idle_controller;
 }
 
-void MotorMixerQuadX_DShotBitbang::setDynamicIdlerControllerConfig(const DynamicIdleController::config_t& config)
+void MotorMixerQuadXDshotBitbang::set_dynamic_idler_controller_config(const DynamicIdleController::config_t& config)
 {
-    _dynamicIdleController.setConfig(config);
+    _dynamic_idle_controller.set_config(config);
 }
 
-void MotorMixerQuadX_DShotBitbang::setMotorsReversed(bool motorsIsReversed)
+void MotorMixerQuadXDshotBitbang::set_motors_reversed(bool motors_is_reversed)
 {
-    _motorsIsReversed = motorsIsReversed;
+    _motors_is_reversed = motors_is_reversed;
 }
 
-void MotorMixerQuadX_DShotBitbang::outputToMotors(commands_t& commands, float deltaT, uint32_t tickCount)
+void MotorMixerQuadXDshotBitbang::output_to_motors(motor_mixer_commands_t& commands, float delta_t, uint32_t tick_count)
 {
-    (void)tickCount;
+    (void)tick_count;
 
-    if (motorsIsOn()) {
-        const float throttleIncrease = (_dynamicIdleController.getMinimumAllowedMotorHz() == 0.0F) ? 0.0F : _dynamicIdleController.calculateSpeedIncrease(calculateSlowestMotorHz(), deltaT);
+    if (motors_is_on()) {
+        const float throttleIncrease = (_dynamic_idle_controller.get_minimum_allowed_motor_hz() == 0.0F) ? 0.0F : _dynamic_idle_controller.calculateSpeedIncrease(calculate_slowest_motor_hz(), delta_t);
         commands.throttle += throttleIncrease;
         // set the throttle to value returned by the mixer
-        commands.throttle = mixQuadX(_outputs, commands, _mixParameters);
+        commands.throttle = mix_quad_x(_outputs, commands, _mix_parameters);
     } else {
         _outputs = { 0.0F, 0.0F, 0.0F, 0.0F };
     }
-    _throttleCommand = commands.throttle;
+    _throttle_command = commands.throttle;
 
     // convert motor output to DShot range [47, 2047]
-    _escDShot.outputToMotors(
-        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M0], _mixParameters.motorOutputMin, 1.0F)) + 47),
-        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M1], _mixParameters.motorOutputMin, 1.0F)) + 47),
-        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M2], _mixParameters.motorOutputMin, 1.0F)) + 47),
-        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M3], _mixParameters.motorOutputMin, 1.0F)) + 47)
+    _esc_dshot.output_to_motors(
+        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M0], _mix_parameters.motor_output_min, 1.0F)) + 47),
+        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M1], _mix_parameters.motor_output_min, 1.0F)) + 47),
+        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M2], _mix_parameters.motor_output_min, 1.0F)) + 47),
+        static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M3], _mix_parameters.motor_output_min, 1.0F)) + 47)
     );
 
     // read the motor RPMs
-    _motorFrequenciesHz[M0] = static_cast<float>(_escDShot.getMotorERPM(M0))*_eRPMtoHz;
-    _motorFrequenciesHz[M1] = static_cast<float>(_escDShot.getMotorERPM(M1))*_eRPMtoHz;
-    _motorFrequenciesHz[M2] = static_cast<float>(_escDShot.getMotorERPM(M2))*_eRPMtoHz;
-    _motorFrequenciesHz[M3] = static_cast<float>(_escDShot.getMotorERPM(M3))*_eRPMtoHz;
+    _motor_frequencies_hz[M0] = static_cast<float>(_esc_dshot.get_motor_erpm(M0))*_erpm_to_hz;
+    _motor_frequencies_hz[M1] = static_cast<float>(_esc_dshot.get_motor_erpm(M1))*_erpm_to_hz;
+    _motor_frequencies_hz[M2] = static_cast<float>(_esc_dshot.get_motor_erpm(M2))*_erpm_to_hz;
+    _motor_frequencies_hz[M3] = static_cast<float>(_esc_dshot.get_motor_erpm(M3))*_erpm_to_hz;
 
-    _rpmFilters.setFrequencyHzIterationStart(M0, _motorFrequenciesHz[M0]);
-    _rpmFilters.setFrequencyHzIterationStart(M1, _motorFrequenciesHz[M1]);
-    _rpmFilters.setFrequencyHzIterationStart(M1, _motorFrequenciesHz[M2]);
-    _rpmFilters.setFrequencyHzIterationStart(M3, _motorFrequenciesHz[M3]);
+    _rpm_filters.set_frequency_hz_iteration_start(M0, _motor_frequencies_hz[M0]);
+    _rpm_filters.set_frequency_hz_iteration_start(M1, _motor_frequencies_hz[M1]);
+    _rpm_filters.set_frequency_hz_iteration_start(M1, _motor_frequencies_hz[M2]);
+    _rpm_filters.set_frequency_hz_iteration_start(M3, _motor_frequencies_hz[M3]);
 
 }
 
-void MotorMixerQuadX_DShotBitbang::rpmFilterSetFrequencyHzIterationStep()
+void MotorMixerQuadXDshotBitbang::rpm_filter_set_frequency_hz_iteration_step()
 {
     // Perform an rpmFilter iteration step for each motor
-    // Note that _rpmFilters.setFrequencyHzIterationStep is an expensive calculation and runs off a state machine, setting one motor harmonic per iteration
+    // Note that _rpm_filters.set_frequency_hz_iteration_step is an expensive calculation and runs off a state machine, setting one motor harmonic per iteration
     // so we want to call it even if we do not write to the motors
 #if (__cplusplus >= 202002L)
-    for ([[maybe_unused]] auto _ : std::views::iota(size_t{0}, _rpmFilterIterationCount)) {
+    for ([[maybe_unused]] auto _ : std::views::iota(size_t{0}, _rpm_filter_iteration_count)) {
 #else
-    for (size_t ii = 0; ii < _rpmFilterIterationCount; ++ii) {
+    for (size_t ii = 0; ii < _rpm_filter_iteration_count; ++ii) {
 #endif
-        _rpmFilters.setFrequencyHzIterationStep();
+        _rpm_filters.set_frequency_hz_iteration_step();
     }
 }

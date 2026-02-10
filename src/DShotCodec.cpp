@@ -107,7 +107,7 @@ uint32_t DShotCodec::decodeSamples(uint64_t value, telemetry_type_e& telemetryTy
     // convert 21-bit edge transition GCR to 20-bit binary GCR
     const uint32_t gcr20 = GCR21_to_GCR20(gcr_result);
 
-    const uint16_t result = GCR20_to_eRPM(gcr20);
+    const uint16_t result = GCR20_to_erpm(gcr20);
 
     if (!checksumBidirectionalIsOK(result)) {
         telemetryType = TELEMETRY_INVALID;
@@ -156,7 +156,7 @@ uint32_t DShotCodec::decodeSamples(const uint32_t* samples, uint32_t count, tele
         return TELEMETRY_INVALID;
     }
 
-    const uint16_t result = GCR20_to_eRPM(value);
+    const uint16_t result = GCR20_to_erpm(value);
 
     if (!checksumBidirectionalIsOK(result)) {
         telemetryType = TELEMETRY_INVALID;
@@ -165,7 +165,7 @@ uint32_t DShotCodec::decodeSamples(const uint32_t* samples, uint32_t count, tele
     return decodeTelemetryFrame(static_cast<uint16_t>(result >> 4), telemetryType);
 }
 
-uint16_t DShotCodec::GCR20_to_eRPM(uint32_t value)
+uint16_t DShotCodec::GCR20_to_erpm(uint32_t value)
 {
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
     uint32_t ret = quintetToNibble[value & 0x1F];

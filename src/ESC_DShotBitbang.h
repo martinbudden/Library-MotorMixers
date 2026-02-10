@@ -73,7 +73,7 @@ static constexpr uint32_t DSHOT_BUFFER_LENGTH = 18;      // 16 bits of Dshot and
     static constexpr uint32_t DSHOT_BB_FRAME_LENGTH = 140;   // how many counts of the timer gives one bit frame (must be multiple of DSHOT_BB_FRAME_SECTIONS)
 #endif
 
-class ESC_DShotBitbang {
+class EscDshotBitbang {
 public:
     static constexpr uint32_t MOTOR_1 = 3; // PA3
     static constexpr uint32_t MOTOR_4 = 2; // PA2
@@ -83,19 +83,19 @@ public:
 
     static constexpr uint16_t RESPONSE_OVERSAMPLING = 3;  // it has to be a factor of DSHOT_BB_FRAME_LENGTH * DSHOT_MODE / BIDIRECTIONAL_DSHOT_RESPONSE_BITRATE
 
-    ESC_DShotBitbang();
+    EscDshotBitbang();
     void init();
     void presetDMA_outputBuffers();
     void setDMA_outputBuffers(uint16_t m1_frame, uint16_t m2_frame, uint16_t m3_frame, uint16_t m4_frame);
 
-    void outputToMotors(uint16_t m1_value, uint16_t m2_value, uint16_t m3_value, uint16_t m4_value); // values should be in the DShot range [47,2047]
+    void output_to_motors(uint16_t m1_value, uint16_t m2_value, uint16_t m3_value, uint16_t m4_value); // values should be in the DShot range [47,2047]
     void update_motors_rpm();
-    int32_t getMotorERPM(size_t motorIndex) { return _eRPMs[motorIndex]; }
+    int32_t get_motor_erpm(size_t motor_index) { return _erpms[motor_index]; }
 
     static uint32_t samples_to_GCR21(const uint32_t* samples, uint32_t motorMask);
     static void GCR21_to_samples(uint32_t* samples, uint32_t motorMask, uint32_t gcr21); // for test code
 public:
-    static ESC_DShotBitbang* self; // alias of `this` to be used in ISR
+    static EscDshotBitbang* self; // alias of `this` to be used in ISR
     struct port_t {
 #if defined(FRAMEWORK_STM32_CUBE) || defined(FRAMEWORK_ARDUINO_STM32)
         GPIO_TypeDef* GPIO;
@@ -116,7 +116,7 @@ public:
     port_t& getPortB() { return _portB; }
     static void IRQ_Handler(port_t& port);
 private:
-    std::array<int32_t, MOTOR_COUNT> _eRPMs {};
+    std::array<int32_t, MOTOR_COUNT> _erpms {};
     std::array<int32_t, MOTOR_COUNT> _motorErrors {};
     port_t _portA {};
     port_t _portB {};

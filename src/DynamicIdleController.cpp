@@ -14,52 +14,52 @@ inline float clamp(float value, float min, float max)
 }
 
 
-DynamicIdleController::DynamicIdleController(uint32_t taskIntervalMicroseconds, Debug& debug) :
-    _taskIntervalMicroseconds(taskIntervalMicroseconds),
+DynamicIdleController::DynamicIdleController(uint32_t task_interval_microseconds, Debug& debug) :
+    _task_interval_microseconds(task_interval_microseconds),
     _debug(debug)
 {
 }
 
-void DynamicIdleController::setConfig(const config_t& config)
+void DynamicIdleController::set_config(const config_t& config)
 {
     _config = config;
 
-    _maxIncrease = static_cast<float>(config.dyn_idle_max_increase) * 0.001F;
+    _max_increase = static_cast<float>(config.dyn_idle_max_increase) * 0.001F;
 
-    _minimumAllowedMotorHz = static_cast<float>(config.dyn_idle_min_rpm_100) * 100.0F / 60.0F;
-    _PID.setSetpoint(_minimumAllowedMotorHz);
+    _minimum_allowed_motor_hz = static_cast<float>(config.dyn_idle_min_rpm_100) * 100.0F / 60.0F;
+    _PID.setSetpoint(_minimum_allowed_motor_hz);
 
     // use Betaflight multiplier for compatibility with Betaflight Configurator
     _PID.setP(static_cast<float>(config.dyn_idle_p_gain) * 0.00015F);
 
-    const float deltaT = static_cast<float>(_taskIntervalMicroseconds) * 0.000001F;
+    const float delta_t = static_cast<float>(_task_interval_microseconds) * 0.000001F;
 
-    _PID.setI(static_cast<float>(config.dyn_idle_i_gain) * 0.01F * deltaT);
-    // limit I-term to range [0, _maxIncrease]
-    _PID.setIntegralMax(_maxIncrease);
+    _PID.setI(static_cast<float>(config.dyn_idle_i_gain) * 0.01F * delta_t);
+    // limit I-term to range [0, _max_increase]
+    _PID.setIntegralMax(_max_increase);
     _PID.setIntegralMin(0.0F);
 
-    _PID.setD(static_cast<float>(config.dyn_idle_i_gain) * 0.0000003F / deltaT);
-    _DTermFilter.init(800.0F * deltaT / 20.0F); //approx 20ms D delay, arbitrarily suits many motors
+    _PID.setD(static_cast<float>(config.dyn_idle_i_gain) * 0.0000003F / delta_t);
+    _DtermFilter.init(800.0F * delta_t / 20.0F); //approx 20ms D delay, arbitrarily suits many motors
 }
 
-void DynamicIdleController::setMinimumAllowedMotorHz(float minimumAllowedMotorHz)
+void DynamicIdleController::set_minimum_allowed_motor_hz(float minimum_allowed_motor_hz)
 {
-    _minimumAllowedMotorHz = minimumAllowedMotorHz;
-    _PID.setSetpoint(_minimumAllowedMotorHz);
+    _minimum_allowed_motor_hz = minimum_allowed_motor_hz;
+    _PID.setSetpoint(_minimum_allowed_motor_hz);
 }
 
-float DynamicIdleController::calculateSpeedIncrease(float slowestMotorHz, float deltaT)
+float DynamicIdleController::calculateSpeedIncrease(float slowestMotorHz, float delta_t)
 {
-    if (_minimumAllowedMotorHz == 0.0F) {
+    if (_minimum_allowed_motor_hz == 0.0F) {
         // if motors are allowed to stop, then no speed increase is needed
         return  0.0F;
     }
 
-    const float slowestMotorHzDeltaFiltered = _DTermFilter.filter(slowestMotorHz - _PID.getPreviousMeasurement());
-    float speedIncrease = _PID.updateDelta(slowestMotorHz, slowestMotorHzDeltaFiltered, deltaT);
+    const float slowestMotorHzDeltaFiltered = _DtermFilter.filter(slowestMotorHz - _PID.getPreviousMeasurement());
+    float speedIncrease = _PID.updateDelta(slowestMotorHz, slowestMotorHzDeltaFiltered, delta_t);
 
-    speedIncrease = clamp(speedIncrease, 0.0F, _maxIncrease);
+    speedIncrease = clamp(speedIncrease, 0.0F, _max_increase);
 
     if (_debug.getMode() == DEBUG_DYN_IDLE) {
         const PIDF::error_t error = _PID.getError();

@@ -36,16 +36,16 @@ https://github.com/wjxway/ESP32-Bidirectional-DShot/blob/main/src/MotorCtrl.cpp 
 
 */
 
-ESC_DShot::ESC_DShot(protocol_e protocol, uint16_t motorPoleCount) :
+EscDshot::EscDshot(protocol_e protocol, uint16_t motor_pole_count) :
     _protocol(protocol),
-    _motorPoleCount(motorPoleCount)
+    _motor_pole_count(motor_pole_count)
 {
-    setProtocol(protocol);
+    set_protocol(protocol);
     static constexpr float SECONDS_PER_MINUTE = 60.0F;
-    _eRPMtoHz = 2.0F * (100.0F / SECONDS_PER_MINUTE) / static_cast<float>(_motorPoleCount);
+    _erpm_to_hz = 2.0F * (100.0F / SECONDS_PER_MINUTE) / static_cast<float>(_motor_pole_count);
 }
 
-void ESC_DShot::init(uint16_t pin)
+void EscDshot::init(uint16_t pin)
 {
     _pin = pin;
 
@@ -57,14 +57,14 @@ void ESC_DShot::init(uint16_t pin)
         // Configure it to run our program, and start it, using the
         // helper function we included in our .pio file.
         //printf("Using gpio %d\n", pin);
-        dshot_bidir_300_program_init(_pio, _pioStateMachine, _pioOffset, pin, _cpuFrequency);
+        dshot_bidir_300_program_init(_pio, _pioStateMachine, _pioOffset, pin, _cpu_frequency);
     } else {
         const bool success = pio_claim_free_sm_and_add_program_for_gpio_range(&dshot_bidir_600_program, &_pio, &_pioStateMachine, &_pioOffset, pin, 1, true);
         hard_assert(success);
         // Configure it to run our program, and start it, using the
         // helper function we included in our .pio file.
         //printf("Using gpio %d\n", pin);
-        dshot_bidir_600_program_init(_pio, _pioStateMachine, _pioOffset, pin, _cpuFrequency);
+        dshot_bidir_600_program_init(_pio, _pioStateMachine, _pioOffset, pin, _cpu_frequency);
     }
     // The PIO State Machine is now running, to use we push onto its TX FIFO and pull from the RX FIFO
 #else
@@ -77,11 +77,11 @@ void ESC_DShot::init(uint16_t pin)
     // get PWM channel for the pin
     const uint32_t pwmChannel = pwm_gpio_to_channel(_pin);
     // channel B uses high order bits on RPI Pico
-    _useHighOrderBits = pwmChannel == PWM_CHANNEL_B ? true : false;
+    _use_high_order_bits = pwmChannel == PWM_CHANNEL_B ? true : false;
 
     // Setup the PWM
     const uint32_t slice = pwm_gpio_to_slice_num(_pin);
-    pwm_set_wrap(slice, _wrapCycleCount);
+    pwm_set_wrap(slice, _wrap_cycle_count);
     pwm_set_enabled(slice, true); // start the PWM
 
     // Setup the DMA
@@ -125,7 +125,7 @@ Calculate pulse widths for that protocol.
 
 Called in construction, before init().
 */
-void ESC_DShot::setProtocol(protocol_e protocol)
+void EscDshot::set_protocol(protocol_e protocol)
 {
 /*
     The DShot protocol is based on WS2812B (NeoPixel) protocol.
@@ -169,32 +169,32 @@ void ESC_DShot::setProtocol(protocol_e protocol)
     enum { DSHOT150_T0H = 2500, DSHOT150_T1H = 5000, DSHOT150_T = 6680 };
     enum { W2818B_T0H = 400, W2818B_T1H = 800, W2818B_T = 1250 };
 
-    // _dataLowPulseWidth and _dataHighPulseWidth are in processor cycles
+    // _data_low_pulse_width and _data_high_pulse_width are in processor cycles
     // for RPI_PICO: default CPU frequency is 150MHz, that is 0.15GHz
 
-    _dataLowPulseWidth = nanoSecondsToCycles(DSHOT150_T0H);  // =  375 = 2500 * 0.15GHz
-    _dataHighPulseWidth = nanoSecondsToCycles(DSHOT150_T1H); // =  750 = 5000 * 0.15GHz
-    _wrapCycleCount = nanoSecondsToCycles(DSHOT150_T);       // = 1002 = 6680 * 0.15GHz
+    _data_low_pulse_width = nano_seconds_to_cycles(DSHOT150_T0H);  // =  375 = 2500 * 0.15GHz
+    _data_high_pulse_width = nano_seconds_to_cycles(DSHOT150_T1H); // =  750 = 5000 * 0.15GHz
+    _wrap_cycle_count = nano_seconds_to_cycles(DSHOT150_T);       // = 1002 = 6680 * 0.15GHz
 
     switch (protocol) {
     case ESC_PROTOCOL_DSHOT150:
         break;
     case ESC_PROTOCOL_DSHOT300:
-        _dataLowPulseWidth /= 2;
-        _dataHighPulseWidth /= 2;
-        _wrapCycleCount /= 2;
+        _data_low_pulse_width /= 2;
+        _data_high_pulse_width /= 2;
+        _wrap_cycle_count /= 2;
         break;
     case ESC_PROTOCOL_DSHOT600:
         [[fallthrough]];
     case ESC_PROTOCOL_PROSHOT:
-        _dataLowPulseWidth /= 4;
-        _dataHighPulseWidth /= 4;
-        _wrapCycleCount /= 4;
+        _data_low_pulse_width /= 4;
+        _data_high_pulse_width /= 4;
+        _wrap_cycle_count /= 4;
         break;
     case ESC_PROTOCOL_W2818B:
-        _dataLowPulseWidth = nanoSecondsToCycles(W2818B_T0H);  // =  60 =  400 * 0.15GHz
-        _dataHighPulseWidth = nanoSecondsToCycles(W2818B_T1H); // = 120 =  800 * 0.15GHz
-        _wrapCycleCount = nanoSecondsToCycles(W2818B_T);       // = 188 = 1250 * 0.15GHz
+        _data_low_pulse_width = nano_seconds_to_cycles(W2818B_T0H);  // =  60 =  400 * 0.15GHz
+        _data_high_pulse_width = nano_seconds_to_cycles(W2818B_T1H); // = 120 =  800 * 0.15GHz
+        _wrap_cycle_count = nano_seconds_to_cycles(W2818B_T);       // = 188 = 1250 * 0.15GHz
         break;
     default:
         break;
@@ -205,17 +205,17 @@ void ESC_DShot::setProtocol(protocol_e protocol)
         // the pin has already been set, so we need to re-set the wrap value
         const uint32_t slice = pwm_gpio_to_slice_num(_pin);
         pwm_set_enabled(slice, false); // stop the PWM
-        pwm_set_wrap(slice, _wrapCycleCount);
+        pwm_set_wrap(slice, _wrap_cycle_count);
         pwm_set_enabled(slice, true); // restart the PWM
     }
 #endif
 }
 
-uint32_t ESC_DShot::nanoSecondsToCycles(uint32_t nanoSeconds) const
+uint32_t EscDshot::nano_seconds_to_cycles(uint32_t nanoSeconds) const
 {
     // note: the k values cancel out, but give greater precision in the calculation
     const uint64_t k = 128;
-    const uint64_t d = k * 1000000000L  / _cpuFrequency;
+    const uint64_t d = k * 1000000000L  / _cpu_frequency;
     const uint64_t ret = nanoSeconds * k / d;
     return static_cast<uint32_t>(ret);
 }
@@ -231,7 +231,7 @@ for description and STM32 implementation.
 
 On Raspberry Pi Pico we can use the Programmable IO (PIO) for this bit-banging.
 */
-void ESC_DShot::write(uint16_t value) // NOLINT(readability-make-member-function-const)
+void EscDshot::write(uint16_t value) // NOLINT(readability-make-member-function-const)
 {
 #if defined(LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO)
     // use the value to create a bidirectional DShot frame and send it to the PIO state machine
@@ -242,23 +242,23 @@ void ESC_DShot::write(uint16_t value) // NOLINT(readability-make-member-function
     const uint16_t frame = DShotCodec::frameUnidirectional(value);
 
     uint16_t maskBit = 1U << (DSHOT_BIT_COUNT - 1);
-    if (_useHighOrderBits) {
-        for (auto& item : _dmaBuffer) {
-            item = ((frame & maskBit) ? _dataHighPulseWidth : _dataLowPulseWidth) << 16;
+    if (_use_high_order_bits) {
+        for (auto& item : _dma_buffer) {
+            item = ((frame & maskBit) ? _data_high_pulse_width : _data_low_pulse_width) << 16;
             maskBit = static_cast<uint16_t>(maskBit >> 1);
         }
     } else {
-        for (auto& item : _dmaBuffer) {
-            item = (frame & maskBit) ? _dataHighPulseWidth : _dataLowPulseWidth;
+        for (auto& item : _dma_buffer) {
+            item = (frame & maskBit) ? _data_high_pulse_width : _data_low_pulse_width;
             maskBit = static_cast<uint16_t>(maskBit >> 1);
         }
     }
-    _dmaBuffer[DMA_BUFFER_SIZE - 1] = 0; // zero last value,  array size is DSHOT_BIT_COUNT + 1
+    _dma_buffer[DMA_BUFFER_SIZE - 1] = 0; // zero last value,  array size is DSHOT_BIT_COUNT + 1
 
 #if defined(FRAMEWORK_RPI_PICO)
     // transfer DMA buffer to PWM
     dma_channel_set_trans_count(_dmaChannel, DMA_BUFFER_SIZE, DONT_START_YET);
-    dma_channel_set_read_addr(_dmaChannel, &_dmaBuffer[0], START_IMMEDIATELY);
+    dma_channel_set_read_addr(_dmaChannel, &_dma_buffer[0], START_IMMEDIATELY);
 #elif defined(FRAMEWORK_ESPIDF)
 #elif defined(FRAMEWORK_TEST)
 #else // defaults to FRAMEWORK_ARDUINO
@@ -267,7 +267,7 @@ void ESC_DShot::write(uint16_t value) // NOLINT(readability-make-member-function
 #endif // LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO
 }
 
-bool ESC_DShot::read()
+bool EscDshot::read()
 {
     DShotCodec::telemetry_type_e telemetryType {};
     uint32_t value {};
@@ -287,17 +287,17 @@ bool ESC_DShot::read()
     telemetryType = DShotCodec::TELEMETRY_INVALID;
 #endif
 
-    ++_telemetryReadCount;
+    ++_telemetry_read_count;
     switch (telemetryType) {
     case DShotCodec::TELEMETRY_INVALID:
-        ++_telemetryErrorCount;
+        ++_telemetry_error_count;
         return false;
     case DShotCodec::TELEMETRY_TYPE_ERPM: {
         // Convert to eRPM * 100
         //return ((1000000 * 60 / 100) + value / 2) / value;
         enum { ONE_MINUTE_IN_MICROSECONDS = 60000000 };
         // value is eRPM period in microseconds
-        _eRPM = static_cast<int32_t>(ONE_MINUTE_IN_MICROSECONDS / value);
+        _erpm = static_cast<int32_t>(ONE_MINUTE_IN_MICROSECONDS / value);
         break;
     }
     case DShotCodec::TELEMETRY_TYPE_TEMPERATURE:
@@ -320,7 +320,7 @@ bool ESC_DShot::read()
     return true;
 }
 
-void ESC_DShot::end()
+void EscDshot::end()
 {
 #if defined(FRAMEWORK_RPI_PICO)
 #if defined(LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO)
