@@ -1,6 +1,7 @@
 #include "Mixers.h"
-#include "MotorMixerWingPWM.h"
+#include "MotorMixerQuadXPwm.h"
 #include <cmath>
+
 
 #if defined(FRAMEWORK_RPI_PICO)
 #include <hardware/gpio.h>
@@ -11,15 +12,27 @@
 #elif defined(FRAMEWORK_STM32_CUBE)
 #elif defined(FRAMEWORK_TEST)
 #else // defaults to FRAMEWORK_ARDUINO
-#include <Arduino.h>
 #if defined(FRAMEWORK_ARDUINO_ESP32)
 #include <esp32-hal-ledc.h>
+#else
+#include <Arduino.h>
 #endif
 #endif // FRAMEWORK
 
+/*
+https://docs.espressif.com/projects/arduino-esp32/en/latest/migration_guides/2.x_to_3.0.html
 
-MotorMixerWingPwm::MotorMixerWingPwm(const stm32_motor_pins_t& pins, Debug* debug) :
-    MotorMixerWingBase(debug)
+Removed:
+ledcSetup
+ledcAttachPin
+
+Added:
+ledcAttach used to set up the LEDC pin (merged ledcSetup and ledcAttachPin functions).
+*/
+
+
+MotorMixerQuadXPwm::MotorMixerQuadXPwm(const stm32_motor_pins_t& pins, Debug* debug) :
+    MotorMixerQuadBase(QUAD_X, debug)
 {
 #if defined(FRAMEWORK_STM32_CUBE) && !defined(FRAMEWORK_ARDUINO_STM32)
     if (pins.m0.pin != 0xFF) {
@@ -28,27 +41,33 @@ MotorMixerWingPwm::MotorMixerWingPwm(const stm32_motor_pins_t& pins, Debug* debu
         _pins[M0].pin = pins.m0.pin;
         HAL_TIM_PWM_Start(_pins[M0].htim, _pins[M0].channel);
     }
-    if (pins.s0.pin != 0xFF) {
-        _pins[S0].htim = &_htims[S0];
-        _pins[S0].channel = pins.s0.channel;
-        _pins[S0].pin = pins.s0.pin;
-        HAL_TIM_PWM_Start(_pins[S0].htim, _pins[S0].channel);
+    if (pins.m1.pin != 0xFF) {
+        _pins[M1].htim = &_htims[M1];
+        _pins[M1].channel = pins.m1.channel;
+        _pins[M1].pin = pins.m1.pin;
+        HAL_TIM_PWM_Start(_pins[M1].htim, _pins[M1].channel);
     }
-    if (pins.s1.pin != 0xFF) {
-        _pins[S1].htim = &_htims[S1];
-        _pins[S1].channel = pins.s1.channel;
-        _pins[S1].pin = pins.s1.pin;
-        HAL_TIM_PWM_Start(_pins[S1].htim, _pins[S1].channel);
+    if (pins.m2.pin != 0xFF) {
+        _pins[M2].htim = &_htims[M2];
+        _pins[M2].channel = pins.m2.channel;
+        _pins[M2].pin = pins.m2.pin;
+        HAL_TIM_PWM_Start(_pins[M2].htim, _pins[M2].channel);
+    }
+    if (pins.m3.pin != 0xFF) {
+        _pins[M3].htim = &_htims[M3];
+        _pins[M3].channel = pins.m3.channel;
+        _pins[M3].pin = pins.m3.pin;
+        HAL_TIM_PWM_Start(_pins[M3].htim, _pins[M3].channel);
     }
 #else
     (void)pins;
 #endif
 }
 
-MotorMixerWingPwm::MotorMixerWingPwm(const motor_pins_t& pins, Debug* debug) :
-    MotorMixerWingBase(debug)
+MotorMixerQuadXPwm::MotorMixerQuadXPwm(const motor_pins_t& pins, Debug* debug) :
+    MotorMixerQuadBase(QUAD_X, debug)
 #if !defined(FRAMEWORK_STM32_CUBE)
-    ,_pins({pins.m0,pins.s0,pins.s1})
+    ,_pins({pins.m0,pins.m1,pins.m2,pins.m3})
 #endif
 {
 #if defined(FRAMEWORK_RPI_PICO)
@@ -57,11 +76,14 @@ MotorMixerWingPwm::MotorMixerWingPwm(const motor_pins_t& pins, Debug* debug) :
     if (pins.m0 != 0xFF) {
         gpio_set_function(pins.m0, GPIO_FUNC_PWM);
     }
-    if (pins.s0 != 0xFF) {
-        gpio_set_function(pins.s0, GPIO_FUNC_PWM);
+    if (pins.m1 != 0xFF) {
+        gpio_set_function(pins.m1, GPIO_FUNC_PWM);
     }
-    if (pins.s1 != 0xFF) {
-        gpio_set_function(pins.s1, GPIO_FUNC_PWM);
+    if (pins.m2 != 0xFF) {
+        gpio_set_function(pins.m2, GPIO_FUNC_PWM);
+    }
+    if (pins.m3 != 0xFF) {
+        gpio_set_function(pins.m3, GPIO_FUNC_PWM);
     }
 
 #elif defined(FRAMEWORK_ESPIDF)
@@ -71,11 +93,14 @@ MotorMixerWingPwm::MotorMixerWingPwm(const motor_pins_t& pins, Debug* debug) :
     if (pins.m0 != 0xFF) {
         ledcAttach(pins.m0, frequency_hz, resolutionBits);
     }
-    if (pins.s0 != 0xFF) {
-        ledcAttach(pins.s0, frequency_hz, resolutionBits);
+    if (pins.m1 != 0xFF) {
+        ledcAttach(pins.m1, frequency_hz, resolutionBits);
     }
-    if (pins.s1 != 0xFF) {
-        ledcAttach(pins.s1, frequency_hz, resolutionBits);
+    if (pins.m2 != 0xFF) {
+        ledcAttach(pins.m2, frequency_hz, resolutionBits);
+    }
+    if (pins.m3 != 0xFF) {
+        ledcAttach(pins.m3, frequency_hz, resolutionBits);
     }
 
 #elif defined(FRAMEWORK_STM32_CUBE)
@@ -86,7 +111,7 @@ MotorMixerWingPwm::MotorMixerWingPwm(const motor_pins_t& pins, Debug* debug) :
 
 #else // defaults to FRAMEWORK_ARDUINO
 #if defined(FRAMEWORK_ARDUINO_ESP32)
-   
+
     static constexpr int frequency_hz = 150000; // Motor PWM Frequency
     static constexpr int resolutionBits = 8; // PWM Resolution
 #if defined(FRAMEWORK_ARDUINO_ESP32_V2)
@@ -94,41 +119,54 @@ MotorMixerWingPwm::MotorMixerWingPwm(const motor_pins_t& pins, Debug* debug) :
         ledcSetup(M0, frequency_hz, resolutionBits);
         ledcAttachPin(pins.m0, M0);
     }
-    if (pins.s0 != 0xFF) {
-        ledcSetup(S0, frequency_hz, resolutionBits);
-        ledcAttachPin(pins.s0, S0);
+    if (pins.m1 != 0xFF) {
+        ledcSetup(M1, frequency_hz, resolutionBits);
+        ledcAttachPin(pins.m1, M1);
     }
-    if (pins.s1 != 0xFF) {
-        ledcSetup(S1, frequency_hz, resolutionBits);
-        ledcAttachPin(pins.s1, S1);
+    if (pins.m2 != 0xFF) {
+        ledcSetup(M2, frequency_hz, resolutionBits);
+        ledcAttachPin(pins.m2, M2);
+    }
+    if (pins.m3 != 0xFF) {
+        ledcSetup(M3, frequency_hz, resolutionBits);
+        ledcAttachPin(pins.m3, M3);
     }
 #else
     if (pins.m0 != 0xFF) {
         ledcAttach(pins.m0, frequency_hz, resolutionBits);
     }
-    if (pins.s0 != 0xFF) {
-        ledcAttach(pins.s0, frequency_hz, resolutionBits);
+    if (pins.m1 != 0xFF) {
+        ledcAttach(pins.m1, frequency_hz, resolutionBits);
     }
-    if (pins.s1 != 0xFF) {
-        ledcAttach(pins.s1, frequency_hz, resolutionBits);
+    if (pins.m2 != 0xFF) {
+        ledcAttach(pins.m2, frequency_hz, resolutionBits);
+    }
+    if (pins.m3 != 0xFF) {
+        ledcAttach(pins.m3, frequency_hz, resolutionBits);
     }
 #endif
+
 #else // defaults to FRAMEWORK_ARDUINO
+
     if (pins.m0 != 0xFF) {
         pinMode(pins.m0, OUTPUT);
     }
-    if (pins.s0 != 0xFF) {
-        pinMode(pins.s0, OUTPUT);
+    if (pins.m1 != 0xFF) {
+        pinMode(pins.m1, OUTPUT);
     }
-    if (pins.s1 != 0xFF) {
-        pinMode(pins.s1, OUTPUT);
+    if (pins.m2 != 0xFF) {
+        pinMode(pins.m2, OUTPUT);
     }
+    if (pins.m3 != 0xFF) {
+        pinMode(pins.m3, OUTPUT);
+    }
+
 #endif
 
 #endif // FRAMEWORK
 }
 
-void MotorMixerWingPwm::write_motor(uint8_t motor_index, float motorOutput) // NOLINT(readability-make-member-function-const_
+void MotorMixerQuadXPwm::write_motor(uint8_t motor_index, float motorOutput) // NOLINT(readability-make-member-function-const_
 {
     const pwm_pin_t& pin = _pins[motor_index];
     if (pin.pin == 0xFF) {
@@ -160,20 +198,20 @@ void MotorMixerWingPwm::write_motor(uint8_t motor_index, float motorOutput) // N
 /*!
 Calculate and output motor mix.
 */
-void MotorMixerWingPwm::output_to_motors(motor_mixer_commands_t& commands, float delta_t, uint32_t tick_count)
+void MotorMixerQuadXPwm::output_to_motors(motor_mixer_commands_t& commands, float delta_t, uint32_t tick_count)
 {
     (void)delta_t;
     (void)tick_count;
 
     if (motors_is_on()) {
         // set the throttle to value returned by the mixer
-        commands.throttle = mix_wing(_outputs, commands, _mix_parameters);
+        commands.throttle = mix_quad_x(_outputs, commands, _mix_parameters);
     } else {
-        _outputs = { 0.0F, 0.0F, 0.0F };
+        _outputs = { 0.0F, 0.0F, 0.0F, 0.0F };
     }
-    _throttle_command = commands.throttle;
 
     write_motor(M0, _outputs[M0]);
-    write_motor(S0, _outputs[S0]);
-    write_motor(S1, _outputs[S1]);
+    write_motor(M1, _outputs[M1]);
+    write_motor(M2, _outputs[M2]);
+    write_motor(M3, _outputs[M3]);
 }

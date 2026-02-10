@@ -1,6 +1,6 @@
 #include "DynamicIdleController.h"
 #include "Mixers.h"
-#include "MotorMixerQuadX_DShot.h"
+#include "MotorMixerQuadXDshot.h"
 
 #include <RPM_Filters.h>
 #if (__cplusplus >= 202002L)

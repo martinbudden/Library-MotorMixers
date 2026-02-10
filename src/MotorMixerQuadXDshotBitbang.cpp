@@ -1,6 +1,6 @@
 #include "DynamicIdleController.h"
 #include "Mixers.h"
-#include "MotorMixerQuadX_DShotBitbang.h"
+#include "MotorMixerQuadXDshotBitbang.h"
 
 #include <RPM_Filters.h>
 

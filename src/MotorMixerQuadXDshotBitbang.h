@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ESC_DShotBitbang.h"
+#include "EscDshotBitbang.h"
 #include "MotorMixerQuadBase.h"
 #include "RPM_Filters.h"
 
