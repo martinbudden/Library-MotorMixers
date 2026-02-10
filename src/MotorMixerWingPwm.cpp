@@ -1,5 +1,5 @@
 #include "Mixers.h"
-#include "MotorMixerWingPwmX.h"
+#include "MotorMixerWingPwm.h"
 #include <cmath>
 
 #if defined(FRAMEWORK_RPI_PICO)
