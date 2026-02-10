@@ -73,9 +73,9 @@ void test_dshot_write()
     TEST_ASSERT_EQUAL(375, HI);
     TEST_ASSERT_EQUAL(187, LO);
 
-    const uint16_t dshot1000 = DShotCodec::pwmToDShotClipped(1000);
+    const uint16_t dshot1000 = DshotCodec::pwm_to_dshot_clamped(1000);
     esc.write(dshot1000);
-    const uint16_t frame1000 = DShotCodec::frameUnidirectional(dshot1000);
+    const uint16_t frame1000 = DshotCodec::frame_unidirectional(dshot1000);
     TEST_ASSERT_EQUAL(0, frame1000);
     TEST_ASSERT_EQUAL(LO, esc.getBufferItem(0));
     TEST_ASSERT_EQUAL(LO, esc.getBufferItem(1));
@@ -95,8 +95,8 @@ void test_dshot_write()
     TEST_ASSERT_EQUAL(LO, esc.getBufferItem(15));
     TEST_ASSERT_EQUAL(0, esc.getBufferItem(16)); // check haven't written past end of buffer
 
-    const uint16_t dshot1500 = DShotCodec::pwmToDShot(1500);
-    const uint16_t frame = DShotCodec::frameUnidirectional(dshot1500);
+    const uint16_t dshot1500 = DshotCodec::pwm_to_dshot(1500);
+    const uint16_t frame = DshotCodec::frame_unidirectional(dshot1500);
     TEST_ASSERT_EQUAL(33508, frame); // 0x82E4, 1000 0010 1110 0100
     esc.write(dshot1500);
     // 1000 0010 1110 0100
@@ -122,8 +122,8 @@ void test_dshot_write()
     TEST_ASSERT_EQUAL(LO, esc.getBufferItem(15));
     TEST_ASSERT_EQUAL(0, esc.getBufferItem(16));
 
-    const uint16_t dshot2000 = DShotCodec::pwmToDShot(2000);
-    const uint16_t frame2000 = DShotCodec::frameUnidirectional(dshot2000);
+    const uint16_t dshot2000 = DshotCodec::pwm_to_dshot(2000);
+    const uint16_t frame2000 = DshotCodec::frame_unidirectional(dshot2000);
     TEST_ASSERT_EQUAL(0xFFEE, frame2000); // 0xFFEE, 1111 1111 1110 1110
     esc.write(dshot2000);
     // 1111
@@ -151,16 +151,16 @@ void test_dshot_write_channel_b()
     const uint32_t HI = esc.get_data_high_pulse_width() << 16;
     const uint32_t LO = esc.get_data_low_pulse_width() << 16;
 
-    const uint16_t dshot1000 = DShotCodec::pwmToDShotClipped(1000);
+    const uint16_t dshot1000 = DshotCodec::pwm_to_dshot_clamped(1000);
     esc.write(dshot1000);
-    const uint16_t frame1000 = DShotCodec::frameUnidirectional(dshot1000);
+    const uint16_t frame1000 = DshotCodec::frame_unidirectional(dshot1000);
     TEST_ASSERT_EQUAL(0, frame1000);
     TEST_ASSERT_EQUAL(LO, esc.getBufferItem(0));
     TEST_ASSERT_EQUAL(LO, esc.getBufferItem(15));
     TEST_ASSERT_EQUAL(0, esc.getBufferItem(16)); // check haven't written past end of buffer
 
-    const uint16_t dshot1500 = DShotCodec::pwmToDShot(1500);
-    const uint16_t frame = DShotCodec::frameUnidirectional(dshot1500);
+    const uint16_t dshot1500 = DshotCodec::pwm_to_dshot(1500);
+    const uint16_t frame = DshotCodec::frame_unidirectional(dshot1500);
     TEST_ASSERT_EQUAL(33508, frame); // 0x82E4, 1000 0010 1110 0100
     esc.write(dshot1500);
     // 1000 0010 1110 0100
@@ -186,8 +186,8 @@ void test_dshot_write_channel_b()
     TEST_ASSERT_EQUAL(LO, esc.getBufferItem(15));
     TEST_ASSERT_EQUAL(0, esc.getBufferItem(16));
 
-    const uint16_t dshot2000 = DShotCodec::pwmToDShot(2000);
-    const uint16_t frame2000 = DShotCodec::frameUnidirectional(dshot2000);
+    const uint16_t dshot2000 = DshotCodec::pwm_to_dshot(2000);
+    const uint16_t frame2000 = DshotCodec::frame_unidirectional(dshot2000);
     TEST_ASSERT_EQUAL(65518, frame2000); // 0xFFEE, 1111 1111 1110 1110
     esc.write(dshot2000);
     // 1111

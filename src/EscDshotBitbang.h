@@ -92,8 +92,8 @@ public:
     void update_motors_rpm();
     int32_t get_motor_erpm(size_t motor_index) { return _erpms[motor_index]; }
 
-    static uint32_t samples_to_GCR21(const uint32_t* samples, uint32_t motorMask);
-    static void GCR21_to_samples(uint32_t* samples, uint32_t motorMask, uint32_t gcr21); // for test code
+    static uint32_t samples_to_gcr21(const uint32_t* samples, uint32_t motorMask);
+    static void gcr21_to_samples(uint32_t* samples, uint32_t motorMask, uint32_t gcr21); // for test code
 public:
     static EscDshotBitbang* self; // alias of `this` to be used in ISR
     struct port_t {

@@ -28,5 +28,5 @@
     "version": "0.0.7",
     "frameworks": "*",
     "platforms": "*",
-    "headers": ["Debug.h", "DShotCodec.h", "DynamicIdleController.h", "EscDshot.h", "EscDshotBitbang.h", "EscDshotBitbangIrq.h", "Mixers.h", "MotorMixerBase.h", "MotorMixerOctoBase.h", "MotorMixerQuadBase.h", "MotorMixerQuadXDshot.h", "MotorMixerQuadXDshotBitbang.h", "MotorMixerQuadXPwm.h", "RpmFilters.h"]
+    "headers": ["Debug.h", "DshotCodec.h", "DynamicIdleController.h", "EscDshot.h", "EscDshotBitbang.h", "EscDshotBitbangIrq.h", "Mixers.h", "MotorMixerBase.h", "MotorMixerOctoBase.h", "MotorMixerQuadBase.h", "MotorMixerQuadXDshot.h", "MotorMixerQuadXDshotBitbang.h", "MotorMixerQuadXPwm.h", "RpmFilters.h"]
 }

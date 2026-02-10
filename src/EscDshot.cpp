@@ -235,11 +235,11 @@ void EscDshot::write(uint16_t value) // NOLINT(readability-make-member-function-
 {
 #if defined(LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO)
     // use the value to create a bidirectional DShot frame and send it to the PIO state machine
-    value = DShotCodec::frameBidirectional(value);
+    value = DshotCodec::frame_bidirectional(value);
     pio_sm_put(_pio, _pioStateMachine, value);
 #else
     // set up a unidirectional DShot frame for sending via DMA
-    const uint16_t frame = DShotCodec::frameUnidirectional(value);
+    const uint16_t frame = DshotCodec::frame_unidirectional(value);
 
     uint16_t maskBit = 1U << (DSHOT_BIT_COUNT - 1);
     if (_use_high_order_bits) {
@@ -269,7 +269,7 @@ void EscDshot::write(uint16_t value) // NOLINT(readability-make-member-function-
 
 bool EscDshot::read()
 {
-    DShotCodec::telemetry_type_e telemetryType {};
+    uint16_t telemetry_type {};
     uint32_t value {};
 
 #if defined(LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO)
@@ -279,20 +279,20 @@ bool EscDshot::read()
         //value = pio_sm_get(_pio, _pioStateMachine);
         uint64_t samples = static_cast<uint64_t>(pio_sm_get_blocking(_pio, _pioStateMachine)) << 32;
         samples |= static_cast<uint64_t>(pio_sm_get_blocking(_pio, _pioStateMachine));
-        value = DShotCodec::decodeSamples(samples, telemetryType);
+        value = DshotCodec::decode_samples(samples, telemetry_type);
     } else {
         return false;
     }
 #else
-    telemetryType = DShotCodec::TELEMETRY_INVALID;
+    telemetry_type = DshotCodec::TELEMETRY_INVALID;
 #endif
 
     ++_telemetry_read_count;
-    switch (telemetryType) {
-    case DShotCodec::TELEMETRY_INVALID:
+    switch (telemetry_type) {
+    case DshotCodec::TELEMETRY_INVALID:
         ++_telemetry_error_count;
         return false;
-    case DShotCodec::TELEMETRY_TYPE_ERPM: {
+    case DshotCodec::TELEMETRY_TYPE_ERPM: {
         // Convert to eRPM * 100
         //return ((1000000 * 60 / 100) + value / 2) / value;
         enum { ONE_MINUTE_IN_MICROSECONDS = 60000000 };
@@ -300,19 +300,19 @@ bool EscDshot::read()
         _erpm = static_cast<int32_t>(ONE_MINUTE_IN_MICROSECONDS / value);
         break;
     }
-    case DShotCodec::TELEMETRY_TYPE_TEMPERATURE:
+    case DshotCodec::TELEMETRY_TYPE_TEMPERATURE:
         [[fallthrough]];
-    case DShotCodec::TELEMETRY_TYPE_VOLTAGE:
+    case DshotCodec::TELEMETRY_TYPE_VOLTAGE:
         [[fallthrough]];
-    case DShotCodec::TELEMETRY_TYPE_CURRENT:
+    case DshotCodec::TELEMETRY_TYPE_CURRENT:
         [[fallthrough]];
-    case DShotCodec::TELEMETRY_TYPE_DEBUG1:
+    case DshotCodec::TELEMETRY_TYPE_DEBUG1:
         [[fallthrough]];
-    case DShotCodec::TELEMETRY_TYPE_DEBUG2:
+    case DshotCodec::TELEMETRY_TYPE_DEBUG2:
         [[fallthrough]];
-    case DShotCodec::TELEMETRY_TYPE_STRESS_LEVEL:
+    case DshotCodec::TELEMETRY_TYPE_STRESS_LEVEL:
         [[fallthrough]];
-    case DShotCodec::TELEMETRY_TYPE_STATE_EVENTS:
+    case DshotCodec::TELEMETRY_TYPE_STATE_EVENTS:
         [[fallthrough]];
     default:
         break;

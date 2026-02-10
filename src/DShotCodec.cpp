@@ -1,7 +1,7 @@
 #include "DShotCodec.h"
 
 // NOLINTBEGIN(hicpp-signed-bitwise)
-uint32_t DShotCodec::decodeERPM(uint16_t value)
+uint32_t DshotCodec::decode_erpm(uint16_t value)
 {
     // eRPM range
     if (value == 0x0FFF) {
@@ -16,7 +16,7 @@ uint32_t DShotCodec::decodeERPM(uint16_t value)
     return value;
 }
 
-uint32_t DShotCodec::decodeTelemetryFrame(uint16_t value, telemetry_type_e& telemetryType)
+uint32_t DshotCodec::decode_telemetry_frame(uint16_t value, uint16_t& telemetry_type)
 {
     // value is of form "eeem mmmm mmmm": e - exponent, m - mantissa
     // https://github.com/bird-sanctuary/extended-dshot-telemetry
@@ -25,7 +25,7 @@ uint32_t DShotCodec::decodeTelemetryFrame(uint16_t value, telemetry_type_e& tele
     const uint16_t type = (value & 0x0F00) >> 8;
     const bool isErpm = (type & 0x01) || (type == 0);
     if (isErpm) {
-        telemetryType = TELEMETRY_TYPE_ERPM;
+        telemetry_type = TELEMETRY_TYPE_ERPM;
         const uint16_t m = value & 0x01FF;
         const uint16_t e = (value & 0xFE00) >> 9;
         value = static_cast<uint16_t>(m << e);
@@ -37,7 +37,7 @@ uint32_t DShotCodec::decodeTelemetryFrame(uint16_t value, telemetry_type_e& tele
     // Extended DShot Telemetry (EDT) frame is of the form:
     // ppp0mmmmmmmm
     // where ppp is the telemetry type and mmmmmmmm is the value
-    telemetryType = static_cast<telemetry_type_e>(type >> 1);
+    telemetry_type = type >> 1;
     return value & 0x00FF;
 }
 
@@ -46,11 +46,11 @@ Decode samples returned by Raspberry Pi PIO implementation.
 
 Returns the value of the Extended DShot Telemetry (EDT) frame (without the  checksum).
 */
-uint32_t DShotCodec::decodeSamples(uint64_t value, telemetry_type_e& telemetryType)
+uint32_t DshotCodec::decode_samples(uint64_t value, uint16_t& telemetry_type)
 {
     // telemetry data must start with a 0, so if the first bit is high, we don't have any data
     if (value & 0x8000000000000000L) {
-        telemetryType = TELEMETRY_INVALID;
+        telemetry_type = TELEMETRY_INVALID;
         return 0;
     }
 
@@ -65,12 +65,12 @@ uint32_t DShotCodec::decodeSamples(uint64_t value, telemetry_type_e& telemetryTy
         if (((value & mask) != 0) != currentBit) {
             // if the masked bit doesn't match the current string of bits then end the current string and flip currentBit
             // bitshift gcr_result by N, and
-            gcr_result = gcr_result << gcrBitLengths[consecutiveBitCount]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+            gcr_result = gcr_result << GCR_BIT_LENGTHS[consecutiveBitCount]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
             // then set N bits in gcr_result, if currentBit is 1
             if (currentBit) {
-                gcr_result |= gcrSetBits[gcrBitLengths[consecutiveBitCount]]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+                gcr_result |= GCR_SET_BITS[GCR_BIT_LENGTHS[consecutiveBitCount]]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
             }
-            bitCount += gcrBitLengths[consecutiveBitCount]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+            bitCount += GCR_BIT_LENGTHS[consecutiveBitCount]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
             // invert currentBit, and reset consecutiveBitCount
             currentBit = !currentBit;
             consecutiveBitCount = 1;  // first bit found in the string is the one we just processed
@@ -78,8 +78,8 @@ uint32_t DShotCodec::decodeSamples(uint64_t value, telemetry_type_e& telemetryTy
             // otherwise increment consecutiveBitCount
             ++consecutiveBitCount;
             if (consecutiveBitCount > 16) {
-                // invalid run length at the current sample rate (outside of gcrBitLengths table)
-                telemetryType = TELEMETRY_INVALID;
+                // invalid run length at the current sample rate (outside of GCR_BIT_LENGTHS table)
+                telemetry_type = TELEMETRY_INVALID;
                 return 0;
             }
         }
@@ -87,17 +87,17 @@ uint32_t DShotCodec::decodeSamples(uint64_t value, telemetry_type_e& telemetryTy
 
     // outside the loop, we still need to account for the final bits if the string ends with 1s
     // bitshift gcr_result by N, and
-    gcr_result <<= gcrBitLengths[consecutiveBitCount]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    gcr_result <<= GCR_BIT_LENGTHS[consecutiveBitCount]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     // then set set N bits in gcr_result, if currentBit is 1
     if (currentBit) {
-        gcr_result |= gcrSetBits[gcrBitLengths[consecutiveBitCount]]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        gcr_result |= GCR_SET_BITS[GCR_BIT_LENGTHS[consecutiveBitCount]]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     }
     // count bitCount (for debugging)
-    bitCount += gcrBitLengths[consecutiveBitCount]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    bitCount += GCR_BIT_LENGTHS[consecutiveBitCount]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
     // GCR data should be 21 bits
     if (bitCount < 21) {
-        telemetryType = TELEMETRY_INVALID;
+        telemetry_type = TELEMETRY_INVALID;
         return 0;
     }
 
@@ -105,15 +105,15 @@ uint32_t DShotCodec::decodeSamples(uint64_t value, telemetry_type_e& telemetryTy
     gcr_result = gcr_result >> (bitCount - 21);
 
     // convert 21-bit edge transition GCR to 20-bit binary GCR
-    const uint32_t gcr20 = GCR21_to_GCR20(gcr_result);
+    const uint32_t gcr20 = gcr21_to_gcr20(gcr_result);
 
-    const uint16_t result = GCR20_to_erpm(gcr20);
+    const uint16_t result = gcr20_to_erpm(gcr20);
 
-    if (!checksumBidirectionalIsOK(result)) {
-        telemetryType = TELEMETRY_INVALID;
+    if (!checksum_bidirectional_is_ok(result)) {
+        telemetry_type = TELEMETRY_INVALID;
         return 0;
     }
-    return decodeTelemetryFrame(static_cast<uint16_t>(result >> 4), telemetryType);
+    return decode_telemetry_frame(static_cast<uint16_t>(result >> 4), telemetry_type);
 }
 
 
@@ -122,7 +122,7 @@ Decode samples value returned by bit-banging.
 
 Returns the value of the Extended DShot Telemetry (EDT) frame (without the  checksum).
 */
-uint32_t DShotCodec::decodeSamples(const uint32_t* samples, uint32_t count, telemetry_type_e& telemetryType) // NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
+uint32_t DshotCodec::decode_samples(const uint32_t* samples, uint32_t count, uint16_t& telemetry_type) // NOLINT(cppcoreguidelines-avoid-c-arrays,hicpp-avoid-c-arrays,modernize-avoid-c-arrays)
 {
     // decode 16 bit GCR (Group Coded Recording) Run Length Limited (RLL) encoding
     // https://en.wikipedia.org/wiki/Run-length_limited#GCR:_(0,2)_RLL
@@ -156,38 +156,38 @@ uint32_t DShotCodec::decodeSamples(const uint32_t* samples, uint32_t count, tele
         return TELEMETRY_INVALID;
     }
 
-    const uint16_t result = GCR20_to_erpm(value);
+    const uint16_t result = gcr20_to_erpm(value);
 
-    if (!checksumBidirectionalIsOK(result)) {
-        telemetryType = TELEMETRY_INVALID;
+    if (!checksum_bidirectional_is_ok(result)) {
+        telemetry_type = TELEMETRY_INVALID;
         return 0;
     }
-    return decodeTelemetryFrame(static_cast<uint16_t>(result >> 4), telemetryType);
+    return decode_telemetry_frame(static_cast<uint16_t>(result >> 4), telemetry_type);
 }
 
-uint16_t DShotCodec::GCR20_to_erpm(uint32_t value)
+uint16_t DshotCodec::gcr20_to_erpm(uint32_t value)
 {
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
-    uint32_t ret = quintetToNibble[value & 0x1F];
-    ret |= quintetToNibble[(value >> 5) & 0x1F] << 4;
-    ret |= quintetToNibble[(value >> 10) & 0x1F] << 8;
-    ret |= quintetToNibble[(value >> 15) & 0x1F] << 12;
+    uint32_t ret = QUINTET_TO_NIBBLE[value & 0x1F];
+    ret |= QUINTET_TO_NIBBLE[(value >> 5) & 0x1F] << 4;
+    ret |= QUINTET_TO_NIBBLE[(value >> 10) & 0x1F] << 8;
+    ret |= QUINTET_TO_NIBBLE[(value >> 15) & 0x1F] << 12;
     return static_cast<uint16_t>(ret);
     // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
 }
 
-uint32_t DShotCodec::eRPM_to_GCR20(uint16_t value)
+uint32_t DshotCodec::erpm_to_gcr20(uint16_t value)
 {
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
-    uint32_t ret = nibbleToQuintet[value & 0x1F];
-    ret |= static_cast<uint32_t>(nibbleToQuintet[(value >> 4) & 0x1F]) << 5;
-    ret |= static_cast<uint32_t>(nibbleToQuintet[(value >> 8) & 0x1F]) << 10;
-    ret |= static_cast<uint32_t>(nibbleToQuintet[(value >> 12) & 0x1F]) << 15;
+    uint32_t ret = NIBBLE_TO_QUINTET[value & 0x1F];
+    ret |= static_cast<uint32_t>(NIBBLE_TO_QUINTET[(value >> 4) & 0x1F]) << 5;
+    ret |= static_cast<uint32_t>(NIBBLE_TO_QUINTET[(value >> 8) & 0x1F]) << 10;
+    ret |= static_cast<uint32_t>(NIBBLE_TO_QUINTET[(value >> 12) & 0x1F]) << 15;
     return ret;
     // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
 }
 
-uint32_t DShotCodec::GR20_to_GCR21(uint32_t value)
+uint32_t DshotCodec::gr20_to_gcr21(uint32_t value)
 {
 // Map the GCR to a 21 bit value, this new value starts with a 0 and the rest of the bits are set by the following two rules:
 //    1. If the current input bit in GCR data is a 1 then the output bit is the inverse of the previous output bit

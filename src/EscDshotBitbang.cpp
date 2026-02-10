@@ -162,10 +162,10 @@ void EscDshotBitbang::output_to_motors(uint16_t m1_value, uint16_t m2_value, uin
     update_motors_rpm();
 
     setDMA_outputBuffers(
-        DShotCodec::frameBidirectional(m1_value),
-        DShotCodec::frameBidirectional(m2_value),
-        DShotCodec::frameBidirectional(m3_value),
-        DShotCodec::frameBidirectional(m4_value)
+        DshotCodec::frame_bidirectional(m1_value),
+        DshotCodec::frame_bidirectional(m2_value),
+        DshotCodec::frame_bidirectional(m3_value),
+        DshotCodec::frame_bidirectional(m4_value)
     );
 
     _portA.reception = true;
@@ -398,7 +398,7 @@ In actual received data these may vary because of jitter.
 
 Converts a buffer of samples (obtained from DMA) to a gcr21 value
 */
-uint32_t EscDshotBitbang::samples_to_GCR21(const uint32_t* samples, uint32_t motorMask)
+uint32_t EscDshotBitbang::samples_to_gcr21(const uint32_t* samples, uint32_t motorMask)
 {
 
     uint16_t i = 0;
@@ -450,7 +450,7 @@ uint32_t EscDshotBitbang::samples_to_GCR21(const uint32_t* samples, uint32_t mot
 /*!
 Converts gcr21 value to a buffer of samples, used for test code
 */
-void EscDshotBitbang::GCR21_to_samples(uint32_t* samples, uint32_t motorMask, uint32_t gcr21)
+void EscDshotBitbang::gcr21_to_samples(uint32_t* samples, uint32_t motorMask, uint32_t gcr21)
 {
     *samples = 0;
     (void)motorMask;
@@ -462,20 +462,20 @@ void EscDshotBitbang::update_motors_rpm()
     // BDshot bit banging reads whole GPIO register.
     // Now it's time to create BDshot responses from all motors (made of individual bits).
     const std::array<uint32_t, 4> motorGCR21s  = {
-        samples_to_GCR21(&_portA.dmaInputBuffer[0], 1 << MOTOR_1),
-        samples_to_GCR21(&_portB.dmaInputBuffer[0], 1 << MOTOR_2),
-        samples_to_GCR21(&_portB.dmaInputBuffer[0], 1 << MOTOR_3),
-        samples_to_GCR21(&_portA.dmaInputBuffer[0], 1 << MOTOR_4)
+        samples_to_gcr21(&_portA.dmaInputBuffer[0], 1 << MOTOR_1),
+        samples_to_gcr21(&_portB.dmaInputBuffer[0], 1 << MOTOR_2),
+        samples_to_gcr21(&_portB.dmaInputBuffer[0], 1 << MOTOR_3),
+        samples_to_gcr21(&_portA.dmaInputBuffer[0], 1 << MOTOR_4)
     };
     for (size_t ii = 0; ii < motorGCR21s.size(); ++ii) {
-        const uint32_t motorGCR20 = DShotCodec::GCR21_to_GCR20(motorGCR21s[ii]);
-        const uint16_t eRPM = DShotCodec::GCR20_to_erpm(motorGCR20);
-        if (DShotCodec::checksumBidirectionalIsOK(eRPM)) {
-            DShotCodec::telemetry_type_e telemetryType {};
-            const auto eRPM_periodMicroseconds = DShotCodec::decodeTelemetryFrame(static_cast<uint16_t>(eRPM >> 4), telemetryType);
+        const uint32_t motorGCR20 = DshotCodec::gcr21_to_gcr20(motorGCR21s[ii]);
+        const uint16_t eRPM = DshotCodec::gcr20_to_erpm(motorGCR20);
+        if (DshotCodec::checksum_bidirectional_is_ok(eRPM)) {
+            uint16_t telemetry_type {};
+            const auto erpm_period_microseconds = DshotCodec::decode_telemetry_frame(static_cast<uint16_t>(eRPM >> 4), telemetry_type);
             enum { ONE_MINUTE_IN_MICROSECONDS = 60000000 };
             // value is eRPM period in microseconds
-            _erpms[ii] = static_cast<int32_t>(ONE_MINUTE_IN_MICROSECONDS / eRPM_periodMicroseconds);
+            _erpms[ii] = static_cast<int32_t>(ONE_MINUTE_IN_MICROSECONDS / erpm_period_microseconds);
         }
     }
 
