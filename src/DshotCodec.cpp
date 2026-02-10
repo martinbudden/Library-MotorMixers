@@ -1,4 +1,4 @@
-#include "DshotCodecX.h"
+#include "DshotCodec.h"
 
 // NOLINTBEGIN(hicpp-signed-bitwise)
 uint32_t DshotCodec::decode_erpm(uint16_t value)
