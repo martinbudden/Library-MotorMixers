@@ -2,7 +2,7 @@
 #include "Mixers.h"
 #include "MotorMixerQuadXDshotBitbang.h"
 
-#include <RPM_Filters.h>
+#include <RpmFilters.h>
 
 #include <cmath>
 #if (__cplusplus >= 202002L)
