@@ -1,5 +1,5 @@
 #include "RpmFilters.h"
-#include <FastTrigonometry.h>
+#include <fast_trigonometry.h>
 
 #if defined(FRAMEWORK_USE_FREERTOS)
 
@@ -114,7 +114,7 @@ void RpmFilters::set_frequency_hz_iteration_step() // NOLINT(readability-functio
         // maxOmega = (0.5 / looptime_seconds) * 2PiLooptimeSeconds = 0.5 * 2PI = PI;
         // so omega is in range [0, PI]
         motor_state_t& motorState = _state.motorStates[_state.motor_index]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        FastTrigonometry::sincos(motorState.omega, motorState.sin_omega, motorState.two_cosOmega);
+        FastTrigonometry::sin_cos(motorState.omega, motorState.sin_omega, motorState.two_cosOmega);
         motorState.two_cosOmega *= 2.0F;
         LOCK_FILTERS();
         rpmFilter.setNotchFrequencyWeighted(motorState.sin_omega, motorState.two_cosOmega, _weights[FUNDAMENTAL]*motorState.weight_multiplier);
