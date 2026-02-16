@@ -31,8 +31,8 @@ ledcAttach used to set up the LEDC pin (merged ledcSetup and ledcAttachPin funct
 */
 
 
-MotorMixerQuadXPwm::MotorMixerQuadXPwm(const stm32_motor_pins_t& pins, Debug* debug) :
-    MotorMixerQuadBase(QUAD_X, debug)
+MotorMixerQuadXPwm::MotorMixerQuadXPwm(const stm32_motor_pins_t& pins, uint8_t output_to_motors_denominator, Debug* debug) :
+    MotorMixerQuadBase(QUAD_X, output_to_motors_denominator, debug)
 {
 #if defined(FRAMEWORK_STM32_CUBE) && !defined(FRAMEWORK_ARDUINO_STM32)
     if (pins.m0.pin != 0xFF) {
@@ -64,8 +64,8 @@ MotorMixerQuadXPwm::MotorMixerQuadXPwm(const stm32_motor_pins_t& pins, Debug* de
 #endif
 }
 
-MotorMixerQuadXPwm::MotorMixerQuadXPwm(const motor_pins_t& pins, Debug* debug) :
-    MotorMixerQuadBase(QUAD_X, debug)
+MotorMixerQuadXPwm::MotorMixerQuadXPwm(const motor_pins_t& pins, uint8_t output_to_motors_denominator, Debug* debug) :
+    MotorMixerQuadBase(QUAD_X, output_to_motors_denominator, debug)
 #if !defined(FRAMEWORK_STM32_CUBE)
     ,_pins({pins.m0,pins.m1,pins.m2,pins.m3})
 #endif
@@ -198,15 +198,29 @@ void MotorMixerQuadXPwm::write_motor(uint8_t motor_index, float motorOutput) // 
 /*!
 Calculate and output motor mix.
 */
-void MotorMixerQuadXPwm::output_to_motors(motor_mixer_commands_t& commands, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count)
+void MotorMixerQuadXPwm::output_to_motors(const motor_mixer_commands_t& commands_dps, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count)
 {
     (void)rpm_filters;
     (void)delta_t;
     (void)tick_count;
 
+
+    // Output to motors every _output_to_motors_denominator times output_to_motors is called.
+    ++_output_to_mixer_count;
+    if (_output_to_mixer_count < _output_to_motors_denominator && motors_is_on()) {
+        return;
+    }
+
+    _output_to_mixer_count = 0;
     if (motors_is_on()) {
-        // set the throttle to value returned by the mixer
-        commands.throttle = mix_quad_x(_outputs, commands, _mix_parameters);
+        const motor_mixer_commands_t commands {
+            .throttle  = commands_dps.throttle,
+            // scale roll, pitch, and yaw from DPS range to [-1.0F, 1.0F]
+            .roll   = commands_dps.roll * MIXER_OUTPUT_SCALE_FACTOR,
+            .pitch  = commands_dps.pitch * MIXER_OUTPUT_SCALE_FACTOR,
+            .yaw    = commands_dps.yaw * MIXER_OUTPUT_SCALE_FACTOR
+        };
+        _throttle_command = mix_quad_x(_outputs, commands, _mix_parameters);
     } else {
         _outputs = { 0.0F, 0.0F, 0.0F, 0.0F };
     }

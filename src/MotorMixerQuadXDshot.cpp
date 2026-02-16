@@ -8,8 +8,8 @@
 #endif
 
 
-MotorMixerQuadXDshot::MotorMixerQuadXDshot(uint32_t task_interval_microseconds, uint32_t output_to_motors_denominator, const motor_pins_t& pins, Debug& debug) :
-    MotorMixerQuadBase(QUAD_X, &debug),
+MotorMixerQuadXDshot::MotorMixerQuadXDshot(uint32_t task_interval_microseconds, uint8_t output_to_motors_denominator, const motor_pins_t& pins, Debug& debug) :
+    MotorMixerQuadBase(QUAD_X, output_to_motors_denominator, &debug),
     _dynamic_idle_controller(task_interval_microseconds/output_to_motors_denominator, debug)
 {
     _motors[M0].init(pins.m0);
@@ -70,39 +70,55 @@ void MotorMixerQuadXDshot::set_motors_reversed(bool motors_is_reversed)
     _motors_is_reversed = motors_is_reversed;
 }
 
-void MotorMixerQuadXDshot::output_to_motors(motor_mixer_commands_t& commands, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count)
+void MotorMixerQuadXDshot::output_to_motors(const motor_mixer_commands_t& commands_dps, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count)
 {
     (void)tick_count;
 
-    if (motors_is_on()) {
-        const float throttleIncrease = (_dynamic_idle_controller.get_minimum_allowed_motor_hz() == 0.0F) 
-            ? 0.0F
-            : _dynamic_idle_controller.calculateSpeedIncrease(calculate_slowest_motor_hz(), delta_t);
-        commands.throttle += throttleIncrease;
-        // set the throttle to value returned by the mixer
-        commands.throttle = mix_quad_x(_outputs, commands, _mix_parameters);
-    } else {
-        _outputs = { 0.0F, 0.0F, 0.0F, 0.0F };
+    // Output to motors every _output_to_motors_denominator times output_to_motors is called.
+    ++_output_to_mixer_count;
+    if (_output_to_mixer_count >= _output_to_motors_denominator || !motors_is_on()) {
+        _output_to_mixer_count = 0;
+
+        motor_mixer_commands_t commands {
+            .throttle  = commands_dps.throttle,
+            // scale roll, pitch, and yaw from DPS range to [-1.0F, 1.0F]
+            .roll   = commands_dps.roll * MIXER_OUTPUT_SCALE_FACTOR,
+            .pitch  = commands_dps.pitch * MIXER_OUTPUT_SCALE_FACTOR,
+            .yaw    = commands_dps.yaw * MIXER_OUTPUT_SCALE_FACTOR
+        };
+
+        if (motors_is_on()) {
+            const float throttleIncrease = (_dynamic_idle_controller.get_minimum_allowed_motor_hz() == 0.0F) 
+                ? 0.0F
+                : _dynamic_idle_controller.calculateSpeedIncrease(calculate_slowest_motor_hz(), delta_t);
+            commands.throttle += throttleIncrease;
+            // set the throttle to value returned by the mixer
+            _throttle_command = mix_quad_x(_outputs, commands, _mix_parameters);
+        } else {
+            _outputs = { 0.0F, 0.0F, 0.0F, 0.0F };
+        }
+
+        // Output to the motors, reading the motor RPM
+        // Motor outputs are converted to DShot range [47,2047]
+        _motors[M0].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M0], _mix_parameters.motor_output_min, 1.0F)) + 47)),
+        _motors[M0].read();
+        rpm_filters->set_frequency_hz_iteration_start(M0, _motors[M0].get_motor_hz());
+
+        _motors[M1].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M1], _mix_parameters.motor_output_min, 1.0F)) + 47)),
+        _motors[M1].read();
+        rpm_filters->set_frequency_hz_iteration_start(M1, _motors[M1].get_motor_hz());
+
+        _motors[M2].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M2], _mix_parameters.motor_output_min, 1.0F)) + 47)),
+        _motors[M2].read();
+        rpm_filters->set_frequency_hz_iteration_start(M2, _motors[M2].get_motor_hz());
+
+        _motors[M3].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M3], _mix_parameters.motor_output_min, 1.0F)) + 47)),
+        _motors[M3].read();
+        rpm_filters->set_frequency_hz_iteration_start(M3, _motors[M3].get_motor_hz());
     }
-    _throttle_command = commands.throttle;
 
-    // Output to the motors, reading the motor RPM
-    // Motor outputs are converted to DShot range [47,2047]
-    _motors[M0].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M0], _mix_parameters.motor_output_min, 1.0F)) + 47)),
-    _motors[M0].read();
-    rpm_filters->set_frequency_hz_iteration_start(M0, _motors[M0].get_motor_hz());
-
-    _motors[M1].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M1], _mix_parameters.motor_output_min, 1.0F)) + 47)),
-    _motors[M1].read();
-    rpm_filters->set_frequency_hz_iteration_start(M1, _motors[M1].get_motor_hz());
-
-    _motors[M2].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M2], _mix_parameters.motor_output_min, 1.0F)) + 47)),
-    _motors[M2].read();
-    rpm_filters->set_frequency_hz_iteration_start(M2, _motors[M2].get_motor_hz());
-
-    _motors[M3].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M3], _mix_parameters.motor_output_min, 1.0F)) + 47)),
-    _motors[M3].read();
-    rpm_filters->set_frequency_hz_iteration_start(M3, _motors[M3].get_motor_hz());
+    // perform an RPM filter iteration step, even if we have not output to the motors
+    rpm_filter_set_frequency_hz_iteration_step(rpm_filters);
 }
 
 void MotorMixerQuadXDshot::rpm_filter_set_frequency_hz_iteration_step(RpmFilters* rpm_filters)

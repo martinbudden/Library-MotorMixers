@@ -18,8 +18,8 @@
 #endif // FRAMEWORK
 
 
-MotorMixerWingPwm::MotorMixerWingPwm(const stm32_motor_pins_t& pins, Debug* debug) :
-    MotorMixerWingBase(debug)
+MotorMixerWingPwm::MotorMixerWingPwm(const stm32_motor_pins_t& pins, uint8_t output_to_motors_denominator, Debug* debug) :
+    MotorMixerWingBase(output_to_motors_denominator, debug)
 {
 #if defined(FRAMEWORK_STM32_CUBE) && !defined(FRAMEWORK_ARDUINO_STM32)
     if (pins.m0.pin != 0xFF) {
@@ -45,8 +45,8 @@ MotorMixerWingPwm::MotorMixerWingPwm(const stm32_motor_pins_t& pins, Debug* debu
 #endif
 }
 
-MotorMixerWingPwm::MotorMixerWingPwm(const motor_pins_t& pins, Debug* debug) :
-    MotorMixerWingBase(debug)
+MotorMixerWingPwm::MotorMixerWingPwm(const motor_pins_t& pins, uint8_t output_to_motors_denominator, Debug* debug) :
+    MotorMixerWingBase(output_to_motors_denominator, debug)
 #if !defined(FRAMEWORK_STM32_CUBE)
     ,_pins({pins.m0,pins.s0,pins.s1})
 #endif
@@ -160,19 +160,30 @@ void MotorMixerWingPwm::write_motor(uint8_t motor_index, float motorOutput) // N
 /*!
 Calculate and output motor mix.
 */
-void MotorMixerWingPwm::output_to_motors(motor_mixer_commands_t& commands, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count)
+void MotorMixerWingPwm::output_to_motors(const motor_mixer_commands_t& commands_dps, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count)
 {
     (void)rpm_filters;
     (void)delta_t;
     (void)tick_count;
 
+    ++_output_to_mixer_count;
+    if (_output_to_mixer_count < _output_to_motors_denominator && motors_is_on()) {
+        return;
+    }
+
     if (motors_is_on()) {
         // set the throttle to value returned by the mixer
-        commands.throttle = mix_wing(_outputs, commands, _mix_parameters);
+        const motor_mixer_commands_t commands {
+            .throttle  = commands_dps.throttle,
+            // scale roll, pitch, and yaw from DPS range to [-1.0F, 1.0F]
+            .roll   = commands_dps.roll * MIXER_OUTPUT_SCALE_FACTOR,
+            .pitch  = commands_dps.pitch * MIXER_OUTPUT_SCALE_FACTOR,
+            .yaw    = commands_dps.yaw * MIXER_OUTPUT_SCALE_FACTOR
+        };
+        _throttle_command = mix_wing(_outputs, commands, _mix_parameters);
     } else {
         _outputs = { 0.0F, 0.0F, 0.0F };
     }
-    _throttle_command = commands.throttle;
 
     write_motor(M0, _outputs[M0]);
     write_motor(S0, _outputs[S0]);

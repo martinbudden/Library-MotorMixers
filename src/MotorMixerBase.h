@@ -93,14 +93,16 @@ public:
     static constexpr uint8_t OCTO_XP = 27;
 public:
     virtual ~MotorMixerBase() = default;
-    MotorMixerBase(uint8_t type, size_t motor_count, size_t servo_count, Debug* debug) :
+    MotorMixerBase(uint8_t type, uint8_t output_to_motors_denominator, size_t motor_count, size_t servo_count, Debug* debug) :
         _type(type),
+        _output_to_motors_denominator(output_to_motors_denominator),
         _motor_count(motor_count),
         _servo_count(servo_count),
         _debug(debug),
         _mixer_config { .type = type, .yaw_motors_reversed = true }
     {}
-    MotorMixerBase(uint8_t type, size_t motor_count, size_t servo_count) : MotorMixerBase(type, motor_count, servo_count, nullptr) {}
+    MotorMixerBase(uint8_t type, uint8_t output_to_motors_denominator, size_t motor_count, size_t servo_count) :
+        MotorMixerBase(type, output_to_motors_denominator, motor_count, servo_count, nullptr) {}
 public:
     static constexpr uint8_t PROTOCOL_FAMILY_UNKNOWN = 0;
     static constexpr uint8_t PROTOCOL_FAMILY_PWM = 1;
@@ -151,7 +153,7 @@ public:
     float get_motor_output_min() const { return _mix_parameters.motor_output_min; }
 
     virtual void set_motors_reversed(bool motors_is_reversed) { _motors_is_reversed = motors_is_reversed; }
-    virtual void output_to_motors(motor_mixer_commands_t& commands, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count) { (void)commands; (void)rpm_filters; (void)delta_t; (void)tick_count; }
+    virtual void output_to_motors(const motor_mixer_commands_t& commands_dps, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count) { (void)commands_dps; (void)rpm_filters; (void)delta_t; (void)tick_count; }
     virtual float get_motor_output(size_t motor_index) const { (void)motor_index; return 0.0F; }
 
     virtual bool can_report_position(size_t motor_index) const { (void)motor_index; return false; }
@@ -174,6 +176,8 @@ public:
     virtual void set_dynamic_idle_controller_config(const dynamic_idle_controller_config_t& config) { (void)config; }
 protected:
     const uint8_t _type;
+    const uint8_t _output_to_motors_denominator;
+    uint8_t _output_to_mixer_count {0};
     const size_t _motor_count;
     const size_t _servo_count;
     Debug* _debug;

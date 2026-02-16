@@ -11,11 +11,11 @@ Hz is used for motor revolutions per second rather than RPS, since RPS is genera
 */
 class MotorMixerQuadXDshot : public MotorMixerQuadBase {
 public:
-    MotorMixerQuadXDshot(uint32_t task_interval_microseconds, uint32_t output_to_motors_denominator, const motor_pins_t& pins, Debug& debug);
+    MotorMixerQuadXDshot(uint32_t task_interval_microseconds, uint8_t output_to_motors_denominator, const motor_pins_t& pins, Debug& debug);
 public:
     virtual void set_motor_config(const motor_config_t& motor_config) override;
     virtual void set_motors_reversed(bool motors_is_reversed) override;
-    virtual void output_to_motors(motor_mixer_commands_t& commands, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count) override;
+    virtual void output_to_motors(const motor_mixer_commands_t& commands_dps, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count) override;
     virtual void rpm_filter_set_frequency_hz_iteration_step(RpmFilters* rpm_filters) override;
     virtual const dynamic_idle_controller_config_t* get_dynamic_idle_config() const override;
     virtual void set_dynamic_idle_controller_config(const dynamic_idle_controller_config_t& config) override;
