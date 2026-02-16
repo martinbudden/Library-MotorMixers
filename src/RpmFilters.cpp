@@ -34,7 +34,7 @@ inline void UNLOCK_FILTERS() {}
 #endif
 
 
-void RpmFilters::set_config(const config_t& config)
+void RpmFilters::set_config(const rpm_filters_config_t& config)
 {
     _config = config;
     _Q = static_cast<float>(_config.rpm_filter_q) * 0.01F;

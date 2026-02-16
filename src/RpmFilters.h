@@ -6,6 +6,16 @@
 #include <xyz_type.h>
 
 
+static constexpr uint8_t RPM_FILTER_HARMONICS_COUNT = 3;
+
+struct rpm_filters_config_t {
+    uint16_t rpm_filter_fade_range_hz;  // range in which notch filters fade down to minHz
+    uint16_t rpm_filter_q;              // Q of the notch filters
+    uint16_t rpm_filter_lpf_hz;         // LPF cutoff (from motor rpm converted to Hz)
+    uint8_t  rpm_filter_weights[RPM_FILTER_HARMONICS_COUNT];    // weight as a percentage for each harmonic
+    uint8_t  rpm_filter_harmonics;      // number of harmonics, zero means filters off
+    uint8_t  rpm_filter_min_hz;         // minimum notch frequency for fundamental harmonic
+};
 /*!
 There are up to 3 filters for each motor, one for filtering at the fundamental frequency
 and up to two others, for filtering at the second harmonic and the third harmonic.
@@ -20,28 +30,19 @@ class RpmFilters {
 public:
     RpmFilters(size_t motor_count, float looptime_seconds) : _motor_count(motor_count), _looptime_seconds(looptime_seconds) {}
 public:
-    static const uint8_t FUNDAMENTAL = 0;
-    static const uint8_t SECOND_HARMONIC = 1;
-    static const uint8_t THIRD_HARMONIC = 2;
-    static const uint8_t RPM_FILTER_HARMONICS_COUNT = 3;
+    static constexpr uint8_t FUNDAMENTAL = 0;
+    static constexpr uint8_t SECOND_HARMONIC = 1;
+    static constexpr uint8_t THIRD_HARMONIC = 2;
 
-    struct config_t {
-        uint16_t rpm_filter_fade_range_hz;  // range in which notch filters fade down to minHz
-        uint16_t rpm_filter_q;              // Q of the notch filters
-        uint16_t rpm_filter_lpf_hz;         // LPF cutoff (from motor rpm converted to Hz)
-        uint8_t  rpm_filter_weights[RPM_FILTER_HARMONICS_COUNT];    // weight as a percentage for each harmonic
-        uint8_t  rpm_filter_harmonics;      // number of harmonics, zero means filters off
-        uint8_t  rpm_filter_min_hz;         // minimum notch frequency for fundamental harmonic
-    };
 public:
 #if defined(LIBRARY_MOTOR_MIXERS_MAX_MOTOR_COUNT_EIGHT)
-    enum { MAX_MOTOR_COUNT = 8 };
+    static constexpr size_t MAX_MOTOR_COUNT = 8;
 #else
-    enum { MAX_MOTOR_COUNT = 4 };
+    static constexpr size_t MAX_MOTOR_COUNT = 4;
 #endif
 public:
-    void set_config(const config_t& config);
-    const config_t& get_config() const { return _config; }
+    void set_config(const rpm_filters_config_t& config);
+    const rpm_filters_config_t& get_config() const { return _config; }
     void set_frequency_hz_iteration_start(size_t motor_index, float frequency_hz); // called from the motor mixer
     void set_frequency_hz_iteration_step(); // called from the motor mixer
     void filter(xyz_t& input, size_t motor_index);
@@ -75,5 +76,5 @@ private:
     float _Q { 0.0F };
     BiquadFilterT<xyz_t> _filters[MAX_MOTOR_COUNT][RPM_FILTER_HARMONICS_COUNT]; //!< note this is a template filter that filters all 3 axes
     std::array<PowerTransferFilter1, MAX_MOTOR_COUNT> _motor_rpm_filters {}; //!< filters the motor RPM before it is used to set the filter frequency
-    config_t _config {}; //!< configuration data is only changed in set_config
+    rpm_filters_config_t _config {}; //!< configuration data is only changed in set_config
 };

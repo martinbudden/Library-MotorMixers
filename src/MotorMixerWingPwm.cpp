@@ -160,8 +160,9 @@ void MotorMixerWingPwm::write_motor(uint8_t motor_index, float motorOutput) // N
 /*!
 Calculate and output motor mix.
 */
-void MotorMixerWingPwm::output_to_motors(motor_mixer_commands_t& commands, float delta_t, uint32_t tick_count)
+void MotorMixerWingPwm::output_to_motors(motor_mixer_commands_t& commands, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count)
 {
+    (void)rpm_filters;
     (void)delta_t;
     (void)tick_count;
 

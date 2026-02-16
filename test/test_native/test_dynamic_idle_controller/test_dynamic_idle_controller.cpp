@@ -14,7 +14,7 @@ void tearDown()
 void test_dynamic_idle_controller()
 {
     enum { TASK_INTERVAL_MICROSECONDS = 1000 };
-    const DynamicIdleController::config_t dynamicIdleControllerConfig = {
+    const dynamic_idle_controller_config_t dynamicIdleControllerConfig = {
         .dyn_idle_min_rpm_100 = 0,
         .dyn_idle_p_gain = 50,
         .dyn_idle_i_gain = 50,
@@ -41,7 +41,7 @@ void test_dynamic_idle_controller_p_only()
     const float motor_hz2000RPM = 2000.0F/ 60.0F;
 
     enum { TASK_INTERVAL_MICROSECONDS = 1000 };
-    const DynamicIdleController::config_t dynamicIdleControllerConfig = {
+    const dynamic_idle_controller_config_t dynamicIdleControllerConfig = {
         .dyn_idle_min_rpm_100 = 10, // 10*100 = 1000 rpm
         .dyn_idle_p_gain = 50,
         .dyn_idle_i_gain = 0,

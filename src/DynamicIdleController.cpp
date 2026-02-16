@@ -20,7 +20,7 @@ DynamicIdleController::DynamicIdleController(uint32_t task_interval_microseconds
 {
 }
 
-void DynamicIdleController::set_config(const config_t& config)
+void DynamicIdleController::set_config(const dynamic_idle_controller_config_t& config)
 {
     _config = config;
 

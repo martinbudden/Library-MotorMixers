@@ -12,8 +12,7 @@
 
 MotorMixerQuadXDshotBitbang::MotorMixerQuadXDshotBitbang(uint32_t task_interval_microseconds, uint32_t output_to_motors_denominator, const stm32_motor_pins_t& pins, Debug& debug) :
     MotorMixerQuadBase(QUAD_X, &debug),
-    _dynamic_idle_controller(task_interval_microseconds/output_to_motors_denominator, debug),
-    _rpm_filters(_motor_count, static_cast<float>(task_interval_microseconds) * 0.000001F)
+    _dynamic_idle_controller(task_interval_microseconds/output_to_motors_denominator, debug)
 {
     (void)pins; // !!TODO: set pins
 
@@ -54,22 +53,12 @@ void MotorMixerQuadXDshotBitbang::set_motor_config(const motor_config_t& motor_c
     _erpm_to_hz = 2.0F * (100.0F / SECONDS_PER_MINUTE) / static_cast<float>(motor_config.motor_pole_count);
 }
 
-RpmFilters* MotorMixerQuadXDshotBitbang::get_rpm_filters()
+const dynamic_idle_controller_config_t* MotorMixerQuadXDshotBitbang::get_dynamic_idle_config() const
 {
-    return &_rpm_filters;
+    return &_dynamic_idle_controller.get_config();
 }
 
-const RpmFilters* MotorMixerQuadXDshotBitbang::get_rpm_filters() const
-{
-    return &_rpm_filters;
-}
-
-const DynamicIdleController* MotorMixerQuadXDshotBitbang::get_dynamic_idle_controller() const
-{
-    return &_dynamic_idle_controller;
-}
-
-void MotorMixerQuadXDshotBitbang::set_dynamic_idler_controller_config(const DynamicIdleController::config_t& config)
+void MotorMixerQuadXDshotBitbang::set_dynamic_idle_controller_config(const dynamic_idle_controller_config_t& config)
 {
     _dynamic_idle_controller.set_config(config);
 }
@@ -79,7 +68,7 @@ void MotorMixerQuadXDshotBitbang::set_motors_reversed(bool motors_is_reversed)
     _motors_is_reversed = motors_is_reversed;
 }
 
-void MotorMixerQuadXDshotBitbang::output_to_motors(motor_mixer_commands_t& commands, float delta_t, uint32_t tick_count)
+void MotorMixerQuadXDshotBitbang::output_to_motors(motor_mixer_commands_t& commands, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count)
 {
     (void)tick_count;
 
@@ -107,23 +96,23 @@ void MotorMixerQuadXDshotBitbang::output_to_motors(motor_mixer_commands_t& comma
     _motor_frequencies_hz[M2] = static_cast<float>(_esc_dshot.get_motor_erpm(M2))*_erpm_to_hz;
     _motor_frequencies_hz[M3] = static_cast<float>(_esc_dshot.get_motor_erpm(M3))*_erpm_to_hz;
 
-    _rpm_filters.set_frequency_hz_iteration_start(M0, _motor_frequencies_hz[M0]);
-    _rpm_filters.set_frequency_hz_iteration_start(M1, _motor_frequencies_hz[M1]);
-    _rpm_filters.set_frequency_hz_iteration_start(M1, _motor_frequencies_hz[M2]);
-    _rpm_filters.set_frequency_hz_iteration_start(M3, _motor_frequencies_hz[M3]);
+    rpm_filters->set_frequency_hz_iteration_start(M0, _motor_frequencies_hz[M0]);
+    rpm_filters->set_frequency_hz_iteration_start(M1, _motor_frequencies_hz[M1]);
+    rpm_filters->set_frequency_hz_iteration_start(M1, _motor_frequencies_hz[M2]);
+    rpm_filters->set_frequency_hz_iteration_start(M3, _motor_frequencies_hz[M3]);
 
 }
 
-void MotorMixerQuadXDshotBitbang::rpm_filter_set_frequency_hz_iteration_step()
+void MotorMixerQuadXDshotBitbang::rpm_filter_set_frequency_hz_iteration_step(RpmFilters* rpm_filters)
 {
     // Perform an rpmFilter iteration step for each motor
-    // Note that _rpm_filters.set_frequency_hz_iteration_step is an expensive calculation and runs off a state machine, setting one motor harmonic per iteration
+    // Note that rpm_filters->set_frequency_hz_iteration_step is an expensive calculation and runs off a state machine, setting one motor harmonic per iteration
     // so we want to call it even if we do not write to the motors
 #if (__cplusplus >= 202002L)
     for ([[maybe_unused]] auto _ : std::views::iota(size_t{0}, _rpm_filter_iteration_count)) {
 #else
     for (size_t ii = 0; ii < _rpm_filter_iteration_count; ++ii) {
 #endif
-        _rpm_filters.set_frequency_hz_iteration_step();
+        rpm_filters->set_frequency_hz_iteration_step();
     }
 }

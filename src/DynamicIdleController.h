@@ -6,6 +6,14 @@
 class Debug;
 
 
+struct dynamic_idle_controller_config_t {
+    uint8_t dyn_idle_min_rpm_100; // multiply this by 100 to get the actual min RPM
+    uint8_t dyn_idle_p_gain;
+    uint8_t dyn_idle_i_gain;
+    uint8_t dyn_idle_d_gain;
+    uint8_t dyn_idle_max_increase;
+};
+
 /*!
 Dynamic Idle: use PID controller to boost motor speeds so that slowest motor does not go below minimum allowed RPM
 
@@ -20,17 +28,10 @@ Instead we have a PID controller that increases output to the motors as the slow
 */
 class DynamicIdleController {
 public:
-    struct config_t {
-        uint8_t dyn_idle_min_rpm_100; // multiply this by 100 to get the actual min RPM
-        uint8_t dyn_idle_p_gain;
-        uint8_t dyn_idle_i_gain;
-        uint8_t dyn_idle_d_gain;
-        uint8_t dyn_idle_max_increase;
-    };
 public:
     DynamicIdleController(uint32_t task_interval_microseconds, Debug& debug);
-    void set_config(const config_t& config);
-    const config_t& get_config() const { return _config; }
+    void set_config(const dynamic_idle_controller_config_t& config);
+    const dynamic_idle_controller_config_t& get_config() const { return _config; }
     void set_minimum_allowed_motor_hz(float minimum_allowed_motor_hz);
     float get_minimum_allowed_motor_hz() const { return _minimum_allowed_motor_hz; }
     void set_max_increase(float max_increase) { _max_increase = max_increase; }
@@ -45,5 +46,5 @@ private:
     //float _dynamicIdleMaxIncreaseDelayK {};
     PIDF _PID {}; // PID to dynamic idle, ie to ensure slowest motor does not go below min RPS
     PowerTransferFilter1 _DtermFilter {};
-    config_t _config {};
+    dynamic_idle_controller_config_t _config {};
 };

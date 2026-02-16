@@ -24,6 +24,43 @@ struct motor_mixer_parameters_t {
     float overshoot; //! used by test code
 };
 
+struct mixer_config_t {
+    uint8_t type;
+    uint8_t yaw_motors_reversed;
+};
+
+struct motor_device_config_t {
+    uint16_t motor_pwm_rate;          // The update rate of motor outputs (50-498Hz)
+    uint8_t  motor_protocol;
+    uint8_t  motor_inversion;        // Active-High vs Active-Low. Useful for brushed FCs converted for brushless operation
+    uint8_t  use_continuous_update;
+    uint8_t  use_burst_dshot;
+    uint8_t  use_dshot_telemetry;
+    uint8_t  use_dshot_edt;
+};
+
+struct motor_config_t {
+    motor_device_config_t device;
+    uint16_t motor_idle;     // percentage of the motor range added to the disarmed value to give the idle value
+    uint16_t max_throttle;   // value of throttle at full power, can be set up to 2000
+    uint16_t min_command;    // value for ESCs when they are not armed. For some specific ESCs this value must be lowered to 900
+    uint16_t kv;            // Motor constant estimate RPM under no load
+    uint8_t motor_pole_count; // Number of motor poles, used to calculate actual RPM from eRPM
+};
+
+struct servo_device_config_t {
+    // PWM values, in milliseconds, common range is 1000-2000 (1ms to 2ms)
+    uint16_t servo_center_pulse;  // This is the value for servos when they should be in the middle. e.g. 1500.
+    uint16_t servo_pwm_Rate;      // The update rate of servo outputs (50-498Hz)
+};
+
+struct servo_config_t {
+    servo_device_config_t device;
+    uint16_t servo_lowpass_freq;            // lowpass servo filter frequency selection; 1/1000ths of loop freq
+    uint8_t tri_unarmed_servo;              // send tail servo correction pulses even when unarmed
+    uint8_t channelForwardingStartChannel;
+};
+
 class MotorMixerBase {
 public:
     // constants compatible with Betaflight mixerMode_e enums.
@@ -83,6 +120,10 @@ public:
 
     static constexpr float RPM_TO_DPS { 360.0F / 60.0F };
     static constexpr float DPS_TO_RPM { 60.0F / 360.0F };
+
+    // Betaflight compatible mixer output scale factor: scales roll, pitch, and yaw from DPS range to [-1.0F, 1.0F]
+    static constexpr float MIXER_OUTPUT_SCALE_FACTOR = 0.001F;
+
     //! parameters to mix function
     struct stm32_motor_pin_t {
         uint8_t port;
@@ -90,38 +131,6 @@ public:
         uint8_t timer;
         uint8_t channel;
     };
-    struct mixer_config_t {
-        uint8_t type;
-        uint8_t yaw_motors_reversed;
-    };
-    struct motor_device_config_t {
-        uint16_t motor_pwm_rate;          // The update rate of motor outputs (50-498Hz)
-        uint8_t  motor_protocol;
-        uint8_t  motor_inversion;        // Active-High vs Active-Low. Useful for brushed FCs converted for brushless operation
-        uint8_t  use_continuous_update;
-        uint8_t  use_burst_dshot;
-        uint8_t  use_dshot_telemetry;
-        uint8_t  use_dshot_edt;
-    };
-    struct motor_config_t {
-        motor_device_config_t device;
-        uint16_t motor_idle;     // percentage of the motor range added to the disarmed value to give the idle value
-        uint16_t max_throttle;   // value of throttle at full power, can be set up to 2000
-        uint16_t min_command;    // value for ESCs when they are not armed. For some specific ESCs this value must be lowered to 900
-        uint16_t kv;            // Motor constant estimate RPM under no load
-        uint8_t motor_pole_count; // Number of motor poles, used to calculate actual RPM from eRPM
-    };
-    struct servo_device_config_t {
-        // PWM values, in milliseconds, common range is 1000-2000 (1ms to 2ms)
-        uint16_t servo_center_pulse;  // This is the value for servos when they should be in the middle. e.g. 1500.
-        uint16_t servo_pwm_Rate;      // The update rate of servo outputs (50-498Hz)
-    };
-    typedef struct servo_config_t {
-        servo_device_config_t device;
-        uint16_t servo_lowpass_freq;            // lowpass servo filter frequency selection; 1/1000ths of loop freq
-        uint8_t tri_unarmed_servo;              // send tail servo correction pulses even when unarmed
-        uint8_t channelForwardingStartChannel;
-    } servoConfig_t;
 public:
     uint8_t get_type() const { return _type; }
     size_t get_motor_count() const { return _motor_count; }
@@ -142,7 +151,7 @@ public:
     float get_motor_output_min() const { return _mix_parameters.motor_output_min; }
 
     virtual void set_motors_reversed(bool motors_is_reversed) { _motors_is_reversed = motors_is_reversed; }
-    virtual void output_to_motors(motor_mixer_commands_t& commands, float delta_t, uint32_t tick_count) { (void)commands; (void)delta_t; (void)tick_count; }
+    virtual void output_to_motors(motor_mixer_commands_t& commands, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count) { (void)commands; (void)rpm_filters; (void)delta_t; (void)tick_count; }
     virtual float get_motor_output(size_t motor_index) const { (void)motor_index; return 0.0F; }
 
     virtual bool can_report_position(size_t motor_index) const { (void)motor_index; return false; }
@@ -159,12 +168,10 @@ public:
 
     float get_throttle_command() const { return _throttle_command; } // for blackbox recording
 
-    virtual void rpm_filter_set_frequency_hz_iteration_step() {};
-    virtual RpmFilters* get_rpm_filters() { return nullptr; }
-    virtual const RpmFilters* get_rpm_filters() const { return nullptr; }
+    virtual void rpm_filter_set_frequency_hz_iteration_step(RpmFilters* rpm_filters) { (void)rpm_filters; };
 
-    virtual const DynamicIdleController* get_dynamic_idle_controller() const { return nullptr; }
-    virtual void set_dynamic_idler_controller_config(const DynamicIdleController::config_t& config) { (void)config; }
+    virtual const dynamic_idle_controller_config_t* get_dynamic_idle_config() const { return nullptr; }
+    virtual void set_dynamic_idle_controller_config(const dynamic_idle_controller_config_t& config) { (void)config; }
 protected:
     const uint8_t _type;
     const size_t _motor_count;
