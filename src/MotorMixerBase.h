@@ -6,6 +6,7 @@
 
 class Debug;
 class DynamicIdleController;
+struct motor_mixer_message_queue_item_t;
 
 struct motor_mixer_commands_t {
     float throttle;
@@ -152,9 +153,10 @@ public:
     void set_motor_output_min(float motor_output_min) { _mix_parameters.motor_output_min = motor_output_min; }
     float get_motor_output_min() const { return _mix_parameters.motor_output_min; }
 
-    virtual void set_motors_reversed(bool motors_is_reversed) { _motors_is_reversed = motors_is_reversed; }
-    virtual void output_to_motors(const motor_mixer_commands_t& commands_dps, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count) { (void)commands_dps; (void)rpm_filters; (void)delta_t; (void)tick_count; }
+    virtual void output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count) { (void)queue_item; (void)rpm_filters; (void)delta_t; (void)tick_count; }
+
     virtual float get_motor_output(size_t motor_index) const { (void)motor_index; return 0.0F; }
+    virtual void set_motors_reversed(bool motors_is_reversed) { _motors_is_reversed = motors_is_reversed; }
 
     virtual bool can_report_position(size_t motor_index) const { (void)motor_index; return false; }
     virtual void reset_all_encoders() {}

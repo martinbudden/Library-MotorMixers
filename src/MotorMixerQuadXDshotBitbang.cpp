@@ -1,10 +1,11 @@
 #include "DynamicIdleController.h"
 #include "Mixers.h"
 #include "MotorMixerQuadXDshotBitbang.h"
-
-#include <RpmFilters.h>
+#include "RpmFilters.h"
+#include "motor_mixer_message_queue.h"
 
 #include <cmath>
+
 #if (__cplusplus >= 202002L)
 #include <ranges>
 #endif
@@ -68,7 +69,7 @@ void MotorMixerQuadXDshotBitbang::set_motors_reversed(bool motors_is_reversed)
     _motors_is_reversed = motors_is_reversed;
 }
 
-void MotorMixerQuadXDshotBitbang::output_to_motors(const motor_mixer_commands_t& commands_dps, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count)
+void MotorMixerQuadXDshotBitbang::output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count)
 {
     (void)tick_count;
 
@@ -78,11 +79,11 @@ void MotorMixerQuadXDshotBitbang::output_to_motors(const motor_mixer_commands_t&
         _output_to_mixer_count = 0;
 
         motor_mixer_commands_t commands {
-            .throttle  = commands_dps.throttle,
+            .throttle  = queue_item.throttle,
             // scale roll, pitch, and yaw from DPS range to [-1.0F, 1.0F]
-            .roll   = commands_dps.roll * MIXER_OUTPUT_SCALE_FACTOR,
-            .pitch  = commands_dps.pitch * MIXER_OUTPUT_SCALE_FACTOR,
-            .yaw    = commands_dps.yaw * MIXER_OUTPUT_SCALE_FACTOR
+            .roll   = queue_item.roll_dps * MIXER_OUTPUT_SCALE_FACTOR,
+            .pitch  = queue_item.pitch_dps * MIXER_OUTPUT_SCALE_FACTOR,
+            .yaw    = queue_item.yaw_dps * MIXER_OUTPUT_SCALE_FACTOR
         };
         if (motors_is_on()) {
             const float throttleIncrease = (_dynamic_idle_controller.get_minimum_allowed_motor_hz() == 0.0F) ? 0.0F : _dynamic_idle_controller.calculateSpeedIncrease(calculate_slowest_motor_hz(), delta_t);
