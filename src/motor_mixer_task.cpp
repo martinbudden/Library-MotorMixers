@@ -18,10 +18,8 @@
 #endif
 
 
-MotorMixerTask::MotorMixerTask(MotorMixerMessageQueue& motor_mixer_message_queue, MotorMixerBase& motor_mixer, RpmFilters* rpm_filters) :
-    _motor_mixer_message_queue(motor_mixer_message_queue),
-    _motor_mixer(motor_mixer),
-    _rpm_filters(rpm_filters)
+MotorMixerTask::MotorMixerTask(const motor_mixer_task_parameters_t& parameters) :
+    _task(parameters)
 {
 }
 
@@ -33,7 +31,7 @@ Task function for the VehicleController.
 #if defined(FRAMEWORK_USE_FREERTOS)
     motor_mixer_message_queue_item_t queue_item {};
     while (true) {
-        _motor_mixer_message_queue.WAIT(queue_item);
+        _task.motor_mixer_message_queue.WAIT(queue_item);
 
         // calculate timings for instrumentation
         const TickType_t tick_count = xTaskGetTickCount();
@@ -41,7 +39,7 @@ Task function for the VehicleController.
         _tickCountPrevious = tick_count;
 
         const float delta_t = static_cast<float>(_tickCountDelta) * 0.001F;
-        _motor_mixer.output_to_motors(queue_item, _rpm_filters, delta_t, tick_count);
+        _task.motor_mixer.output_to_motors(queue_item, _task.rpm_filters, delta_t, tick_count);
     }
 #else
     while (true) {}

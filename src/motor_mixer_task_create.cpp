@@ -20,15 +20,15 @@
 #endif
 
 
-MotorMixerTask* MotorMixerTask::create_task(MotorMixerMessageQueue& motor_mixer_message_queue, MotorMixerBase& motor_mixer, RpmFilters* rpm_filters, uint8_t priority, uint32_t core)
+MotorMixerTask* MotorMixerTask::create_task(const motor_mixer_task_parameters_t& parameters, uint8_t priority, uint32_t core)
 {
     task_info_t task_info {};
-    return create_task(task_info, motor_mixer_message_queue, motor_mixer, rpm_filters, priority, core);
+    return create_task(task_info, parameters, priority, core);
 }
 
-MotorMixerTask* MotorMixerTask::create_task(task_info_t& task_info, MotorMixerMessageQueue& motor_mixer_message_queue, MotorMixerBase& motor_mixer, RpmFilters* rpm_filters, uint8_t priority, uint32_t core)
+MotorMixerTask* MotorMixerTask::create_task(task_info_t& task_info, const motor_mixer_task_parameters_t& parameters, uint8_t priority, uint32_t core)
 {
-    static MotorMixerTask motor_mixer_task(motor_mixer_message_queue, motor_mixer, rpm_filters);
+    static MotorMixerTask motor_mixer_task(parameters);
 
     static TaskBase::parameters_t task_parameters { // NOLINT(misc-const-correctness) false positive
         .task = &motor_mixer_task
