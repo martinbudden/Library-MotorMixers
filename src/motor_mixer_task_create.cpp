@@ -42,56 +42,56 @@ MotorMixerTask* MotorMixerTask::create_task(task_info_t& task_info, const motor_
     static std::array <StackType_t, VEHICLE_CONTROLLER_TASK_STACK_DEPTH_BYTES / sizeof(StackType_t)> stack;
 #endif
     task_info = {
-        .taskHandle = nullptr,
+        .task_handle = nullptr,
         .name = "MotorMixerTask", // max length 16, including zero terminator
-        .stackDepthBytes = VEHICLE_CONTROLLER_TASK_STACK_DEPTH_BYTES,
-        .stackBuffer = reinterpret_cast<uint8_t*>(&stack[0]), // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+        .stack_depth_bytes = VEHICLE_CONTROLLER_TASK_STACK_DEPTH_BYTES,
+        .stack_buffer = reinterpret_cast<uint8_t*>(&stack[0]), // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
         .priority = priority,
         .core = core,
-        .taskIntervalMicroseconds = 0,
+        .task_interval_microseconds = 0,
     };
 
 #if defined(FRAMEWORK_USE_FREERTOS)
     assert(std::strlen(task_info.name) < configMAX_TASK_NAME_LEN);
     assert(task_info.priority < configMAX_PRIORITIES);
 
-    static StaticTask_t taskBuffer;
+    static StaticTask_t task_buffer;
 #if defined(FRAMEWORK_ESPIDF) || defined(FRAMEWORK_ARDUINO_ESP32)
-    task_info.taskHandle = xTaskCreateStaticPinnedToCore(
+    task_info.task_handle = xTaskCreateStaticPinnedToCore(
         MotorMixerTask::task_static,
         task_info.name,
-        task_info.stackDepthBytes / sizeof(StackType_t),
+        task_info.stack_depth_bytes / sizeof(StackType_t),
         &task_parameters,
         task_info.priority,
         &stack[0],
-        &taskBuffer,
+        &task_buffer,
         task_info.core
     );
-    assert(task_info.taskHandle != nullptr && "Unable to create MotorMixerTask");
+    assert(task_info.task_handle != nullptr && "Unable to create MotorMixerTask");
 #elif defined(FRAMEWORK_RPI_PICO) || defined(FRAMEWORK_ARDUINO_RPI_PICO)
-    task_info.taskHandle = xTaskCreateStaticAffinitySet(
+    task_info.task_handle = xTaskCreateStaticAffinitySet(
         MotorMixerTask::task_static,
         task_info.name,
-        task_info.stackDepthBytes / sizeof(StackType_t),
+        task_info.stack_depth_bytes / sizeof(StackType_t),
         &task_parameters,
         task_info.priority,
         &stack[0],
-        &taskBuffer,
+        &task_buffer,
         task_info.core
     );
-    assert(task_info.taskHandle != nullptr && "Unable to create MotorMixerTask");
+    assert(task_info.task_handle != nullptr && "Unable to create MotorMixerTask");
 #else
-    task_info.taskHandle = xTaskCreateStatic(
+    task_info.task_handle = xTaskCreateStatic(
         MotorMixerTask::task_static,
         task_info.name,
-        task_info.stackDepthBytes / sizeof(StackType_t),
+        task_info.stack_depth_bytes / sizeof(StackType_t),
         &task_parameters,
         task_info.priority,
         &stack[0],
-        &taskBuffer
+        &task_buffer
     );
-    assert(task_info.taskHandle != nullptr && "Unable to create MotorMixerTask");
-    // vTaskCoreAffinitySet(task_info.taskHandle, task_info.core);
+    assert(task_info.task_handle != nullptr && "Unable to create MotorMixerTask");
+    // vTaskCoreAffinitySet(task_info.task_handle, task_info.core);
 #endif
 #else
     (void)task_parameters;

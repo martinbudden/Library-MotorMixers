@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Filters.h>
-#include <PIDF.h>
+#include <pid_controller.h>
 
 class Debug;
 
@@ -37,14 +37,14 @@ public:
     void set_max_increase(float max_increase) { _max_increase = max_increase; }
     float get_max_increase()const { return _max_increase; }
     float calculateSpeedIncrease(float slowestMotorHz, float delta_t);
-    void resetPID(); //!< for test code
+    void reset_pid(); //!< for test code
 private:
     uint32_t _task_interval_microseconds;
     Debug& _debug;
     float _minimum_allowed_motor_hz {}; // minimum motor Hz, dynamically controlled
     float _max_increase {};
     //float _dynamicIdleMaxIncreaseDelayK {};
-    PIDF _PID {}; // PID to dynamic idle, ie to ensure slowest motor does not go below min RPS
+    PidController _pid {}; // PID to dynamic idle, ie to ensure slowest motor does not go below min RPS
     PowerTransferFilter1 _DtermFilter {};
     dynamic_idle_controller_config_t _config {};
 };

@@ -2,7 +2,7 @@
 #include "motor_mixer_message_queue.h"
 #include "motor_mixer_task.h"
 
-#include <TimeMicroseconds.h>
+#include <time_microseconds.h>
 
 #if defined(FRAMEWORK_USE_FREERTOS)
 #if defined(FRAMEWORK_ESPIDF) || defined(FRAMEWORK_ARDUINO_ESP32)
@@ -35,10 +35,10 @@ Task function for the VehicleController.
 
         // calculate timings for instrumentation
         const TickType_t tick_count = xTaskGetTickCount();
-        _tickCountDelta = tick_count - _tickCountPrevious;
-        _tickCountPrevious = tick_count;
+        _tick_count_delta = tick_count - _tick_count_previous;
+        _tick_count_previous = tick_count;
 
-        const float delta_t = static_cast<float>(_tickCountDelta) * 0.001F;
+        const float delta_t = static_cast<float>(_tick_count_delta) * 0.001F;
         _task.motor_mixer.output_to_motors(queue_item, _task.rpm_filters, delta_t, tick_count);
     }
 #else
