@@ -1,4 +1,4 @@
-#include "Mixers.h"
+#include "mixers.h"
 
 
 float mix_wing(std::array<float, 3>& motor_outputs, const motor_mixer_commands_t& commands, motor_mixer_parameters_t& params)

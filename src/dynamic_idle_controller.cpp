@@ -1,7 +1,7 @@
-#include "DynamicIdleController.h"
-#include "Debug.h"
+#include "dynamic_idle_controller.h"
 
 #include <algorithm>
+#include <debug.h>
 
 
 inline float clamp(float value, float min, float max)

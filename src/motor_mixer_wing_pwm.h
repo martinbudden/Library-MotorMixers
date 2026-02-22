@@ -1,6 +1,6 @@
 #pragma once
 
-#include <MotorMixerWingBase.h>
+#include <motor_mixer_wing_base.h>
 
 #if defined(FRAMEWORK_STM32_CUBE)
 

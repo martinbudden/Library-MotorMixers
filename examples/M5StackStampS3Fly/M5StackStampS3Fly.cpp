@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <MotorMixerQuadX_PWM.h>
+#include <motor_mixer_quadx_pwm.h>
 #if defined(FRAMEWORK_ARDUINO_ESP32)
 #include <esp32-hal-ledc.h>
 #endif

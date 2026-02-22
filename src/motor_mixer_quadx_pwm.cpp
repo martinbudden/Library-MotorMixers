@@ -1,6 +1,6 @@
-#include "Mixers.h"
-#include "MotorMixerQuadXPwm.h"
+#include "mixers.h"
 #include "motor_mixer_message_queue.h"
+#include "motor_mixer_quadx_pwm.h"
 
 #include <cmath>
 

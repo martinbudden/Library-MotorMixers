@@ -1,5 +1,5 @@
-#include <Debug.h>
-#include <DynamicIdleController.h>
+#include <debug.h>
+#include <dynamic_idle_controller.h>
 #include <unity.h>
 
 void setUp()

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "EscDshotBitbang.h"
-#include "MotorMixerQuadBase.h"
-#include "RpmFilters.h"
+#include "esc_dshot_bitbang.h"
+#include "motor_mixer_quad_base.h"
+#include "rpm_filters.h"
 
 
 /*!

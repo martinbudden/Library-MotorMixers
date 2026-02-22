@@ -1,4 +1,4 @@
-#include <EscDshotBitbang.h>
+#include <esc_dshot_bitbang.h>
 
 
 EscDshotBitbang* EscDshotBitbang::self; // alias of `this` to be used in ISR

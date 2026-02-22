@@ -1,4 +1,4 @@
-#include "DshotCodec.h"
+#include "dshot_codec.h"
 #include <cstddef>
 #if defined(FRAMEWORK_STM32_CUBE) || defined(FRAMEWORK_ARDUINO_STM32)
 

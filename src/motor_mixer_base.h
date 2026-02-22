@@ -1,7 +1,7 @@
 #pragma once
 
-#include "DynamicIdleController.h"
-#include "RpmFilters.h"
+#include "dynamic_idle_controller.h"
+#include "rpm_filters.h"
 #include <cstddef>
 
 class Debug;

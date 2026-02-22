@@ -1,5 +1,5 @@
-#include <DshotCodec.h>
-#include <EscDshot.h>
+#include <dshot_codec.h>
+#include <esc_dshot.h>
 #include <unity.h>
 
 void setUp()

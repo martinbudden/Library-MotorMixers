@@ -1,8 +1,8 @@
-#include "DynamicIdleController.h"
-#include "Mixers.h"
-#include "MotorMixerQuadXDshot.h"
-#include "RpmFilters.h"
+#include "dynamic_idle_controller.h"
+#include "mixers.h"
 #include "motor_mixer_message_queue.h"
+#include "motor_mixer_quadx_dshot.h"
+#include "rpm_filters.h"
 
 #if (__cplusplus >= 202002L)
 #include <ranges>

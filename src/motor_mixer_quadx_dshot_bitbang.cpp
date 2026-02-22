@@ -1,8 +1,8 @@
-#include "DynamicIdleController.h"
-#include "Mixers.h"
-#include "MotorMixerQuadXDshotBitbang.h"
-#include "RpmFilters.h"
+#include "dynamic_idle_controller.h"
+#include "mixers.h"
 #include "motor_mixer_message_queue.h"
+#include "motor_mixer_quadx_dshot_bitbang.h"
+#include "rpm_filters.h"
 
 #include <cmath>
 

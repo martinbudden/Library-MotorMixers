@@ -1,6 +1,6 @@
 #pragma once
 
-#include <MotorMixerQuadBase.h>
+#include <motor_mixer_quad_base.h>
 
 #if defined(FRAMEWORK_STM32_CUBE)
 
