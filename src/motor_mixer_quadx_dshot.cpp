@@ -9,9 +9,9 @@
 #endif
 
 
-MotorMixerQuadXDshot::MotorMixerQuadXDshot(uint32_t task_interval_microseconds, uint8_t output_to_motors_denominator, const motor_pins_t& pins, Debug& debug) :
-    MotorMixerQuadBase(QUAD_X, output_to_motors_denominator, &debug),
-    _dynamic_idle_controller(task_interval_microseconds/output_to_motors_denominator, debug)
+MotorMixerQuadXDshot::MotorMixerQuadXDshot(uint32_t task_interval_microseconds, uint8_t output_to_motors_denominator, const motor_pins_t& pins) :
+    MotorMixerQuadBase(QUAD_X, output_to_motors_denominator),
+    _dynamic_idle_controller(task_interval_microseconds/output_to_motors_denominator)
 {
     _motors[M0].init(pins.m0);
     _motors[M1].init(pins.m1);
@@ -71,9 +71,10 @@ void MotorMixerQuadXDshot::set_motors_reversed(bool motors_is_reversed)
     _motors_is_reversed = motors_is_reversed;
 }
 
-void MotorMixerQuadXDshot::output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count)
+void MotorMixerQuadXDshot::output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count, Debug& debug)
 {
     (void)tick_count;
+    (void)debug;
 
     // Output to motors every _output_to_motors_denominator times output_to_motors is called.
     ++_output_to_mixer_count;
@@ -91,7 +92,7 @@ void MotorMixerQuadXDshot::output_to_motors(const motor_mixer_message_queue_item
         if (motors_is_on()) {
             const float throttleIncrease = (_dynamic_idle_controller.get_minimum_allowed_motor_hz() == 0.0F) 
                 ? 0.0F
-                : _dynamic_idle_controller.calculateSpeedIncrease(calculate_slowest_motor_hz(), delta_t);
+                : _dynamic_idle_controller.calculateSpeedIncrease(calculate_slowest_motor_hz(), delta_t, debug);
             commands.throttle += throttleIncrease;
             // set the throttle to value returned by the mixer
             _throttle_command = mix_quad_x(_outputs, commands, _mix_parameters);

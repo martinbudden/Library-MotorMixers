@@ -94,16 +94,13 @@ public:
     static constexpr uint8_t OCTO_XP = 27;
 public:
     virtual ~MotorMixerBase() = default;
-    MotorMixerBase(uint8_t type, uint8_t output_to_motors_denominator, size_t motor_count, size_t servo_count, Debug* debug) :
+    MotorMixerBase(uint8_t type, uint8_t output_to_motors_denominator, size_t motor_count, size_t servo_count) :
         _type(type),
         _output_to_motors_denominator(output_to_motors_denominator),
         _motor_count(motor_count),
         _servo_count(servo_count),
-        _debug(debug),
         _mixer_config { .type = type, .yaw_motors_reversed = true }
     {}
-    MotorMixerBase(uint8_t type, uint8_t output_to_motors_denominator, size_t motor_count, size_t servo_count) :
-        MotorMixerBase(type, output_to_motors_denominator, motor_count, servo_count, nullptr) {}
 public:
     static constexpr uint8_t PROTOCOL_FAMILY_UNKNOWN = 0;
     static constexpr uint8_t PROTOCOL_FAMILY_PWM = 1;
@@ -157,7 +154,9 @@ public:
     Called by the scheduler when the updateOutputsUsingPIDs function running in the AHRS task SIGNALs that output data is available.
     It is typically called at frequency of between 1000Hz and 8000Hz, so it has to be FAST.
     */
-    virtual void output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count) { (void)queue_item; (void)rpm_filters; (void)delta_t; (void)tick_count; }
+    virtual void output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count, Debug& debug) {
+        (void)queue_item; (void)rpm_filters; (void)delta_t; (void)tick_count; (void)debug;
+    }
 
     virtual float get_motor_output(size_t motor_index) const { (void)motor_index; return 0.0F; }
     virtual void set_motors_reversed(bool motors_is_reversed) { _motors_is_reversed = motors_is_reversed; }
@@ -186,7 +185,6 @@ protected:
     uint8_t _output_to_mixer_count {0};
     const size_t _motor_count;
     const size_t _servo_count;
-    Debug* _debug;
     mixer_config_t _mixer_config;
     motor_config_t _motor_config {
         .device = {

@@ -14,9 +14,8 @@ inline float clamp(float value, float min, float max)
 }
 
 
-DynamicIdleController::DynamicIdleController(uint32_t task_interval_microseconds, Debug& debug) :
-    _task_interval_microseconds(task_interval_microseconds),
-    _debug(debug)
+DynamicIdleController::DynamicIdleController(uint32_t task_interval_microseconds) :
+    _task_interval_microseconds(task_interval_microseconds)
 {
 }
 
@@ -49,7 +48,7 @@ void DynamicIdleController::set_minimum_allowed_motor_hz(float minimum_allowed_m
     _pid.set_setpoint(_minimum_allowed_motor_hz);
 }
 
-float DynamicIdleController::calculateSpeedIncrease(float slowestMotorHz, float delta_t)
+float DynamicIdleController::calculateSpeedIncrease(float slowestMotorHz, float delta_t, Debug& debug)
 {
     if (_minimum_allowed_motor_hz == 0.0F) {
         // if motors are allowed to stop, then no speed increase is needed
@@ -61,11 +60,11 @@ float DynamicIdleController::calculateSpeedIncrease(float slowestMotorHz, float 
 
     speedIncrease = clamp(speedIncrease, 0.0F, _max_increase);
 
-    if (_debug.getMode() == DEBUG_DYN_IDLE) {
+    if (debug.getMode() == DEBUG_DYN_IDLE) {
         const pid_error_t error = _pid.get_error();
-        _debug.set(0, static_cast<int16_t>(std::max(-1000L, std::lroundf(error.p * 10000))));
-        _debug.set(1, static_cast<int16_t>(std::lroundf(error.i * 10000)));
-        _debug.set(2, static_cast<int16_t>(std::lroundf(error.d * 10000)));
+        debug.set(0, static_cast<int16_t>(std::max(-1000L, std::lroundf(error.p * 10000))));
+        debug.set(1, static_cast<int16_t>(std::lroundf(error.i * 10000)));
+        debug.set(2, static_cast<int16_t>(std::lroundf(error.d * 10000)));
     }
 
     return speedIncrease;

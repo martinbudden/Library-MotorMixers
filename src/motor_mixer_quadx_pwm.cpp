@@ -33,8 +33,8 @@ ledcAttach used to set up the LEDC pin (merged ledcSetup and ledcAttachPin funct
 */
 
 
-MotorMixerQuadXPwm::MotorMixerQuadXPwm(const stm32_motor_pins_t& pins, uint8_t output_to_motors_denominator, Debug* debug) :
-    MotorMixerQuadBase(QUAD_X, output_to_motors_denominator, debug)
+MotorMixerQuadXPwm::MotorMixerQuadXPwm(const stm32_motor_pins_t& pins, uint8_t output_to_motors_denominator) :
+    MotorMixerQuadBase(QUAD_X, output_to_motors_denominator)
 {
 #if defined(FRAMEWORK_STM32_CUBE) && !defined(FRAMEWORK_ARDUINO_STM32)
     if (pins.m0.pin != 0xFF) {
@@ -66,8 +66,8 @@ MotorMixerQuadXPwm::MotorMixerQuadXPwm(const stm32_motor_pins_t& pins, uint8_t o
 #endif
 }
 
-MotorMixerQuadXPwm::MotorMixerQuadXPwm(const motor_pins_t& pins, uint8_t output_to_motors_denominator, Debug* debug) :
-    MotorMixerQuadBase(QUAD_X, output_to_motors_denominator, debug)
+MotorMixerQuadXPwm::MotorMixerQuadXPwm(const motor_pins_t& pins, uint8_t output_to_motors_denominator) :
+    MotorMixerQuadBase(QUAD_X, output_to_motors_denominator)
 #if !defined(FRAMEWORK_STM32_CUBE)
     ,_pins({pins.m0,pins.m1,pins.m2,pins.m3})
 #endif
@@ -200,11 +200,12 @@ void MotorMixerQuadXPwm::write_motor(uint8_t motor_index, float motorOutput) // 
 /*!
 Calculate and output motor mix.
 */
-void MotorMixerQuadXPwm::output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count)
+void MotorMixerQuadXPwm::output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count, Debug& debug)
 {
     (void)rpm_filters;
     (void)delta_t;
     (void)tick_count;
+    (void)debug;
 
     // Output to motors every _output_to_motors_denominator times output_to_motors is called.
     ++_output_to_mixer_count;

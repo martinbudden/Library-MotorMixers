@@ -29,18 +29,17 @@ Instead we have a PID controller that increases output to the motors as the slow
 class DynamicIdleController {
 public:
 public:
-    DynamicIdleController(uint32_t task_interval_microseconds, Debug& debug);
+    explicit DynamicIdleController(uint32_t task_interval_microseconds);
     void set_config(const dynamic_idle_controller_config_t& config);
     const dynamic_idle_controller_config_t& get_config() const { return _config; }
     void set_minimum_allowed_motor_hz(float minimum_allowed_motor_hz);
     float get_minimum_allowed_motor_hz() const { return _minimum_allowed_motor_hz; }
     void set_max_increase(float max_increase) { _max_increase = max_increase; }
     float get_max_increase()const { return _max_increase; }
-    float calculateSpeedIncrease(float slowestMotorHz, float delta_t);
+    float calculateSpeedIncrease(float slowestMotorHz, float delta_t, Debug& debug);
     void reset_pid(); //!< for test code
 private:
     uint32_t _task_interval_microseconds;
-    Debug& _debug;
     float _minimum_allowed_motor_hz {}; // minimum motor Hz, dynamically controlled
     float _max_increase {};
     //float _dynamicIdleMaxIncreaseDelayK {};

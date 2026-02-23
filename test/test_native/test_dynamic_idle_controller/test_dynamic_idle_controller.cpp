@@ -22,15 +22,15 @@ void test_dynamic_idle_controller()
         .dyn_idle_max_increase = 150,
     };
     static Debug debug;
-    static DynamicIdleController dynamicIdleController(TASK_INTERVAL_MICROSECONDS, debug);
+    static DynamicIdleController dynamicIdleController(TASK_INTERVAL_MICROSECONDS);
     dynamicIdleController.set_config(dynamicIdleControllerConfig);
     const float delta_t = static_cast<float>(TASK_INTERVAL_MICROSECONDS) * 0.000001F;
 
     TEST_ASSERT_EQUAL(0, dynamicIdleController.get_config().dyn_idle_min_rpm_100);
 
-    TEST_ASSERT_EQUAL_FLOAT(0.0F, dynamicIdleController.calculateSpeedIncrease(0.0F, delta_t));
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, dynamicIdleController.calculateSpeedIncrease(0.0F, delta_t, debug));
     const float slowestMotorHz = 1000.0F/ 60.0F; // 1000 RPM
-    TEST_ASSERT_EQUAL_FLOAT(0.0F, dynamicIdleController.calculateSpeedIncrease(slowestMotorHz, delta_t));
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, dynamicIdleController.calculateSpeedIncrease(slowestMotorHz, delta_t, debug));
 }
 
 void test_dynamic_idle_controller_p_only()
@@ -49,7 +49,7 @@ void test_dynamic_idle_controller_p_only()
         .dyn_idle_max_increase = 150,
     };
     static Debug debug;
-    static DynamicIdleController dynamicIdleController(TASK_INTERVAL_MICROSECONDS, debug);
+    static DynamicIdleController dynamicIdleController(TASK_INTERVAL_MICROSECONDS);
     dynamicIdleController.set_config(dynamicIdleControllerConfig);
     const float delta_t = static_cast<float>(TASK_INTERVAL_MICROSECONDS) * 0.000001F;
 
@@ -57,15 +57,15 @@ void test_dynamic_idle_controller_p_only()
     TEST_ASSERT_EQUAL_FLOAT(motor_hz1000RPM, dynamicIdleController.get_minimum_allowed_motor_hz());
 
     // slowest motor faster than 1000 RPM, so no speed increase
-    TEST_ASSERT_EQUAL_FLOAT(0.0F, dynamicIdleController.calculateSpeedIncrease(motor_hz2000RPM, delta_t));
-    TEST_ASSERT_EQUAL_FLOAT(0.0F, dynamicIdleController.calculateSpeedIncrease(motor_hz1000RPM, delta_t));
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, dynamicIdleController.calculateSpeedIncrease(motor_hz2000RPM, delta_t, debug));
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, dynamicIdleController.calculateSpeedIncrease(motor_hz1000RPM, delta_t, debug));
 
     // slowest motor slower than 1000 RPM, speed increase
-    TEST_ASSERT_EQUAL_FLOAT(0.0625F, dynamicIdleController.calculateSpeedIncrease(motor_hz500RPM, delta_t));
-    TEST_ASSERT_EQUAL_FLOAT(0.0625F, dynamicIdleController.calculateSpeedIncrease(motor_hz500RPM, delta_t));
+    TEST_ASSERT_EQUAL_FLOAT(0.0625F, dynamicIdleController.calculateSpeedIncrease(motor_hz500RPM, delta_t, debug));
+    TEST_ASSERT_EQUAL_FLOAT(0.0625F, dynamicIdleController.calculateSpeedIncrease(motor_hz500RPM, delta_t, debug));
     // half the speed difference from 1000, so half the output, since PID is P-Term only
-    TEST_ASSERT_EQUAL_FLOAT(0.03125F, dynamicIdleController.calculateSpeedIncrease(motor_hz750RPM, delta_t));
-    TEST_ASSERT_EQUAL_FLOAT(0.03125F, dynamicIdleController.calculateSpeedIncrease(motor_hz750RPM, delta_t));
+    TEST_ASSERT_EQUAL_FLOAT(0.03125F, dynamicIdleController.calculateSpeedIncrease(motor_hz750RPM, delta_t, debug));
+    TEST_ASSERT_EQUAL_FLOAT(0.03125F, dynamicIdleController.calculateSpeedIncrease(motor_hz750RPM, delta_t, debug));
 }
 
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers,cppcoreguidelines-init-variables,cppcoreguidelines-pro-bounds-pointer-arithmetic,hicpp-signed-bitwise,readability-magic-numbers)

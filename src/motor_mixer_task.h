@@ -2,6 +2,7 @@
 
 #include <task_base.h>
 
+class Debug;
 class MotorMixerMessageQueue;
 class MotorMixerBase;
 class RpmFilters;
@@ -11,6 +12,7 @@ struct motor_mixer_task_parameters_t {
     MotorMixerMessageQueue& motor_mixer_message_queue;
     MotorMixerBase& motor_mixer;
     RpmFilters* rpm_filters;
+    Debug& debug;
 };
 
 class MotorMixerTask : public TaskBase {

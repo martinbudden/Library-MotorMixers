@@ -7,7 +7,7 @@
 class MotorMixerOctoBase : public MotorMixerBase {
 public:
     enum { M0=0, M1=1, M2=2, M3=3, M4=4, M5=5, M6=6, M7=8, MOTOR_COUNT=8, SERVO_COUNT=0 };
-    explicit MotorMixerOctoBase(Debug* debug) : MotorMixerBase(OCTO_QUAD_X, MOTOR_COUNT, SERVO_COUNT, debug) {}
+    MotorMixerOctoBase() : MotorMixerBase(OCTO_QUAD_X, MOTOR_COUNT, SERVO_COUNT) {}
     virtual float get_motor_output(size_t motor_index) const override { return _outputs[motor_index]; } // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 public:
     struct motor_pins_t {

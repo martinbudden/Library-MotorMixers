@@ -23,10 +23,8 @@
 
 class MotorMixerQuadXPwm : public MotorMixerQuadBase {
 public:
-    MotorMixerQuadXPwm(const motor_pins_t& pins, uint8_t output_to_motors_denominator, Debug* debug);
-    MotorMixerQuadXPwm(const motor_pins_t& pins, uint8_t output_to_motors_denominator) : MotorMixerQuadXPwm(pins, output_to_motors_denominator, nullptr) {}
-    MotorMixerQuadXPwm(const stm32_motor_pins_t& pins, uint8_t output_to_motors_denominator, Debug* debug);
-    MotorMixerQuadXPwm(const stm32_motor_pins_t& pins, uint8_t output_to_motors_denominator) : MotorMixerQuadXPwm(pins, output_to_motors_denominator, nullptr) {}
+    MotorMixerQuadXPwm(const motor_pins_t& pins, uint8_t output_to_motors_denominator);
+    MotorMixerQuadXPwm(const stm32_motor_pins_t& pins, uint8_t output_to_motors_denominator);
 public:
 #if defined(FRAMEWORK_STM32_CUBE)
     struct pwm_pin_t {
@@ -40,7 +38,7 @@ public:
     };
 #endif
 public:
-    virtual void output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count) override;
+    virtual void output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count, Debug& debug) override;
     void write_motor(uint8_t motor_index, float motorOutput);
 protected:
     float _pwm_scale {255.0F};

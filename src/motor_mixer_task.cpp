@@ -39,7 +39,7 @@ Task function for the VehicleController.
         _tick_count_previous = tick_count;
 
         const float delta_t = static_cast<float>(_tick_count_delta) * 0.001F;
-        _task.motor_mixer.output_to_motors(queue_item, _task.rpm_filters, delta_t, tick_count);
+        _task.motor_mixer.output_to_motors(queue_item, _task.rpm_filters, delta_t, tick_count, _task.debug);
     }
 #else
     while (true) {}

@@ -20,8 +20,8 @@
 #endif // FRAMEWORK
 
 
-MotorMixerWingPwm::MotorMixerWingPwm(const stm32_motor_pins_t& pins, uint8_t output_to_motors_denominator, Debug* debug) :
-    MotorMixerWingBase(output_to_motors_denominator, debug)
+MotorMixerWingPwm::MotorMixerWingPwm(const stm32_motor_pins_t& pins, uint8_t output_to_motors_denominator) :
+    MotorMixerWingBase(output_to_motors_denominator)
 {
 #if defined(FRAMEWORK_STM32_CUBE) && !defined(FRAMEWORK_ARDUINO_STM32)
     if (pins.m0.pin != 0xFF) {
@@ -47,8 +47,8 @@ MotorMixerWingPwm::MotorMixerWingPwm(const stm32_motor_pins_t& pins, uint8_t out
 #endif
 }
 
-MotorMixerWingPwm::MotorMixerWingPwm(const motor_pins_t& pins, uint8_t output_to_motors_denominator, Debug* debug) :
-    MotorMixerWingBase(output_to_motors_denominator, debug)
+MotorMixerWingPwm::MotorMixerWingPwm(const motor_pins_t& pins, uint8_t output_to_motors_denominator) :
+    MotorMixerWingBase(output_to_motors_denominator)
 #if !defined(FRAMEWORK_STM32_CUBE)
     ,_pins({pins.m0,pins.s0,pins.s1})
 #endif
@@ -162,11 +162,12 @@ void MotorMixerWingPwm::write_motor(uint8_t motor_index, float motorOutput) // N
 /*!
 Calculate and output motor mix.
 */
-void MotorMixerWingPwm::output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count)
+void MotorMixerWingPwm::output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count, Debug& debug)
 {
     (void)rpm_filters;
     (void)delta_t;
     (void)tick_count;
+    (void)debug;
 
     ++_output_to_mixer_count;
     if (_output_to_mixer_count < _output_to_motors_denominator && motors_is_on()) {
