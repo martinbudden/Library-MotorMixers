@@ -1,7 +1,7 @@
 #pragma once
 
-#include <FilterTemplates.h>
-#include <Filters.h>
+#include <filter_templates.h>
+#include <filters.h>
 
 #include <xyz_type.h>
 
