@@ -86,8 +86,8 @@ void MotorMixerQuadXDshotBitbang::output_to_motors(const motor_mixer_message_que
             .yaw    = queue_item.yaw_dps * MIXER_OUTPUT_SCALE_FACTOR
         };
         if (motors_is_on()) {
-            const float throttleIncrease = (_dynamic_idle_controller.get_minimum_allowed_motor_hz() == 0.0F) ? 0.0F : _dynamic_idle_controller.calculateSpeedIncrease(calculate_slowest_motor_hz(), delta_t, debug);
-            commands.throttle += throttleIncrease;
+            const float throttle_increase = (_dynamic_idle_controller.get_minimum_allowed_motor_hz() == 0.0F) ? 0.0F : _dynamic_idle_controller.calculate_speed_increase(calculate_slowest_motor_hz(), delta_t, debug);
+            commands.throttle += throttle_increase;
             // set the throttle to value returned by the mixer
             _throttle_command = mix_quad_x(_outputs, commands, _mix_parameters);
         } else {

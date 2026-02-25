@@ -21,7 +21,7 @@ void EscDshotBitbang::IRQ_Handler(port_t& port)
     // Set DMA to copy GPIOA->IDR register value to the _dmaInputBufferA buffer).
     port.DMA_Stream->CR &= ~(DMA_SxCR_DIR);
     port.DMA_Stream->PAR = reinterpret_cast<uint32_t>(&(GPIOA->IDR)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-    port.DMA_Stream->M0AR = reinterpret_cast<uint32_t>(&EscDshotBitbang::self->_portA.dmaInputBuffer[0]); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    port.DMA_Stream->M0AR = reinterpret_cast<uint32_t>(&EscDshotBitbang::self->_port_a.dmaInputBuffer[0]); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
     // Main idea:
     // After sending DShot frame to ESC start receiving GPIO values.
     // Capture data (probing longer than ESC response).
@@ -42,36 +42,36 @@ EscDshotBitbang::EscDshotBitbang()
 
 void EscDshotBitbang::init()
 {
-    presetDMA_outputBuffers();
+    preset_dma_output_buffers();
 #if (defined(FRAMEWORK_STM32_CUBE) || defined(FRAMEWORK_ARDUINO_STM32))
 
-    _portA.GPIO = GPIOA;
-    _portB.GPIO = GPIOB;
+    _port_a.GPIO = GPIOA;
+    _port_b.GPIO = GPIOB;
  #if defined(FRAMEWORK_STM32_CUBE_F4)
-    _portB.GPIO_input = ~(GPIO_MODER_MODER2   | GPIO_MODER_MODER3);
-    _portA.GPIO_output =  GPIO_MODER_MODER2_0 | GPIO_MODER_MODER3_0;
-    _portA.GPIO_PUPDR =   GPIO_PUPDR_PUPDR2_0 | GPIO_PUPDR_PUPDR3_0;
-    setupGPIO(_portA.GPIO, RCC_AHB1ENR_GPIOAEN, GPIO_OSPEEDER_OSPEEDR2 | GPIO_OSPEEDER_OSPEEDR3);
+    _port_b.GPIO_input = ~(GPIO_MODER_MODER2   | GPIO_MODER_MODER3);
+    _port_a.GPIO_output =  GPIO_MODER_MODER2_0 | GPIO_MODER_MODER3_0;
+    _port_a.GPIO_PUPDR =   GPIO_PUPDR_PUPDR2_0 | GPIO_PUPDR_PUPDR3_0;
+    setupGPIO(_port_a.GPIO, RCC_AHB1ENR_GPIOAEN, GPIO_OSPEEDER_OSPEEDR2 | GPIO_OSPEEDER_OSPEEDR3);
 
-     _portB.GPIO_input = ~(GPIO_MODER_MODER0   | GPIO_MODER_MODER1);
-    _portB.GPIO_output =  GPIO_MODER_MODER0_0 | GPIO_MODER_MODER1_0;
-    _portB.GPIO_PUPDR =   GPIO_PUPDR_PUPDR0_0 | GPIO_PUPDR_PUPDR1_0;
-    setupGPIO(_portB.GPIO, RCC_AHB1ENR_GPIOBEN, GPIO_OSPEEDER_OSPEEDR0 | GPIO_OSPEEDER_OSPEEDR1);
+    _port_b.GPIO_input = ~(GPIO_MODER_MODER0   | GPIO_MODER_MODER1);
+    _port_b.GPIO_output =  GPIO_MODER_MODER0_0 | GPIO_MODER_MODER1_0;
+    _port_b.GPIO_PUPDR =   GPIO_PUPDR_PUPDR0_0 | GPIO_PUPDR_PUPDR1_0;
+    setupGPIO(_port_b.GPIO, RCC_AHB1ENR_GPIOBEN, GPIO_OSPEEDER_OSPEEDR0 | GPIO_OSPEEDER_OSPEEDR1);
 
-    _portA.DMA_Stream = DMA2_Stream6;
-    setupDMA(_portA.DMA_Stream, RCC_AHB1ENR_DMA1EN);
-    _portB.DMA_Stream = DMA2_Stream2;
-    setupDMA(_portB.DMA_Stream, RCC_AHB1ENR_DMA2EN);
+    _port_a.DMA_Stream = DMA2_Stream6;
+    setupDMA(_port_a.DMA_Stream, RCC_AHB1ENR_DMA1EN);
+    _port_b.DMA_Stream = DMA2_Stream2;
+    setupDMA(_port_b.DMA_Stream, RCC_AHB1ENR_DMA2EN);
 #endif
 
-    _portA.TIM = TIM1;
-    setupTimers(_portA.TIM, RCC_APB2ENR_TIM1EN);
+    _port_a.TIM = TIM1;
+    setupTimers(_port_a.TIM, RCC_APB2ENR_TIM1EN);
 #if defined(FRAMEWORK_STM32_CUBE_F1)
-    _portB.TIM = TIM4;
-    setupTimers(_portB.TIM, RCC_APB1ENR_TIM4EN);
+    _port_b.TIM = TIM4;
+    setupTimers(_port_b.TIM, RCC_APB1ENR_TIM4EN);
 #elif defined(FRAMEWORK_STM32_CUBE_F4)
-    _portB.TIM = TIM8;
-    setupTimers(_portB.TIM, RCC_APB2ENR_TIM8EN);
+    _port_b.TIM = TIM8;
+    setupTimers(_port_b.TIM, RCC_APB2ENR_TIM8EN);
     // Nested Vectored Interrupt Controller
     // enable DMA interrupts
     NVIC_EnableIRQ(DMA2_Stream6_IRQn);
@@ -161,36 +161,36 @@ void EscDshotBitbang::output_to_motors(uint16_t m1_value, uint16_t m2_value, uin
 {
     update_motors_rpm();
 
-    setDMA_outputBuffers(
+    set_dma_output_buffers(
         DshotCodec::frame_bidirectional(m1_value),
         DshotCodec::frame_bidirectional(m2_value),
         DshotCodec::frame_bidirectional(m3_value),
         DshotCodec::frame_bidirectional(m4_value)
     );
 
-    _portA.reception = true;
-    _portB.reception = true;
+    _port_a.reception = true;
+    _port_b.reception = true;
 
 #if (defined(FRAMEWORK_STM32_CUBE) || defined(FRAMEWORK_ARDUINO_STM32))
     // set GPIOs as output:
  #if defined(FRAMEWORK_STM32_CUBE_F4)
     // MODER: GPIO port mode register
-    _portA.GPIO->MODER |= _portA.GPIO_output;
-    _portB.GPIO->MODER |= _portB.GPIO_output;
+    _port_a.GPIO->MODER |= _port_a.GPIO_output;
+    _port_b.GPIO->MODER |= _port_b.GPIO_output;
 
     // CR:   DMA stream x configuration register
     // NDTR: DMA stream x number of data register
     // PAR:  DMA stream x peripheral address register
     // M0AR: DMA stream x memory 0 address register
-    _portA.DMA_Stream->CR |= DMA_SxCR_DIR_0;
-    _portA.DMA_Stream->PAR = reinterpret_cast<uint32_t>(&(_portA.GPIO->BSRR));
-    _portA.DMA_Stream->M0AR = reinterpret_cast<uint32_t>(&_portA.dmaOutputBuffer[0]);
-    _portA.DMA_Stream->NDTR = DSHOT_BB_BUFFER_LENGTH * DSHOT_BB_FRAME_SECTIONS;
+    _port_a.DMA_Stream->CR |= DMA_SxCR_DIR_0;
+    _port_a.DMA_Stream->PAR = reinterpret_cast<uint32_t>(&(_port_a.GPIO->BSRR));
+    _port_a.DMA_Stream->M0AR = reinterpret_cast<uint32_t>(&_port_a.dmaOutputBuffer[0]);
+    _port_a.DMA_Stream->NDTR = DSHOT_BB_BUFFER_LENGTH * DSHOT_BB_FRAME_SECTIONS;
 
-    _portB.DMA_Stream->CR |= DMA_SxCR_DIR_0;
-    _portB.DMA_Stream->PAR = reinterpret_cast<uint32_t>(&(_portB.GPIO->BSRR));
-    _portB.DMA_Stream->M0AR = reinterpret_cast<uint32_t>(&_portB.dmaOutputBuffer[0]);
-    _portB.DMA_Stream->NDTR = DSHOT_BB_BUFFER_LENGTH * DSHOT_BB_FRAME_SECTIONS;
+    _port_b.DMA_Stream->CR |= DMA_SxCR_DIR_0;
+    _port_b.DMA_Stream->PAR = reinterpret_cast<uint32_t>(&(_port_b.GPIO->BSRR));
+    _port_b.DMA_Stream->M0AR = reinterpret_cast<uint32_t>(&_port_b.dmaOutputBuffer[0]);
+    _port_b.DMA_Stream->NDTR = DSHOT_BB_BUFFER_LENGTH * DSHOT_BB_FRAME_SECTIONS;
 
 #if defined(BIT_BANGING_V1)
     // Main idea:
@@ -200,26 +200,26 @@ void EscDshotBitbang::output_to_motors(uint16_t m1_value, uint16_t m2_value, uin
     // It uses only 1 CCR on each timer.
     // Idea for reception is the same.
 
-    // portA TIM setup:
-    _portA.TIM->CR1 &= ~TIM_CR1_CEN;
-    _portA.TIM->ARR = DSHOT_BB_FRAME_LENGTH / DSHOT_BB_FRAME_SECTIONS - 1;
-    _portA.TIM->CCR1 = DSHOT_BB_FRAME_LENGTH / DSHOT_BB_FRAME_SECTIONS;
+    // port_a TIM setup:
+    _port_a.TIM->CR1 &= ~TIM_CR1_CEN;
+    _port_a.TIM->ARR = DSHOT_BB_FRAME_LENGTH / DSHOT_BB_FRAME_SECTIONS - 1;
+    _port_a.TIM->CCR1 = DSHOT_BB_FRAME_LENGTH / DSHOT_BB_FRAME_SECTIONS;
 
     // porB TIM setup:
-    _portB.TIM->CR1 &= ~TIM_CR1_CEN;
-    _portB.TIM->CCR1 = DSHOT_BB_FRAME_LENGTH / DSHOT_BB_FRAME_SECTIONS;
-    _portB.TIM->ARR = DSHOT_BB_FRAME_LENGTH / DSHOT_BB_FRAME_SECTIONS - 1;
+    _port_b.TIM->CR1 &= ~TIM_CR1_CEN;
+    _port_b.TIM->CCR1 = DSHOT_BB_FRAME_LENGTH / DSHOT_BB_FRAME_SECTIONS;
+    _port_b.TIM->ARR = DSHOT_BB_FRAME_LENGTH / DSHOT_BB_FRAME_SECTIONS - 1;
 
     // send
-    _portA.DMA_Stream->CR |= DMA_SxCR_EN;
-    _portB.DMA_Stream->CR |= DMA_SxCR_EN;
+    _port_a.DMA_Stream->CR |= DMA_SxCR_EN;
+    _port_b.DMA_Stream->CR |= DMA_SxCR_EN;
 
     // EGR: event generation register
     // CR: Control Register
-    _portA.TIM->EGR |= TIM_EGR_UG; // Update Generation
-    _portA.TIM->CR1 |= TIM_CR1_CEN; // Counter Enable
-    _portB.TIM->EGR |= TIM_EGR_UG;
-    _portB.TIM->CR1 |= TIM_CR1_CEN;
+    _port_a.TIM->EGR |= TIM_EGR_UG; // Update Generation
+    _port_a.TIM->CR1 |= TIM_CR1_CEN; // Counter Enable
+    _port_b.TIM->EGR |= TIM_EGR_UG;
+    _port_b.TIM->CR1 |= TIM_CR1_CEN;
 #elif defined(BIT_BANGING_V2)
     // Main idea:
     // DMA requests generated at beginning, after 0-bit time and after 1-bit time
@@ -228,25 +228,25 @@ void EscDshotBitbang::output_to_motors(uint16_t m1_value, uint16_t m2_value, uin
     // It works for transferring but for reception it is not useful
 
     //    TIM1 setup:
-    _portA.TIM->CCR1 = 0;
-    _portA.TIM->CCR2 = DSHOT_BB_0_LENGTH;
-    _portA.TIM->CCR3 = DSHOT_BB_1_LENGTH;
-    _portA.TIM->ARR = DSHOT_BB_FRAME_LENGTH - 1;
+    _port_a.TIM->CCR1 = 0;
+    _port_a.TIM->CCR2 = DSHOT_BB_0_LENGTH;
+    _port_a.TIM->CCR3 = DSHOT_BB_1_LENGTH;
+    _port_a.TIM->ARR = DSHOT_BB_FRAME_LENGTH - 1;
 
     // TIM8 setup:
-    _portB.TIM->CCR1 = 0;
-    _portB.TIM->CCR2 = DSHOT_BB_0_LENGTH;
-    _portB.TIM->CCR3 = DSHOT_BB_1_LENGTH;
-    _portB.TIM->ARR = DSHOT_BB_FRAME_LENGTH - 1;
+    _port_b.TIM->CCR1 = 0;
+    _port_b.TIM->CCR2 = DSHOT_BB_0_LENGTH;
+    _port_b.TIM->CCR3 = DSHOT_BB_1_LENGTH;
+    _port_b.TIM->ARR = DSHOT_BB_FRAME_LENGTH - 1;
 
     //  send:
-    _portA.TIM->EGR |= TIM_EGR_UG;
-    _portA.TIM->CR1 |= TIM_CR1_CEN;
-    _portB.TIM->EGR |= TIM_EGR_UG;
-    _portB.TIM->CR1 |= TIM_CR1_CEN;
+    _port_a.TIM->EGR |= TIM_EGR_UG;
+    _port_a.TIM->CR1 |= TIM_CR1_CEN;
+    _port_b.TIM->EGR |= TIM_EGR_UG;
+    _port_b.TIM->CR1 |= TIM_CR1_CEN;
 
-    _portA.DMA_Stream->CR |= DMA_SxCR_EN;
-    _portB.DMA_Stream->CR |= DMA_SxCR_EN;
+    _port_a.DMA_Stream->CR |= DMA_SxCR_EN;
+    _port_b.DMA_Stream->CR |= DMA_SxCR_EN;
 #endif
 #endif // FRAMEWORK_STM32_CUBE_F4
 #endif // FRAMEWORK_STM32
@@ -292,13 +292,13 @@ Method 2 uses 3 sections for each bit and variable length sections
 This requires smaller buffers, has lower DMA load, has more precise timing, but requires more timer channels
 */
 
-void EscDshotBitbang::presetDMA_outputBuffers()
+void EscDshotBitbang::preset_dma_output_buffers()
 {
 #if (defined(FRAMEWORK_STM32_CUBE) || defined(FRAMEWORK_ARDUINO_STM32)) && defined(FRAMEWORK_STM32_CUBE_F4)
     // this values are constant so they can be set once here
 #if defined(BIT_BANGING_V1)
-    _portA.dmaOutputBuffer.fill(0);
-    _portB.dmaOutputBuffer.fill(0);
+    _port_a.dmaOutputBuffer.fill(0);
+    _port_b.dmaOutputBuffer.fill(0);
 
     // for DSHOT_BB_FRAME_SECTIONS=14, DSHOT_BB_1_LENGTH=10 we have
     // r means BR (Bit Reset) (ie set to 0)
@@ -310,8 +310,8 @@ void EscDshotBitbang::presetDMA_outputBuffers()
 #else
     // make 2 high frames after Dshot frame:
     for (size_t i = 0; i < DSHOT_BB_FRAME_SECTIONS * 2; ++i) {
-        _portA.dmaOutputBuffer[DSHOT_BUFFER_LENGTH*DSHOT_BB_FRAME_SECTIONS - i - 1] = (GPIO_BSRR_BS_0 << MOTOR_1) | (GPIO_BSRR_BS_0 << MOTOR_4);
-        _portB.dmaOutputBuffer[DSHOT_BUFFER_LENGTH*DSHOT_BB_FRAME_SECTIONS - i - 1] = (GPIO_BSRR_BS_0 << MOTOR_2) | (GPIO_BSRR_BS_0 << MOTOR_3);
+        _port_a.dmaOutputBuffer[DSHOT_BUFFER_LENGTH*DSHOT_BB_FRAME_SECTIONS - i - 1] = (GPIO_BSRR_BS_0 << MOTOR_1) | (GPIO_BSRR_BS_0 << MOTOR_4);
+        _port_b.dmaOutputBuffer[DSHOT_BUFFER_LENGTH*DSHOT_BB_FRAME_SECTIONS - i - 1] = (GPIO_BSRR_BS_0 << MOTOR_2) | (GPIO_BSRR_BS_0 << MOTOR_3);
     }
     const size_t highOffset = 2;
 #endif
@@ -319,17 +319,17 @@ void EscDshotBitbang::presetDMA_outputBuffers()
     for (size_t i = 0; i < DSHOT_BB_BUFFER_LENGTH - 2; ++i) { // last 2 bits are always high (logic 0)
         const size_t index = i * DSHOT_BB_FRAME_SECTIONS;
         //  first section always lower edge:
-        _portA.dmaOutputBuffer[index] = (GPIO_BSRR_BR_0 << MOTOR_1) | (GPIO_BSRR_BR_0 << MOTOR_4);
-        _portB.dmaOutputBuffer[index] = (GPIO_BSRR_BR_0 << MOTOR_2) | (GPIO_BSRR_BR_0 << MOTOR_3);
+        _port_a.dmaOutputBuffer[index] = (GPIO_BSRR_BR_0 << MOTOR_1) | (GPIO_BSRR_BR_0 << MOTOR_4);
+        _port_b.dmaOutputBuffer[index] = (GPIO_BSRR_BR_0 << MOTOR_2) | (GPIO_BSRR_BR_0 << MOTOR_3);
 
         // last section always rise edge:
-        _portA.dmaOutputBuffer[index + highOffset] = (GPIO_BSRR_BS_0 << MOTOR_1) | (GPIO_BSRR_BS_0 << MOTOR_4);
-        _portB.dmaOutputBuffer[index + highOffset] = (GPIO_BSRR_BS_0 << MOTOR_2) | (GPIO_BSRR_BS_0 << MOTOR_3);
+        _port_a.dmaOutputBuffer[index + highOffset] = (GPIO_BSRR_BS_0 << MOTOR_1) | (GPIO_BSRR_BS_0 << MOTOR_4);
+        _port_b.dmaOutputBuffer[index + highOffset] = (GPIO_BSRR_BS_0 << MOTOR_2) | (GPIO_BSRR_BS_0 << MOTOR_3);
     }
 #endif
 }
 
-void EscDshotBitbang::setDMA_outputBuffers(uint16_t m1_frame, uint16_t m2_frame, uint16_t m3_frame, uint16_t m4_frame)
+void EscDshotBitbang::set_dma_output_buffers(uint16_t m1_frame, uint16_t m2_frame, uint16_t m3_frame, uint16_t m4_frame)
 {
 /*
 For each output bit DMA is transfering DSHOT_BB_FRAME_SECTIONS (14) times data into GPIO register.
@@ -369,13 +369,13 @@ In addition last 2 frame bits are set always high
     size_t index = 1;
 #endif
     for (uint32_t bitMask = 0x8000; bitMask !=0; bitMask >>= 1) {
-        _portA.dmaOutputBuffer[index] = (bitMask & m1_frame) ? 0x00 : GPIO_BSRR_BS_0 << MOTOR_1;
+        _port_a.dmaOutputBuffer[index] = (bitMask & m1_frame) ? 0x00 : GPIO_BSRR_BS_0 << MOTOR_1;
         if (bitMask & m4_frame) {
-            _portA.dmaOutputBuffer[index] |= GPIO_BSRR_BS_0 << MOTOR_4;
+            _port_a.dmaOutputBuffer[index] |= GPIO_BSRR_BS_0 << MOTOR_4;
         }
-        _portB.dmaOutputBuffer[index] = (bitMask & m2_frame) ? 0x00 : GPIO_BSRR_BS_0 << MOTOR_2;
+        _port_b.dmaOutputBuffer[index] = (bitMask & m2_frame) ? 0x00 : GPIO_BSRR_BS_0 << MOTOR_2;
         if (bitMask & m3_frame) {
-            _portB.dmaOutputBuffer[index] |= GPIO_BSRR_BS_0 << MOTOR_3;
+            _port_b.dmaOutputBuffer[index] |= GPIO_BSRR_BS_0 << MOTOR_3;
         }
         index += DSHOT_BB_FRAME_SECTIONS;
     }
@@ -462,10 +462,10 @@ void EscDshotBitbang::update_motors_rpm()
     // BDshot bit banging reads whole GPIO register.
     // Now it's time to create BDshot responses from all motors (made of individual bits).
     const std::array<uint32_t, 4> motorGCR21s  = {
-        samples_to_gcr21(&_portA.dmaInputBuffer[0], 1 << MOTOR_1),
-        samples_to_gcr21(&_portB.dmaInputBuffer[0], 1 << MOTOR_2),
-        samples_to_gcr21(&_portB.dmaInputBuffer[0], 1 << MOTOR_3),
-        samples_to_gcr21(&_portA.dmaInputBuffer[0], 1 << MOTOR_4)
+        samples_to_gcr21(&_port_a.dmaInputBuffer[0], 1 << MOTOR_1),
+        samples_to_gcr21(&_port_b.dmaInputBuffer[0], 1 << MOTOR_2),
+        samples_to_gcr21(&_port_b.dmaInputBuffer[0], 1 << MOTOR_3),
+        samples_to_gcr21(&_port_a.dmaInputBuffer[0], 1 << MOTOR_4)
     };
     for (size_t ii = 0; ii < motorGCR21s.size(); ++ii) {
         const uint32_t motorGCR20 = DshotCodec::gcr21_to_gcr20(motorGCR21s[ii]);

@@ -172,11 +172,11 @@ float mix_quad_x(std::array<float, 4>& motor_outputs, const motor_mixer_commands
         params.overshoot = std::max(params.overshoot, motor_outputs[3] - params.motor_output_max);
         if (commands.yaw + (params.undershoot - params.overshoot) > 0.0F) {
             throttle -= (params.undershoot + params.overshoot);
-            const float yawDelta =  (params.undershoot - params.overshoot);
-            motor_outputs[BACK_RIGHT]  += yawDelta;
-            motor_outputs[FRONT_RIGHT] -= yawDelta;
-            motor_outputs[BACK_LEFT]   -= yawDelta;
-            motor_outputs[FRONT_LEFT]  += yawDelta;
+            const float yaw_delta =  (params.undershoot - params.overshoot);
+            motor_outputs[BACK_RIGHT]  += yaw_delta;
+            motor_outputs[FRONT_RIGHT] -= yaw_delta;
+            motor_outputs[BACK_LEFT]   -= yaw_delta;
+            motor_outputs[FRONT_LEFT]  += yaw_delta;
         }
     } else if (commands.yaw < 0.0F) {
         // check if m0 or m3 will have output less than params.motor_output_min
@@ -187,11 +187,11 @@ float mix_quad_x(std::array<float, 4>& motor_outputs, const motor_mixer_commands
         params.overshoot = std::max(params.overshoot, motor_outputs[2] - params.motor_output_max);
         if (commands.yaw - (params.undershoot - params.overshoot) < 0.0F) {
             throttle -= (params.undershoot + params.overshoot);
-            const float yawDelta = -(params.undershoot - params.overshoot);
-            motor_outputs[BACK_RIGHT]  += yawDelta;
-            motor_outputs[FRONT_RIGHT] -= yawDelta;
-            motor_outputs[BACK_LEFT]   -= yawDelta;
-            motor_outputs[FRONT_LEFT]  += yawDelta;
+            const float yaw_delta = -(params.undershoot - params.overshoot);
+            motor_outputs[BACK_RIGHT]  += yaw_delta;
+            motor_outputs[FRONT_RIGHT] -= yaw_delta;
+            motor_outputs[BACK_LEFT]   -= yaw_delta;
+            motor_outputs[FRONT_LEFT]  += yaw_delta;
         }
     }
 #endif // LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING_YAW)
@@ -273,13 +273,13 @@ float mix_hex_x(std::array<float, 6>& motor_outputs, const motor_mixer_commands_
         params.overshoot = std::max(params.overshoot, motor_outputs[4] - params.motor_output_max);
         if (commands.roll + (params.undershoot - params.overshoot) > 0.0F) {
             throttle -= (params.undershoot + params.overshoot);
-            const float rollDelta =  (params.undershoot - params.overshoot);
-            motor_outputs[0] -= rollDelta;
-            motor_outputs[1] -= rollDelta;
-            motor_outputs[2] += rollDelta;
-            motor_outputs[3] += rollDelta;
-            motor_outputs[4] -= rollDelta;
-            motor_outputs[5] += rollDelta;
+            const float roll_delta =  (params.undershoot - params.overshoot);
+            motor_outputs[0] -= roll_delta;
+            motor_outputs[1] -= roll_delta;
+            motor_outputs[2] += roll_delta;
+            motor_outputs[3] += roll_delta;
+            motor_outputs[4] -= roll_delta;
+            motor_outputs[5] += roll_delta;
         }
     } else {
         // check if m2, m3, or m5 will have output less than params.motor_output_min
@@ -292,13 +292,13 @@ float mix_hex_x(std::array<float, 6>& motor_outputs, const motor_mixer_commands_
         params.overshoot = std::max(params.overshoot, motor_outputs[4] - params.motor_output_max);
         if (commands.yaw - (params.undershoot - params.overshoot) < 0.0F) {
             throttle -= (params.undershoot + params.overshoot);
-            const float rollDelta = -(params.undershoot - params.overshoot);
-            motor_outputs[0] -= rollDelta;
-            motor_outputs[1] -= rollDelta;
-            motor_outputs[2] += rollDelta;
-            motor_outputs[3] += rollDelta;
-            motor_outputs[4] -= rollDelta;
-            motor_outputs[5] += rollDelta;
+            const float roll_delta = -(params.undershoot - params.overshoot);
+            motor_outputs[0] -= roll_delta;
+            motor_outputs[1] -= roll_delta;
+            motor_outputs[2] += roll_delta;
+            motor_outputs[3] += roll_delta;
+            motor_outputs[4] -= roll_delta;
+            motor_outputs[5] += roll_delta;
         }
     }
 #endif // LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING_ROLL_PITCH
@@ -322,13 +322,13 @@ float mix_hex_x(std::array<float, 6>& motor_outputs, const motor_mixer_commands_
         params.overshoot = std::max(params.overshoot, motor_outputs[4] - params.motor_output_max);
         if (commands.yaw + (params.undershoot - params.overshoot) > 0.0F) {
             throttle -= (params.undershoot + params.overshoot);
-            const float yawDelta =  (params.undershoot - params.overshoot);
-            motor_outputs[0] -= yawDelta;
-            motor_outputs[1] -= yawDelta;
-            motor_outputs[2] += yawDelta;
-            motor_outputs[3] += yawDelta;
-            motor_outputs[4] += yawDelta;
-            motor_outputs[5] -= yawDelta;
+            const float yaw_delta =  (params.undershoot - params.overshoot);
+            motor_outputs[0] -= yaw_delta;
+            motor_outputs[1] -= yaw_delta;
+            motor_outputs[2] += yaw_delta;
+            motor_outputs[3] += yaw_delta;
+            motor_outputs[4] += yaw_delta;
+            motor_outputs[5] -= yaw_delta;
         }
     } else {
         // check if m2, m3, or m4 will have output less than params.motor_output_min
@@ -341,13 +341,13 @@ float mix_hex_x(std::array<float, 6>& motor_outputs, const motor_mixer_commands_
         params.overshoot = std::max(params.overshoot, motor_outputs[5] - params.motor_output_max);
         if (commands.yaw - (params.undershoot - params.overshoot) < 0.0F) {
             throttle -= (params.undershoot + params.overshoot);
-            const float yawDelta = -(params.undershoot - params.overshoot);
-            motor_outputs[0] -= yawDelta;
-            motor_outputs[1] -= yawDelta;
-            motor_outputs[2] += yawDelta;
-            motor_outputs[3] += yawDelta;
-            motor_outputs[4] += yawDelta;
-            motor_outputs[5] -= yawDelta;
+            const float yaw_delta = -(params.undershoot - params.overshoot);
+            motor_outputs[0] -= yaw_delta;
+            motor_outputs[1] -= yaw_delta;
+            motor_outputs[2] += yaw_delta;
+            motor_outputs[3] += yaw_delta;
+            motor_outputs[4] += yaw_delta;
+            motor_outputs[5] -= yaw_delta;
         }
     }
 #endif // LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING_YAW
@@ -430,15 +430,15 @@ float mix_octo_quad_x(std::array<float, 8>& motor_outputs, const motor_mixer_com
         params.overshoot = std::max(params.overshoot, motor_outputs[7] - params.motor_output_max);
         if (commands.yaw + (params.undershoot - params.overshoot) > 0.0F) {
             throttle -= (params.undershoot + params.overshoot);
-            const float yawDelta =  (params.undershoot - params.overshoot);
-            motor_outputs[0] -= yawDelta;
-            motor_outputs[1] += yawDelta;
-            motor_outputs[2] += yawDelta;
-            motor_outputs[3] -= yawDelta;
-            motor_outputs[4] += yawDelta;
-            motor_outputs[5] -= yawDelta;
-            motor_outputs[6] -= yawDelta;
-            motor_outputs[7] += yawDelta;
+            const float yaw_delta =  (params.undershoot - params.overshoot);
+            motor_outputs[0] -= yaw_delta;
+            motor_outputs[1] += yaw_delta;
+            motor_outputs[2] += yaw_delta;
+            motor_outputs[3] -= yaw_delta;
+            motor_outputs[4] += yaw_delta;
+            motor_outputs[5] -= yaw_delta;
+            motor_outputs[6] -= yaw_delta;
+            motor_outputs[7] += yaw_delta;
         }
     } else {
         // check if m1, m2, m4, or m7  will have output less than params.motor_output_min
@@ -453,15 +453,15 @@ float mix_octo_quad_x(std::array<float, 8>& motor_outputs, const motor_mixer_com
         params.overshoot = std::max(params.overshoot, motor_outputs[6] - params.motor_output_max);
         if (commands.yaw - (params.undershoot - params.overshoot) < 0.0F) {
             throttle -= (params.undershoot + params.overshoot);
-            const float yawDelta = -(params.undershoot - params.overshoot);
-            motor_outputs[0] -= yawDelta;
-            motor_outputs[1] += yawDelta;
-            motor_outputs[2] += yawDelta;
-            motor_outputs[3] -= yawDelta;
-            motor_outputs[4] += yawDelta;
-            motor_outputs[5] -= yawDelta;
-            motor_outputs[6] -= yawDelta;
-            motor_outputs[7] += yawDelta;
+            const float yaw_delta = -(params.undershoot - params.overshoot);
+            motor_outputs[0] -= yaw_delta;
+            motor_outputs[1] += yaw_delta;
+            motor_outputs[2] += yaw_delta;
+            motor_outputs[3] -= yaw_delta;
+            motor_outputs[4] += yaw_delta;
+            motor_outputs[5] -= yaw_delta;
+            motor_outputs[6] -= yaw_delta;
+            motor_outputs[7] += yaw_delta;
         }
     }
 #endif // LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING_YAW

@@ -39,7 +39,7 @@ void DynamicIdleController::set_config(const dynamic_idle_controller_config_t& c
     _pid.set_integral_min(0.0F);
 
     _pid.set_d(static_cast<float>(config.dyn_idle_i_gain) * 0.0000003F / delta_t);
-    _DtermFilter.init(800.0F * delta_t / 20.0F); //approx 20ms D delay, arbitrarily suits many motors
+    _dterm_filter.init(800.0F * delta_t / 20.0F); //approx 20ms D delay, arbitrarily suits many motors
 }
 
 void DynamicIdleController::set_minimum_allowed_motor_hz(float minimum_allowed_motor_hz)
@@ -48,17 +48,17 @@ void DynamicIdleController::set_minimum_allowed_motor_hz(float minimum_allowed_m
     _pid.set_setpoint(_minimum_allowed_motor_hz);
 }
 
-float DynamicIdleController::calculateSpeedIncrease(float slowestMotorHz, float delta_t, Debug& debug)
+float DynamicIdleController::calculate_speed_increase(float slowestMotorHz, float delta_t, Debug& debug)
 {
     if (_minimum_allowed_motor_hz == 0.0F) {
         // if motors are allowed to stop, then no speed increase is needed
         return  0.0F;
     }
 
-    const float slowestMotorHzDeltaFiltered = _DtermFilter.filter(slowestMotorHz - _pid.get_previous_measurement());
-    float speedIncrease = _pid.update_delta(slowestMotorHz, slowestMotorHzDeltaFiltered, delta_t);
+    const float slowestMotorHzDeltaFiltered = _dterm_filter.filter(slowestMotorHz - _pid.get_previous_measurement());
+    float speed_increase = _pid.update_delta(slowestMotorHz, slowestMotorHzDeltaFiltered, delta_t);
 
-    speedIncrease = clamp(speedIncrease, 0.0F, _max_increase);
+    speed_increase = clamp(speed_increase, 0.0F, _max_increase);
 
     if (debug.getMode() == DEBUG_DYN_IDLE) {
         const pid_error_t error = _pid.get_error();
@@ -67,7 +67,7 @@ float DynamicIdleController::calculateSpeedIncrease(float slowestMotorHz, float 
         debug.set(2, static_cast<int16_t>(std::lroundf(error.d * 10000)));
     }
 
-    return speedIncrease;
+    return speed_increase;
 }
 
 void DynamicIdleController::reset_pid()

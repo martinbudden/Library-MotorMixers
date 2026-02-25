@@ -20,15 +20,15 @@
 #endif
 
 
-MotorMixerTask* MotorMixerTask::create_task(const motor_mixer_task_parameters_t& parameters, uint8_t priority, uint32_t core)
+MotorMixerTask* MotorMixerTask::create_task(const motor_mixer_parameter_group_t& parameter_group, uint8_t priority, uint32_t core)
 {
     task_info_t task_info {};
-    return create_task(task_info, parameters, priority, core);
+    return create_task(task_info, parameter_group, priority, core);
 }
 
-MotorMixerTask* MotorMixerTask::create_task(task_info_t& task_info, const motor_mixer_task_parameters_t& parameters, uint8_t priority, uint32_t core)
+MotorMixerTask* MotorMixerTask::create_task(task_info_t& task_info, const motor_mixer_parameter_group_t& parameter_group, uint8_t priority, uint32_t core)
 {
-    static MotorMixerTask motor_mixer_task(parameters);
+    static MotorMixerTask motor_mixer_task(parameter_group);
 
     static TaskBase::parameters_t task_parameters { // NOLINT(misc-const-correctness) false positive
         .task = &motor_mixer_task

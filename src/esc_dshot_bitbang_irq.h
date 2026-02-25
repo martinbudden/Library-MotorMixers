@@ -13,7 +13,7 @@ void DMA##d##_Stream##s##_IRQHandler(); \
 void DMA##d##_Stream##s##_IRQHandler() { \
     if ( CONCAT(DMA,d)->CONCAT(h,ISR) & CONCAT(DMA_##h##ISR_TCIF,s) ) { \
         CONCAT(DMA,d)->CONCAT(h,IFCR) |= CONCAT(DMA_##h##IFCR_CTCIF,s); \
-        EscDshotBitbang::port_t& port = EscDshotBitbang::CONCAT(self->getPort,p)(); \
+        EscDshotBitbang::port_t& port = EscDshotBitbang::CONCAT(self->get_port_,p)(); \
         if (port.reception) { \
             EscDshotBitbang::IRQ_Handler(port); \
         } \
@@ -30,9 +30,9 @@ void DMA##d##_Stream##s##_IRQHandler() { \
 }
 
 
-DMA_STREAM_IRQ_HANDLER(2,6,H,A)
+DMA_STREAM_IRQ_HANDLER(2,6,H,a)
 
-DMA_STREAM_IRQ_HANDLER(2,2,L,B)
+DMA_STREAM_IRQ_HANDLER(2,2,L,b)
 
 #else
 void DMA2_Stream6_IRQHandler()
@@ -42,7 +42,7 @@ void DMA2_Stream6_IRQHandler()
     // HIFCR: DMA high interrupt flag clear register
     if (DMA2->HISR & DMA_HISR_TCIF6) {
         DMA2->HIFCR |= DMA_HIFCR_CTCIF6;
-        EscDshotBitbang::port_t& port = EscDshotBitbang::self->getPortA();
+        EscDshotBitbang::port_t& port = EscDshotBitbang::self->get_port_a();
         if (port.reception) {
             EscDshotBitbang::IRQ_Handler(port);
         }
@@ -66,7 +66,7 @@ void DMA2_Stream2_IRQHandler()
     // LIFCR: DMA low interrupt flag clear register
     if (DMA2->LISR & DMA_LISR_TCIF2) {
         DMA2->LIFCR |= DMA_LIFCR_CTCIF2;
-        EscDshotBitbang::port_t& port = EscDshotBitbang::self->getPortB();
+        EscDshotBitbang::port_t& port = EscDshotBitbang::self->get_port_b();
         if (port.reception) {
             EscDshotBitbang::IRQ_Handler(port);
         }

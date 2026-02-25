@@ -85,8 +85,8 @@ public:
 
     EscDshotBitbang();
     void init();
-    void presetDMA_outputBuffers();
-    void setDMA_outputBuffers(uint16_t m1_frame, uint16_t m2_frame, uint16_t m3_frame, uint16_t m4_frame);
+    void preset_dma_output_buffers();
+    void set_dma_output_buffers(uint16_t m1_frame, uint16_t m2_frame, uint16_t m3_frame, uint16_t m4_frame);
 
     void output_to_motors(uint16_t m1_value, uint16_t m2_value, uint16_t m3_value, uint16_t m4_value); // values should be in the DShot range [47,2047]
     void update_motors_rpm();
@@ -112,14 +112,14 @@ public:
         std::array<uint32_t, (int)(33 * BDSHOT_RESPONSE_BITRATE / 1000 + BDSHOT_RESPONSE_LENGTH + 1) * RESPONSE_OVERSAMPLING> dmaInputBuffer;
         std::array<uint32_t, DSHOT_BB_BUFFER_LENGTH * DSHOT_BB_FRAME_SECTIONS> dmaOutputBuffer;
     };
-    port_t& getPortA() { return _portA; }
-    port_t& getPortB() { return _portB; }
+    port_t& get_port_a() { return _port_a; }
+    port_t& get_port_b() { return _port_b; }
     static void IRQ_Handler(port_t& port);
 private:
     std::array<int32_t, MOTOR_COUNT> _erpms {};
-    std::array<int32_t, MOTOR_COUNT> _motorErrors {};
-    port_t _portA {};
-    port_t _portB {};
+    std::array<int32_t, MOTOR_COUNT> _motor_errors {};
+    port_t _port_a {};
+    port_t _port_b {};
 #if defined(FRAMEWORK_STM32_CUBE) || defined(FRAMEWORK_ARDUINO_STM32)
     static void setupGPIO(GPIO_TypeDef*GPIO, uint32_t GPIOxEN, uint32_t GPIO_OSPEEDER_OSPEEDRn); // cppcheck-suppress unusedPrivateFunction
 #if defined(FRAMEWORK_STM32_CUBE_F4)
