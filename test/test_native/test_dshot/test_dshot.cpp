@@ -77,23 +77,23 @@ void test_dshot_write()
     esc.write(dshot1000);
     const uint16_t frame1000 = DshotCodec::frame_unidirectional(dshot1000);
     TEST_ASSERT_EQUAL(0, frame1000);
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(0));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(1));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(2));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(3));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(4));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(5));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(6));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(7));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(8));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(9));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(10));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(11));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(12));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(13));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(14));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(15));
-    TEST_ASSERT_EQUAL(0, esc.getBufferItem(16)); // check haven't written past end of buffer
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(0));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(1));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(2));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(3));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(4));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(5));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(6));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(7));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(8));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(9));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(10));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(11));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(12));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(13));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(14));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(15));
+    TEST_ASSERT_EQUAL(0, esc.get_buffer_item(16)); // check haven't written past end of buffer
 
     const uint16_t dshot1500 = DshotCodec::pwm_to_dshot(1500);
     const uint16_t frame = DshotCodec::frame_unidirectional(dshot1500);
@@ -101,42 +101,42 @@ void test_dshot_write()
     esc.write(dshot1500);
     // 1000 0010 1110 0100
     // 1000
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(0));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(1));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(2));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(3));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(0));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(1));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(2));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(3));
     // 0010
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(4));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(5));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(6));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(7));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(4));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(5));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(6));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(7));
     // 1110
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(8));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(9));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(10));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(11));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(8));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(9));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(10));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(11));
     //0100
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(12));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(13));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(14));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(15));
-    TEST_ASSERT_EQUAL(0, esc.getBufferItem(16));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(12));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(13));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(14));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(15));
+    TEST_ASSERT_EQUAL(0, esc.get_buffer_item(16));
 
     const uint16_t dshot2000 = DshotCodec::pwm_to_dshot(2000);
     const uint16_t frame2000 = DshotCodec::frame_unidirectional(dshot2000);
     TEST_ASSERT_EQUAL(0xFFEE, frame2000); // 0xFFEE, 1111 1111 1110 1110
     esc.write(dshot2000);
     // 1111
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(0));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(1));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(2));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(3));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(0));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(1));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(2));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(3));
     // 1110
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(12));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(13));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(14));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(15));
-    TEST_ASSERT_EQUAL(0, esc.getBufferItem(16));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(12));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(13));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(14));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(15));
+    TEST_ASSERT_EQUAL(0, esc.get_buffer_item(16));
 }
 
 void test_dshot_write_channel_b()
@@ -155,9 +155,9 @@ void test_dshot_write_channel_b()
     esc.write(dshot1000);
     const uint16_t frame1000 = DshotCodec::frame_unidirectional(dshot1000);
     TEST_ASSERT_EQUAL(0, frame1000);
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(0));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(15));
-    TEST_ASSERT_EQUAL(0, esc.getBufferItem(16)); // check haven't written past end of buffer
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(0));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(15));
+    TEST_ASSERT_EQUAL(0, esc.get_buffer_item(16)); // check haven't written past end of buffer
 
     const uint16_t dshot1500 = DshotCodec::pwm_to_dshot(1500);
     const uint16_t frame = DshotCodec::frame_unidirectional(dshot1500);
@@ -165,42 +165,42 @@ void test_dshot_write_channel_b()
     esc.write(dshot1500);
     // 1000 0010 1110 0100
     // 1000
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(0));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(1));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(2));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(3));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(0));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(1));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(2));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(3));
     // 0010
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(4));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(5));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(6));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(7));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(4));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(5));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(6));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(7));
     // 1110
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(8));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(9));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(10));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(11));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(8));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(9));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(10));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(11));
     //0100
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(12));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(13));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(14));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(15));
-    TEST_ASSERT_EQUAL(0, esc.getBufferItem(16));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(12));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(13));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(14));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(15));
+    TEST_ASSERT_EQUAL(0, esc.get_buffer_item(16));
 
     const uint16_t dshot2000 = DshotCodec::pwm_to_dshot(2000);
     const uint16_t frame2000 = DshotCodec::frame_unidirectional(dshot2000);
     TEST_ASSERT_EQUAL(65518, frame2000); // 0xFFEE, 1111 1111 1110 1110
     esc.write(dshot2000);
     // 1111
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(0));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(1));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(2));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(3));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(0));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(1));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(2));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(3));
     // 1110
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(12));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(13));
-    TEST_ASSERT_EQUAL(HI, esc.getBufferItem(14));
-    TEST_ASSERT_EQUAL(LO, esc.getBufferItem(15));
-    TEST_ASSERT_EQUAL(0, esc.getBufferItem(16));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(12));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(13));
+    TEST_ASSERT_EQUAL(HI, esc.get_buffer_item(14));
+    TEST_ASSERT_EQUAL(LO, esc.get_buffer_item(15));
+    TEST_ASSERT_EQUAL(0, esc.get_buffer_item(16));
 }
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers,cppcoreguidelines-init-variables,cppcoreguidelines-pro-bounds-pointer-arithmetic,hicpp-signed-bitwise,readability-magic-numbers)
 

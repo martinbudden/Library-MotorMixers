@@ -146,8 +146,8 @@ float mix_quad_x(std::array<float, 4>& motor_outputs, const motor_mixer_commands
     // Check for overshoot caused by roll and pitch.
     // If there is overshoot, we can just clamp the output, since this will just reduce the magnitude of the command
     // without without affecting the other axes (because of the symmetry of the QuadX).
-    for (auto& motorOutput : motor_outputs) {
-        motorOutput = std::clamp(motorOutput, params.motor_output_min, params.motor_output_max);
+    for (auto& motor_output : motor_outputs) {
+        motor_output = std::clamp(motor_output, params.motor_output_min, params.motor_output_max);
     }
 #endif // LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING_ROLL_PITCH
 
@@ -401,8 +401,8 @@ float mix_octo_quad_x(std::array<float, 8>& motor_outputs, const motor_mixer_com
     // Check for overshoot caused by roll and pitch.
     // If there is overshoot, we can just clamp the output, since this will just reduce the magnitude of the command
     // without without affecting the other axes (because of the symmetry of the QuadX).
-    for (auto& motorOutput : motor_outputs) {
-        motorOutput = std::clamp(motorOutput, params.motor_output_min, params.motor_output_max);
+    for (auto& motor_output : motor_outputs) {
+        motor_output = std::clamp(motor_output, params.motor_output_min, params.motor_output_max);
     }
 #endif // LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING_ROLL_PITCH
 

@@ -9,7 +9,7 @@
 static constexpr uint8_t RPM_FILTER_HARMONICS_COUNT = 3;
 
 struct rpm_filters_config_t {
-    uint16_t rpm_filter_fade_range_hz;  // range in which notch filters fade down to minHz
+    uint16_t rpm_filter_fade_range_hz;  // range in which notch filters fade down to min_hz
     uint16_t rpm_filter_q;              // Q of the notch filters
     uint16_t rpm_filter_lpf_hz;         // LPF cutoff (from motor rpm converted to Hz)
     uint8_t  rpm_filter_weights[RPM_FILTER_HARMONICS_COUNT];    // weight as a percentage for each harmonic
@@ -58,12 +58,12 @@ private:
         float weight_multiplier;
         float omega;
         float sin_omega;
-        float two_cosOmega;
+        float two_cos_omega;
     };
     struct state_t {
         state_e state;
         size_t motor_index;
-        std::array<motor_state_t, MAX_MOTOR_COUNT> motorStates;
+        std::array<motor_state_t, MAX_MOTOR_COUNT> motor_states;
     };
     state_t _state {};
 
@@ -72,8 +72,8 @@ private:
     float _max_frequency_hz {};
     float _half_of_max_frequency_hz {};
     float _third_of_max_frequency_hz {};
-    float _fadeRangeHz { 50.0F };
-    float _Q { 0.0F };
+    float _fade_range_hz { 50.0F };
+    float _q { 0.0F };
     BiquadFilterT<xyz_t> _filters[MAX_MOTOR_COUNT][RPM_FILTER_HARMONICS_COUNT]; //!< note this is a template filter that filters all 3 axes
     std::array<PowerTransferFilter1, MAX_MOTOR_COUNT> _motor_rpm_filters {}; //!< filters the motor RPM before it is used to set the filter frequency
     rpm_filters_config_t _config {}; //!< configuration data is only changed in set_config

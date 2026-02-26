@@ -47,7 +47,7 @@ public:
     void set_use_high_order_bits(bool use_high_order_bits) { _use_high_order_bits = use_high_order_bits; }
     uint32_t get_data_high_pulse_width() const { return _data_high_pulse_width; }
     uint32_t get_data_low_pulse_width() const { return _data_low_pulse_width; }
-    uint32_t getBufferItem(size_t index) const { return _dma_buffer[index]; }
+    uint32_t get_buffer_item(size_t index) const { return _dma_buffer[index]; }
 protected:
     uint32_t _cpu_frequency {150000000};
     protocol_e _protocol;

@@ -29,8 +29,8 @@ void test_dynamic_idle_controller()
     TEST_ASSERT_EQUAL(0, dynamic_idle_controller.get_config().dyn_idle_min_rpm_100);
 
     TEST_ASSERT_EQUAL_FLOAT(0.0F, dynamic_idle_controller.calculate_speed_increase(0.0F, delta_t, debug));
-    const float slowestMotorHz = 1000.0F/ 60.0F; // 1000 RPM
-    TEST_ASSERT_EQUAL_FLOAT(0.0F, dynamic_idle_controller.calculate_speed_increase(slowestMotorHz, delta_t, debug));
+    const float slowest_motor_hz = 1000.0F/ 60.0F; // 1000 RPM
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, dynamic_idle_controller.calculate_speed_increase(slowest_motor_hz, delta_t, debug));
 }
 
 void test_dynamic_idle_controller_p_only()

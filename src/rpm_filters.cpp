@@ -37,7 +37,7 @@ inline void UNLOCK_FILTERS() {}
 void RpmFilters::set_config(const rpm_filters_config_t& config)
 {
     _config = config;
-    _Q = static_cast<float>(_config.rpm_filter_q) * 0.01F;
+    _q = static_cast<float>(_config.rpm_filter_q) * 0.01F;
 
     _state.state = STATE_STOPPED;
     // just under  Nyquist frequency (ie just under half sampling rate)
@@ -46,7 +46,7 @@ void RpmFilters::set_config(const rpm_filters_config_t& config)
     _half_of_max_frequency_hz = _max_frequency_hz / 2.0F;
     _third_of_max_frequency_hz = _max_frequency_hz / 3.0F;
     _min_frequency_hz = _config.rpm_filter_min_hz;
-    _fadeRangeHz = _config.rpm_filter_fade_range_hz;
+    _fade_range_hz = _config.rpm_filter_fade_range_hz;
 
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
 #if (__cplusplus >= 202002L)
@@ -56,7 +56,7 @@ void RpmFilters::set_config(const rpm_filters_config_t& config)
     for (size_t harmonic = 0; harmonic < _config.rpm_filter_harmonics; ++harmonic) {
         for (size_t motor = 0; motor < _motor_count; ++motor) {
 #endif
-            _filters[motor][harmonic].init_notch(_min_frequency_hz * static_cast<float>(harmonic + 1), _looptime_seconds, _Q);
+            _filters[motor][harmonic].init_notch(_min_frequency_hz * static_cast<float>(harmonic + 1), _looptime_seconds, _q);
         }
     }
     // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
@@ -84,17 +84,17 @@ void RpmFilters::set_frequency_hz_iteration_start(size_t motor_index, float freq
         _state.state = STATE_FUNDAMENTAL;
         _state.motor_index = 0;
     }
-    motor_state_t& motorState = _state.motorStates[motor_index]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    motor_state_t& motor_state = _state.motor_states[motor_index]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
     frequency_hz = _motor_rpm_filters[motor_index].filter(frequency_hz);
-    motorState.frequency_hz_unclamped = frequency_hz;
+    motor_state.frequency_hz_unclamped = frequency_hz;
     frequency_hz = std::clamp(frequency_hz, _min_frequency_hz, _max_frequency_hz);
 
     const float margin_frequency_hz = frequency_hz - _min_frequency_hz;
-    motorState.weight_multiplier = (margin_frequency_hz < _fadeRangeHz) ? margin_frequency_hz / _fadeRangeHz : 1.0F;
+    motor_state.weight_multiplier = (margin_frequency_hz < _fade_range_hz) ? margin_frequency_hz / _fade_range_hz : 1.0F;
 
     const BiquadFilterT<xyz_t>& rpmFilter = _filters[motor_index][FUNDAMENTAL]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-    motorState.omega = rpmFilter.calculate_omega(frequency_hz);
+    motor_state.omega = rpmFilter.calculate_omega(frequency_hz);
 }
 
 /*!
@@ -110,14 +110,14 @@ void RpmFilters::set_frequency_hz_iteration_step() // NOLINT(readability-functio
     case STATE_FUNDAMENTAL: {
         BiquadFilterT<xyz_t>& rpmFilter = _filters[_state.motor_index][FUNDAMENTAL]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
         // omega = frequency * _2PiLoopTimeSeconds
-        // maxFrequency < 0.5 / looptime_seconds
-        // maxOmega = (0.5 / looptime_seconds) * 2PiLooptimeSeconds = 0.5 * 2PI = PI;
+        // max_frequency < 0.5 / looptime_seconds
+        // max_omega = (0.5 / looptime_seconds) * 2PiLooptimeSeconds = 0.5 * 2PI = PI;
         // so omega is in range [0, PI]
-        motor_state_t& motorState = _state.motorStates[_state.motor_index]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        FastTrigonometry::sin_cos(motorState.omega, motorState.sin_omega, motorState.two_cosOmega);
-        motorState.two_cosOmega *= 2.0F;
+        motor_state_t& motor_state = _state.motor_states[_state.motor_index]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        FastTrigonometry::sin_cos(motor_state.omega, motor_state.sin_omega, motor_state.two_cos_omega);
+        motor_state.two_cos_omega *= 2.0F;
         LOCK_FILTERS();
-        rpmFilter.set_notch_frequency_weighted(motorState.sin_omega, motorState.two_cosOmega, _weights[FUNDAMENTAL]*motorState.weight_multiplier);
+        rpmFilter.set_notch_frequency_weighted(motor_state.sin_omega, motor_state.two_cos_omega, _weights[FUNDAMENTAL]*motor_state.weight_multiplier);
         UNLOCK_FILTERS();
         ++_state.motor_index;
         if (_state.motor_index == _motor_count) {
@@ -138,8 +138,8 @@ void RpmFilters::set_frequency_hz_iteration_step() // NOLINT(readability-functio
         break;
     }
     case STATE_SECOND_HARMONIC: {
-        const motor_state_t& motorState = _state.motorStates[_state.motor_index]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        if (motorState.frequency_hz_unclamped > _half_of_max_frequency_hz) { // ie 2.0F * frequency_hz_unclamped > _max_frequency_hz
+        const motor_state_t& motor_state = _state.motor_states[_state.motor_index]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        if (motor_state.frequency_hz_unclamped > _half_of_max_frequency_hz) { // ie 2.0F * frequency_hz_unclamped > _max_frequency_hz
             // no point filtering the second harmonic if it is above the Nyquist frequency
             _weights[SECOND_HARMONIC] = 0.0F;
         } else {
@@ -147,10 +147,10 @@ void RpmFilters::set_frequency_hz_iteration_step() // NOLINT(readability-functio
             BiquadFilterT<xyz_t>& rpmFilter = _filters[_state.motor_index][SECOND_HARMONIC]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
             // sin(2θ) = 2 * sin(θ) * cos(θ)
             // cos(2θ) = 2 * cos^2(θ) - 1
-            const float sin_2Omega = motorState.sin_omega * motorState.two_cosOmega;
-            const float two_cos_2Omega = motorState.two_cosOmega * motorState.two_cosOmega - 2.0F;
+            const float sin_2_omega = motor_state.sin_omega * motor_state.two_cos_omega;
+            const float two_cos_2_omega = motor_state.two_cos_omega * motor_state.two_cos_omega - 2.0F;
             LOCK_FILTERS();
-            rpmFilter.set_notch_frequency_weighted(sin_2Omega, two_cos_2Omega, _weights[SECOND_HARMONIC]*motorState.weight_multiplier);
+            rpmFilter.set_notch_frequency_weighted(sin_2_omega, two_cos_2_omega, _weights[SECOND_HARMONIC]*motor_state.weight_multiplier);
             UNLOCK_FILTERS();
         }
         ++_state.motor_index;
@@ -166,8 +166,8 @@ void RpmFilters::set_frequency_hz_iteration_step() // NOLINT(readability-functio
         break;
     }
     case STATE_THIRD_HARMONIC: {
-        const motor_state_t& motorState = _state.motorStates[_state.motor_index]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        if (motorState.frequency_hz_unclamped > _third_of_max_frequency_hz) { // ie 3.0F * frequency_hz_unclamped > _max_frequency_hz
+        const motor_state_t& motor_state = _state.motor_states[_state.motor_index]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        if (motor_state.frequency_hz_unclamped > _third_of_max_frequency_hz) { // ie 3.0F * frequency_hz_unclamped > _max_frequency_hz
             // no point filtering the third harmonic if it is above the Nyquist frequency
             _weights[THIRD_HARMONIC] = 0.0F;
         } else {
@@ -179,11 +179,11 @@ void RpmFilters::set_frequency_hz_iteration_step() // NOLINT(readability-functio
             //         = sin(θ) * ( 4 * cos^2(θ) - 1)
             // cos(3θ) = 4 * cos^3(θ) - 3 * cos(θ)
             //         = cos(θ) * ( 4 * cos^2(θ) - 3 )
-            const float four_cosSquaredOmega = motorState.two_cosOmega * motorState.two_cosOmega;
-            const float sin_3Omega = motorState.sin_omega * (four_cosSquaredOmega - 1.0F);
-            const float two_cos_3Omega = motorState.two_cosOmega * (four_cosSquaredOmega - 3.0F);
+            const float four_cos_squared_omega = motor_state.two_cos_omega * motor_state.two_cos_omega;
+            const float sin_3_omega = motor_state.sin_omega * (four_cos_squared_omega - 1.0F);
+            const float two_cos_3_omega = motor_state.two_cos_omega * (four_cos_squared_omega - 3.0F);
             LOCK_FILTERS();
-            rpmFilter.set_notch_frequency_weighted(sin_3Omega, two_cos_3Omega, _weights[THIRD_HARMONIC]*motorState.weight_multiplier);
+            rpmFilter.set_notch_frequency_weighted(sin_3_omega, two_cos_3_omega, _weights[THIRD_HARMONIC]*motor_state.weight_multiplier);
             UNLOCK_FILTERS();
         }
         ++_state.motor_index;

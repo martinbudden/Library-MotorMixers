@@ -48,15 +48,15 @@ void DynamicIdleController::set_minimum_allowed_motor_hz(float minimum_allowed_m
     _pid.set_setpoint(_minimum_allowed_motor_hz);
 }
 
-float DynamicIdleController::calculate_speed_increase(float slowestMotorHz, float delta_t, Debug& debug)
+float DynamicIdleController::calculate_speed_increase(float slowest_motor_hz, float delta_t, Debug& debug)
 {
     if (_minimum_allowed_motor_hz == 0.0F) {
         // if motors are allowed to stop, then no speed increase is needed
         return  0.0F;
     }
 
-    const float slowestMotorHzDeltaFiltered = _dterm_filter.filter(slowestMotorHz - _pid.get_previous_measurement());
-    float speed_increase = _pid.update_delta(slowestMotorHz, slowestMotorHzDeltaFiltered, delta_t);
+    const float slowest_motor_hz_delta_filtered = _dterm_filter.filter(slowest_motor_hz - _pid.get_previous_measurement());
+    float speed_increase = _pid.update_delta(slowest_motor_hz, slowest_motor_hz_delta_filtered, delta_t);
 
     speed_increase = clamp(speed_increase, 0.0F, _max_increase);
 

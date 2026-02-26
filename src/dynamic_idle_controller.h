@@ -36,7 +36,7 @@ public:
     float get_minimum_allowed_motor_hz() const { return _minimum_allowed_motor_hz; }
     void set_max_increase(float max_increase) { _max_increase = max_increase; }
     float get_max_increase()const { return _max_increase; }
-    float calculate_speed_increase(float slowestMotorHz, float delta_t, Debug& debug);
+    float calculate_speed_increase(float slowest_motor_hz, float delta_t, Debug& debug);
     void reset_pid(); //!< for test code
 private:
     uint32_t _task_interval_microseconds;

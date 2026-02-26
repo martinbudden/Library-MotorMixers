@@ -32,20 +32,20 @@ MotorMixerQuadXDshot::MotorMixerQuadXDshot(uint32_t task_interval_microseconds, 
 
 float MotorMixerQuadXDshot::calculate_slowest_motor_hz() const
 {
-    float slowestMotorHz = _motors[M0].get_motor_hz();
+    float slowest_motor_hz = _motors[M0].get_motor_hz();
     float motor_hz = _motors[M1].get_motor_hz();
-    if (motor_hz < slowestMotorHz) {
-        slowestMotorHz = motor_hz;
+    if (motor_hz < slowest_motor_hz) {
+        slowest_motor_hz = motor_hz;
     }
     motor_hz = _motors[M2].get_motor_hz();
-    if (motor_hz < slowestMotorHz) {
-        slowestMotorHz = motor_hz;
+    if (motor_hz < slowest_motor_hz) {
+        slowest_motor_hz = motor_hz;
     }
     motor_hz = _motors[M3].get_motor_hz();
-    if (motor_hz < slowestMotorHz) {
-        slowestMotorHz = motor_hz;
+    if (motor_hz < slowest_motor_hz) {
+        slowest_motor_hz = motor_hz;
     }
-    return slowestMotorHz;
+    return slowest_motor_hz;
 }
 
 void MotorMixerQuadXDshot::set_motor_config(const motor_config_t& motor_config)

@@ -32,20 +32,20 @@ MotorMixerQuadXDshotBitbang::MotorMixerQuadXDshotBitbang(uint32_t task_interval_
 
 float MotorMixerQuadXDshotBitbang::calculate_slowest_motor_hz() const
 {
-    float slowestMotorHz = _motor_frequencies_hz[M0];
+    float slowest_motor_hz = _motor_frequencies_hz[M0];
     float motor_hz = _motor_frequencies_hz[M1];
-    if (motor_hz < slowestMotorHz) {
-        slowestMotorHz = motor_hz;
+    if (motor_hz < slowest_motor_hz) {
+        slowest_motor_hz = motor_hz;
     }
     motor_hz = _motor_frequencies_hz[M2];
-    if (motor_hz < slowestMotorHz) {
-        slowestMotorHz = motor_hz;
+    if (motor_hz < slowest_motor_hz) {
+        slowest_motor_hz = motor_hz;
     }
     motor_hz = _motor_frequencies_hz[M3];
-    if (motor_hz < slowestMotorHz) {
-        slowestMotorHz = motor_hz;
+    if (motor_hz < slowest_motor_hz) {
+        slowest_motor_hz = motor_hz;
     }
-    return slowestMotorHz;
+    return slowest_motor_hz;
 }
 
 void MotorMixerQuadXDshotBitbang::set_motor_config(const motor_config_t& motor_config)

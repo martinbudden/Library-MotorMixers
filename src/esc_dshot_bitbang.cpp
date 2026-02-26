@@ -398,7 +398,7 @@ In actual received data these may vary because of jitter.
 
 Converts a buffer of samples (obtained from DMA) to a gcr21 value
 */
-uint32_t EscDshotBitbang::samples_to_gcr21(const uint32_t* samples, uint32_t motorMask)
+uint32_t EscDshotBitbang::samples_to_gcr21(const uint32_t* samples, uint32_t motor_mask)
 {
 
     uint16_t i = 0;
@@ -408,7 +408,7 @@ uint32_t EscDshotBitbang::samples_to_gcr21(const uint32_t* samples, uint32_t mot
 
     // Reception starts just after transmission, so there is a lot of HIGH samples. Find first LOW bit:
     while (i < (33 * BDSHOT_RESPONSE_BITRATE / 1000 * RESPONSE_OVERSAMPLING)) {
-        if (!(samples[i] & motorMask)) { // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        if (!(samples[i] & motor_mask)) { // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
             previous_value = 0;
             previous_i = i;
             end_i = static_cast<uint16_t>(i + BDSHOT_RESPONSE_LENGTH * RESPONSE_OVERSAMPLING);
@@ -426,7 +426,7 @@ uint32_t EscDshotBitbang::samples_to_gcr21(const uint32_t* samples, uint32_t mot
     uint32_t gcr21 = 0;
     while (i < end_i) {
         // then look for changes in bits values and compute BDSHOT bits:
-        const uint32_t value = samples[i] & motorMask; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        const uint32_t value = samples[i] & motor_mask; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         if (value != previous_value) {
             const uint32_t rlen = static_cast<uint32_t>(i - previous_i) / RESPONSE_OVERSAMPLING;
             const uint32_t len = (rlen > 1) ? rlen : 1; // how many bits had the same value
@@ -450,10 +450,10 @@ uint32_t EscDshotBitbang::samples_to_gcr21(const uint32_t* samples, uint32_t mot
 /*!
 Converts gcr21 value to a buffer of samples, used for test code
 */
-void EscDshotBitbang::gcr21_to_samples(uint32_t* samples, uint32_t motorMask, uint32_t gcr21)
+void EscDshotBitbang::gcr21_to_samples(uint32_t* samples, uint32_t motor_mask, uint32_t gcr21)
 {
     *samples = 0;
-    (void)motorMask;
+    (void)motor_mask;
     (void)gcr21;
 }
 
