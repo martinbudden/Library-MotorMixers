@@ -60,7 +60,7 @@ float DynamicIdleController::calculate_speed_increase(float slowest_motor_hz, fl
 
     speed_increase = clamp(speed_increase, 0.0F, _max_increase);
 
-    if (debug.getMode() == DEBUG_DYN_IDLE) {
+    if (debug.get_mode() == DEBUG_DYN_IDLE) {
         const pid_error_t error = _pid.get_error();
         debug.set(0, static_cast<int16_t>(std::max(-1000L, std::lroundf(error.p * 10000))));
         debug.set(1, static_cast<int16_t>(std::lroundf(error.i * 10000)));

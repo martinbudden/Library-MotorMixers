@@ -115,8 +115,8 @@ public:
 public:
     Debug() = default;
 
-    void setMode(debug_mode_e mode) { _mode = mode; }
-    inline debug_mode_e getMode() const { return _mode; }
+    void set_mode(debug_mode_e mode) { _mode = mode; }
+    inline debug_mode_e get_mode() const { return _mode; }
 
     inline void set(size_t index, int16_t value) { _values[index] = value; }
     inline void set(size_t index, int8_t value) { _values[index] = static_cast<int16_t>(value); }
