@@ -46,7 +46,7 @@ public:
     void set_frequency_hz_iteration_start(size_t motor_index, float frequency_hz); // called from the motor mixer
     void set_frequency_hz_iteration_step(); // called from the motor mixer
     void filter(xyz_t& input, size_t motor_index);
-    bool isActive() const { return _config.rpm_filter_harmonics > 0; }
+    bool is_active() const { return _config.rpm_filter_harmonics > 0; }
     size_t get_motor_count() const { return _motor_count; }
 private:
     size_t _motor_count;
