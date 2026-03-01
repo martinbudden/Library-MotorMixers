@@ -84,7 +84,7 @@ void RpmFilters::set_config(const rpm_filters_config_t& config)
 /*!
 This is called from MotorMixer::output_to_motors and so needs to be FAST.
 */
-void RpmFilters::set_frequency_hz_iteration_start(size_t motor_index, float frequency_hz)
+void RpmFilters::set_frequency_hz_iteration_start(size_t motor_index, float frequency_hz) // NOLINT(readability-make-member-function-const)
 {
     if (_config.rpm_filter_lpf_hz == 0) {
         return;

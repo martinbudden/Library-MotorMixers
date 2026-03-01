@@ -8,7 +8,7 @@ class MotorMixerInterface;
 class RpmFilters;
 
 
-struct motor_mixer_parameter_group_t {
+struct motor_mixer_context_t {
     MotorMixerMessageQueue& motor_mixer_message_queue;
     MotorMixerInterface& motor_mixer;
     RpmFilters* rpm_filters;
@@ -17,14 +17,14 @@ struct motor_mixer_parameter_group_t {
 
 class MotorMixerTask : public TaskBase {
 public:
-    explicit MotorMixerTask(const motor_mixer_parameter_group_t& parameter_group);
+    explicit MotorMixerTask(const motor_mixer_context_t& context);
 public:
-    static MotorMixerTask* create_task(task_info_t& task_info, const motor_mixer_parameter_group_t& parameter_group, uint8_t priority, uint32_t core);
-    static MotorMixerTask* create_task(const motor_mixer_parameter_group_t& parameter_group, uint8_t priority, uint32_t core);
+    static MotorMixerTask* create_task(task_info_t& task_info, const motor_mixer_context_t& context, uint8_t priority, uint32_t core);
+    static MotorMixerTask* create_task(const motor_mixer_context_t& context, uint8_t priority, uint32_t core);
 public:
     [[noreturn]] static void task_static(void* arg);
 private:
     [[noreturn]] void task();
 private:
-    motor_mixer_parameter_group_t _parameter_group;
+    motor_mixer_context_t _context;
 };
