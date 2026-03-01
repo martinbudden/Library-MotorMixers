@@ -18,7 +18,8 @@
 #endif
 
 
-MotorMixerTask::MotorMixerTask(const motor_mixer_context_t& context) :
+MotorMixerTask::MotorMixerTask(MotorMixerInterface& motor_mixer, const motor_mixer_context_t& context) :
+    _motor_mixer(motor_mixer),
     _context(context)
 {
 }
@@ -39,7 +40,7 @@ Task function for the VehicleController.
         _tick_count_previous = tick_count;
 
         const float delta_t = static_cast<float>(_tick_count_delta) * 0.001F;
-        _context.motor_mixer.output_to_motors(queue_item, _context.rpm_filters, delta_t, tick_count, _context.debug);
+        _motor_mixer.output_to_motors(queue_item, _context.rpm_filters, delta_t, tick_count, _context.debug);
     }
 #else
     while (true) {}
