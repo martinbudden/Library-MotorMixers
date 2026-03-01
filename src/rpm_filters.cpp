@@ -33,6 +33,15 @@ inline void UNLOCK_FILTERS() {}
 #include <ranges>
 #endif
 
+inline float clamp(float value, float min, float max)
+{
+#if (__cplusplus >= 202002L)
+    return std::clamp(value, min, max);
+#else
+    return (value < min) ? min : (value > max) ? max : value;
+#endif
+}
+
 
 void RpmFilters::set_config(const rpm_filters_config_t& config)
 {
@@ -88,7 +97,7 @@ void RpmFilters::set_frequency_hz_iteration_start(size_t motor_index, float freq
 
     frequency_hz = _motor_rpm_filters[motor_index].filter(frequency_hz);
     motor_state.frequency_hz_unclamped = frequency_hz;
-    frequency_hz = std::clamp(frequency_hz, _min_frequency_hz, _max_frequency_hz);
+    frequency_hz = clamp(frequency_hz, _min_frequency_hz, _max_frequency_hz);
 
     const float margin_frequency_hz = frequency_hz - _min_frequency_hz;
     motor_state.weight_multiplier = (margin_frequency_hz < _fade_range_hz) ? margin_frequency_hz / _fade_range_hz : 1.0F;

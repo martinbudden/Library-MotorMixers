@@ -102,19 +102,19 @@ void MotorMixerQuadXDshot::output_to_motors(const motor_mixer_message_queue_item
 
         // Output to the motors, reading the motor RPM
         // Motor outputs are converted to DShot range [47,2047]
-        _motors[M0].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M0], _mix_parameters.motor_output_min, 1.0F)) + 47)),
+        _motors[M0].write(static_cast<uint16_t>(std::lroundf(2000.0F*clamp(_outputs[M0], _mix_parameters.motor_output_min, 1.0F)) + 47)),
         _motors[M0].read();
         rpm_filters->set_frequency_hz_iteration_start(M0, _motors[M0].get_motor_hz());
 
-        _motors[M1].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M1], _mix_parameters.motor_output_min, 1.0F)) + 47)),
+        _motors[M1].write(static_cast<uint16_t>(std::lroundf(2000.0F*clamp(_outputs[M1], _mix_parameters.motor_output_min, 1.0F)) + 47)),
         _motors[M1].read();
         rpm_filters->set_frequency_hz_iteration_start(M1, _motors[M1].get_motor_hz());
 
-        _motors[M2].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M2], _mix_parameters.motor_output_min, 1.0F)) + 47)),
+        _motors[M2].write(static_cast<uint16_t>(std::lroundf(2000.0F*clamp(_outputs[M2], _mix_parameters.motor_output_min, 1.0F)) + 47)),
         _motors[M2].read();
         rpm_filters->set_frequency_hz_iteration_start(M2, _motors[M2].get_motor_hz());
 
-        _motors[M3].write(static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M3], _mix_parameters.motor_output_min, 1.0F)) + 47)),
+        _motors[M3].write(static_cast<uint16_t>(std::lroundf(2000.0F*clamp(_outputs[M3], _mix_parameters.motor_output_min, 1.0F)) + 47)),
         _motors[M3].read();
         rpm_filters->set_frequency_hz_iteration_start(M3, _motors[M3].get_motor_hz());
     }

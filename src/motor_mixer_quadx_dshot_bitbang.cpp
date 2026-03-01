@@ -97,10 +97,10 @@ void MotorMixerQuadXDshotBitbang::output_to_motors(const motor_mixer_message_que
 
         // convert motor output to DShot range [47, 2047]
         _esc_dshot.output_to_motors(
-            static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M0], _mix_parameters.motor_output_min, 1.0F)) + 47),
-            static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M1], _mix_parameters.motor_output_min, 1.0F)) + 47),
-            static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M2], _mix_parameters.motor_output_min, 1.0F)) + 47),
-            static_cast<uint16_t>(std::lroundf(2000.0F*std::clamp(_outputs[M3], _mix_parameters.motor_output_min, 1.0F)) + 47)
+            static_cast<uint16_t>(std::lroundf(2000.0F*clamp(_outputs[M0], _mix_parameters.motor_output_min, 1.0F)) + 47),
+            static_cast<uint16_t>(std::lroundf(2000.0F*clamp(_outputs[M1], _mix_parameters.motor_output_min, 1.0F)) + 47),
+            static_cast<uint16_t>(std::lroundf(2000.0F*clamp(_outputs[M2], _mix_parameters.motor_output_min, 1.0F)) + 47),
+            static_cast<uint16_t>(std::lroundf(2000.0F*clamp(_outputs[M3], _mix_parameters.motor_output_min, 1.0F)) + 47)
         );
 
         // read the motor RPMs

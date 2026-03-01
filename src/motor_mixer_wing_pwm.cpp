@@ -137,7 +137,7 @@ void MotorMixerWingPwm::write_motor(uint8_t motor_index, float motor_output) // 
         return;
     }
     // scale motor output to GPIO range (normally [0,255] or [0, 65535])
-    const auto output = static_cast<uint16_t>(roundf(_pwm_scale*std::clamp(motor_output, 0.0F, 1.0F)));
+    const auto output = static_cast<uint16_t>(roundf(_pwm_scale*clamp(motor_output, 0.0F, 1.0F)));
 #if defined(FRAMEWORK_RPI_PICO)
     pwm_set_gpio_level(pin.pin, output);
 #elif defined(FRAMEWORK_ESPIDF)
