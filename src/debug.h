@@ -138,7 +138,6 @@ public:
     inline void set(debug_mode_e mode, size_t index, uint16_t value) { set(mode, index, static_cast<int16_t>(value)); }
     inline void set(debug_mode_e mode, size_t index, int32_t value) { set(mode, index, static_cast<int16_t>(value)); }
     inline void set(debug_mode_e mode, size_t index, uint32_t value) { set(mode, index, static_cast<int16_t>(value)); }
-    inline void set(debug_mode_e mode, size_t index, size_t value) { set(mode, index, static_cast<int16_t>(value)); }
 #if defined(FRAMEWORK_TEST)
     inline void set(debug_mode_e mode, size_t index, long value) { set(mode, index, static_cast<int16_t>(value)); }
 #endif
