@@ -4,6 +4,7 @@
 #include "motor_mixer_quadx_dshot_bitbang.h"
 #include "rpm_filters.h"
 
+#include <algorithm>
 #include <cmath>
 
 #if (__cplusplus >= 202002L)

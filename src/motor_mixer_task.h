@@ -4,13 +4,13 @@
 
 class Debug;
 class MotorMixerMessageQueue;
-class MotorMixerBase;
+class MotorMixerInterface;
 class RpmFilters;
 
 
 struct motor_mixer_parameter_group_t {
     MotorMixerMessageQueue& motor_mixer_message_queue;
-    MotorMixerBase& motor_mixer;
+    MotorMixerInterface& motor_mixer;
     RpmFilters* rpm_filters;
     Debug& debug;
 };

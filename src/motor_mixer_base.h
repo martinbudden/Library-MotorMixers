@@ -1,19 +1,12 @@
 #pragma once
 
 #include "dynamic_idle_controller.h"
+#include "motor_mixer_interface.h"
 #include "rpm_filters.h"
 #include <cstddef>
 
 class Debug;
 class DynamicIdleController;
-struct motor_mixer_message_queue_item_t;
-
-struct motor_mixer_commands_t {
-    float throttle;
-    float roll;
-    float pitch;
-    float yaw;
-};
 
 struct motor_mixer_parameters_t {
     //! minimum motor output, typically set to 5.5% to avoid ESC desynchronization,
@@ -62,7 +55,7 @@ struct servo_config_t {
     uint8_t channel_forwarding_start_channel;
 };
 
-class MotorMixerBase {
+class MotorMixerBase : public MotorMixerInterface {
 public:
     // constants compatible with Betaflight mixerMode_e enums.
     static constexpr uint8_t TRICOPTER = 1;
@@ -149,14 +142,6 @@ public:
 
     void set_motor_output_min(float motor_output_min) { _mix_parameters.motor_output_min = motor_output_min; }
     float get_motor_output_min() const { return _mix_parameters.motor_output_min; }
-
-    /*!
-    Called by the scheduler when the updateOutputsUsingPIDs function running in the AHRS task SIGNALs that output data is available.
-    It is typically called at frequency of between 1000Hz and 8000Hz, so it has to be FAST.
-    */
-    virtual void output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count, Debug& debug) {
-        (void)queue_item; (void)rpm_filters; (void)delta_t; (void)tick_count; (void)debug;
-    }
 
     virtual float get_motor_output(size_t motor_index) const { (void)motor_index; return 0.0F; }
     virtual void set_motors_reversed(bool motors_is_reversed) { _motors_is_reversed = motors_is_reversed; }
