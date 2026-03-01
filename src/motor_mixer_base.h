@@ -146,14 +146,6 @@ public:
     virtual float get_motor_output(size_t motor_index) const { (void)motor_index; return 0.0F; }
     virtual void set_motors_reversed(bool motors_is_reversed) { _motors_is_reversed = motors_is_reversed; }
 
-    virtual bool can_report_position(size_t motor_index) const { (void)motor_index; return false; }
-    virtual void reset_all_encoders() {}
-    virtual void read_all_encoders() {}
-    virtual void read_encoder(size_t motor_index) { (void)motor_index; }
-    virtual int32_t get_encoder(size_t motor_index) const { (void)motor_index; return 0; }
-    virtual uint32_t get_steps_per_revolution(size_t motor_index) const { (void)motor_index; return 0; }
-
-    virtual bool can_report_speed(size_t motor_index) const { (void)motor_index; return false; }
     virtual int32_t get_motor_rpm(size_t motor_index) const { (void)motor_index; return 0; }
     virtual float get_motor_speed_dps(size_t motor_index) const { return static_cast<float>(get_motor_rpm(motor_index)) * RPM_TO_DPS; }
     virtual float get_motor_frequency_hz(size_t motor_index) const { (void)motor_index; return 0; }
