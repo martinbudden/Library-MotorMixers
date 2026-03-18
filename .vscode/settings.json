@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "ACRO",
+        "adafruit",
         "AHRS",
         "altera",
         "ARPE",
@@ -19,6 +20,7 @@
         "clangtidy",
         "clkdiv",
         "Connor",
+        "cppcheck",
         "cppcoreguidelines",
         "CRSF",
         "desynchronization",
@@ -68,6 +70,7 @@
         "OSPEEDR",
         "osre",
         "PHASELOCK",
+        "Pico",
         "pindirs",
         "pioenvs",
         "PROSHOT",
@@ -92,6 +95,7 @@
         "Waggressive",
         "Wattributes",
         "Wcast",
+        "Wconversion",
         "Wdeprecated",
         "Wdisabled",
         "Wdouble",
@@ -112,6 +116,7 @@
         "Wsign",
         "Wstrict",
         "Wtrampolines",
+        "Wunreachable",
         "Wunsafe",
         "Wunused"
     ]
