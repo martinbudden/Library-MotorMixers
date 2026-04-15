@@ -222,7 +222,7 @@ void MotorMixerQuadXPwm::output_to_motors(const motor_mixer_message_queue_item_t
             .pitch  = queue_item.pitch_dps * MIXER_OUTPUT_SCALE_FACTOR,
             .yaw    = queue_item.yaw_dps * MIXER_OUTPUT_SCALE_FACTOR
         };
-        _throttle_command = mix_quad_x(_outputs, commands, _mix_parameters);
+        _outputs  = mix_quad_x(commands, _mix_parameters);
     } else {
         _outputs = { 0.0F, 0.0F, 0.0F, 0.0F };
     }

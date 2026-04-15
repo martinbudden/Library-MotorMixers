@@ -71,12 +71,12 @@ void RpmFilters::set_config(const rpm_filters_config_t& config)
     // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
 
     if (config.rpm_filter_lpf_hz == 0) {
-        for (auto& rpmFilter : _motor_rpm_filters) {
-            rpmFilter.set_to_passthrough();
+        for (auto& rpm_filter : _motor_rpm_filters) {
+            rpm_filter.set_to_passthrough();
         }
     } else {
-        for (auto& rpmFilter : _motor_rpm_filters) {
-            rpmFilter.set_cutoff_frequency_and_reset(config.rpm_filter_lpf_hz, _looptime_seconds);
+        for (auto& rpm_filter : _motor_rpm_filters) {
+            rpm_filter.set_cutoff_frequency_and_reset(config.rpm_filter_lpf_hz, _looptime_seconds);
         }
     }
 }
@@ -102,8 +102,8 @@ void RpmFilters::set_frequency_hz_iteration_start(size_t motor_index, float freq
     const float margin_frequency_hz = frequency_hz - _min_frequency_hz;
     motor_state.weight_multiplier = (margin_frequency_hz < _fade_range_hz) ? margin_frequency_hz / _fade_range_hz : 1.0F;
 
-    const BiquadFilterT<xyz_t>& rpmFilter = _filters[motor_index][FUNDAMENTAL]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-    motor_state.omega = rpmFilter.calculate_omega(frequency_hz);
+    const BiquadFilterT<xyz_t>& rpm_filter = _filters[motor_index][FUNDAMENTAL]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    motor_state.omega = rpm_filter.calculate_omega(frequency_hz);
 }
 
 /*!
@@ -117,7 +117,7 @@ void RpmFilters::set_frequency_hz_iteration_step() // NOLINT(readability-functio
     case STATE_STOPPED:
         return;
     case STATE_FUNDAMENTAL: {
-        BiquadFilterT<xyz_t>& rpmFilter = _filters[_state.motor_index][FUNDAMENTAL]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        BiquadFilterT<xyz_t>& rpm_filter = _filters[_state.motor_index][FUNDAMENTAL]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
         // omega = frequency * _2PiLoopTimeSeconds
         // max_frequency < 0.5 / looptime_seconds
         // max_omega = (0.5 / looptime_seconds) * 2PiLooptimeSeconds = 0.5 * 2PI = PI;
@@ -126,7 +126,7 @@ void RpmFilters::set_frequency_hz_iteration_step() // NOLINT(readability-functio
         FastTrigonometry::sin_cos(motor_state.omega, motor_state.sin_omega, motor_state.two_cos_omega);
         motor_state.two_cos_omega *= 2.0F;
         LOCK_FILTERS();
-        rpmFilter.set_notch_frequency_weighted(motor_state.sin_omega, motor_state.two_cos_omega, _weights[FUNDAMENTAL]*motor_state.weight_multiplier);
+        rpm_filter.set_notch_frequency_weighted(motor_state.sin_omega, motor_state.two_cos_omega, _weights[FUNDAMENTAL]*motor_state.weight_multiplier);
         UNLOCK_FILTERS();
         ++_state.motor_index;
         if (_state.motor_index == _motor_count) {
@@ -153,13 +153,13 @@ void RpmFilters::set_frequency_hz_iteration_step() // NOLINT(readability-functio
             _weights[SECOND_HARMONIC] = 0.0F;
         } else {
             _weights[SECOND_HARMONIC] = _config.rpm_filter_weights[SECOND_HARMONIC] * 0.01F;
-            BiquadFilterT<xyz_t>& rpmFilter = _filters[_state.motor_index][SECOND_HARMONIC]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+            BiquadFilterT<xyz_t>& rpm_filter = _filters[_state.motor_index][SECOND_HARMONIC]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
             // sin(2θ) = 2 * sin(θ) * cos(θ)
             // cos(2θ) = 2 * cos^2(θ) - 1
             const float sin_2_omega = motor_state.sin_omega * motor_state.two_cos_omega;
             const float two_cos_2_omega = motor_state.two_cos_omega * motor_state.two_cos_omega - 2.0F;
             LOCK_FILTERS();
-            rpmFilter.set_notch_frequency_weighted(sin_2_omega, two_cos_2_omega, _weights[SECOND_HARMONIC]*motor_state.weight_multiplier);
+            rpm_filter.set_notch_frequency_weighted(sin_2_omega, two_cos_2_omega, _weights[SECOND_HARMONIC]*motor_state.weight_multiplier);
             UNLOCK_FILTERS();
         }
         ++_state.motor_index;
@@ -181,7 +181,7 @@ void RpmFilters::set_frequency_hz_iteration_step() // NOLINT(readability-functio
             _weights[THIRD_HARMONIC] = 0.0F;
         } else {
             _weights[THIRD_HARMONIC] = _config.rpm_filter_weights[THIRD_HARMONIC] * 0.01F;
-            BiquadFilterT<xyz_t>& rpmFilter = _filters[_state.motor_index][THIRD_HARMONIC]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+            BiquadFilterT<xyz_t>& rpm_filter = _filters[_state.motor_index][THIRD_HARMONIC]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
             // sin(3θ) = 3 * sin(θ)   - 4 * sin^3(θ)
             //         = sin(θ) * ( 3 - 4 * sin^2(θ) )
             //         = sin(θ) * ( 3 - 4 * (1 - cos^2(θ)) )
@@ -192,7 +192,7 @@ void RpmFilters::set_frequency_hz_iteration_step() // NOLINT(readability-functio
             const float sin_3_omega = motor_state.sin_omega * (four_cos_squared_omega - 1.0F);
             const float two_cos_3_omega = motor_state.two_cos_omega * (four_cos_squared_omega - 3.0F);
             LOCK_FILTERS();
-            rpmFilter.set_notch_frequency_weighted(sin_3_omega, two_cos_3_omega, _weights[THIRD_HARMONIC]*motor_state.weight_multiplier);
+            rpm_filter.set_notch_frequency_weighted(sin_3_omega, two_cos_3_omega, _weights[THIRD_HARMONIC]*motor_state.weight_multiplier);
             UNLOCK_FILTERS();
         }
         ++_state.motor_index;

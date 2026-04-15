@@ -18,7 +18,7 @@ MotorMixerQuadXDshotBitbang::MotorMixerQuadXDshotBitbang(uint32_t task_interval_
 {
     (void)pins; // !!TODO: set pins
 
-    // There are a maximum of 12 rpmFilter iterations: 4 motors and up to 3 harmonics for each motor.
+    // There are a maximum of 12 rpm_filter iterations: 4 motors and up to 3 harmonics for each motor.
     // We want to complete all 12 iterations in less than 1000 microseconds.
     if (task_interval_microseconds >= 1000) {
         _rpm_filter_iteration_count =  12;
@@ -90,7 +90,7 @@ void MotorMixerQuadXDshotBitbang::output_to_motors(const motor_mixer_message_que
             const float throttle_increase = (_dynamic_idle_controller.get_minimum_allowed_motor_hz() == 0.0F) ? 0.0F : _dynamic_idle_controller.calculate_speed_increase(calculate_slowest_motor_hz(), delta_t, debug);
             commands.throttle += throttle_increase;
             // set the throttle to value returned by the mixer
-            _throttle_command = mix_quad_x(_outputs, commands, _mix_parameters);
+            _outputs = mix_quad_x(commands, _mix_parameters);
         } else {
             _outputs = { 0.0F, 0.0F, 0.0F, 0.0F };
         }
@@ -120,7 +120,7 @@ void MotorMixerQuadXDshotBitbang::output_to_motors(const motor_mixer_message_que
 
 void MotorMixerQuadXDshotBitbang::rpm_filter_set_frequency_hz_iteration_step(RpmFilters* rpm_filters)
 {
-    // Perform an rpmFilter iteration step for each motor
+    // Perform an rpm_filter iteration step for each motor
     // Note that rpm_filters->set_frequency_hz_iteration_step is an expensive calculation and runs off a state machine, setting one motor harmonic per iteration
     // so we want to call it even if we do not write to the motors
 #if (__cplusplus >= 202002L)

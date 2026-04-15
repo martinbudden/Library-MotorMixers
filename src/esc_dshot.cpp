@@ -86,20 +86,20 @@ void EscDshot::init(uint16_t pin)
 
     // Setup the DMA
     enum { PANIC_IF_NONE_AVAILABLE = true };
-    _dmaChannel = dma_claim_unused_channel(PANIC_IF_NONE_AVAILABLE);
+    _dma_channel = dma_claim_unused_channel(PANIC_IF_NONE_AVAILABLE);
 
-    dma_channel_config dmaConfig = dma_channel_get_default_config(_dmaChannel); // NOLINT(cppcoreguidelines-init-variables) false positive
-    channel_config_set_dreq(&dmaConfig, pwm_get_dreq(slice)); // Set the DMA Data Request (DREQ)
+    dma_channel_config dma_config = dma_channel_get_default_config(_dma_channel); // NOLINT(cppcoreguidelines-init-variables) false positive
+    channel_config_set_dreq(&dma_config, pwm_get_dreq(slice)); // Set the DMA Data Request (DREQ)
     // transfer 32 bits at a time
     // don't increment write address so we always transfer to the same PWM register.
     // increment read address so we pick up a new value each time
-    channel_config_set_transfer_data_size(&dmaConfig, DMA_SIZE_32);
-    channel_config_set_write_increment(&dmaConfig, false);
-    channel_config_set_read_increment(&dmaConfig, true);
+    channel_config_set_transfer_data_size(&dma_config, DMA_SIZE_32);
+    channel_config_set_write_increment(&dma_config, false);
+    channel_config_set_read_increment(&dma_config, true);
 
     dma_channel_configure(
-        _dmaChannel,
-        &dmaConfig,
+        _dma_channel,
+        &dma_config,
         &pwm_hw->slice[slice].cc, // write to PWM counter compare
         nullptr, // inital read address, set when DMA is started
         0, // transfer count, set when DMA is started
@@ -241,24 +241,24 @@ void EscDshot::write(uint16_t value) // NOLINT(readability-make-member-function-
     // set up a unidirectional DShot frame for sending via DMA
     const uint16_t frame = DshotCodec::frame_unidirectional(value);
 
-    uint16_t maskBit = 1U << (DSHOT_BIT_COUNT - 1);
+    uint16_t mask_bit = 1U << (DSHOT_BIT_COUNT - 1);
     if (_use_high_order_bits) {
         for (auto& item : _dma_buffer) {
-            item = ((frame & maskBit) ? _data_high_pulse_width : _data_low_pulse_width) << 16;
-            maskBit = static_cast<uint16_t>(maskBit >> 1);
+            item = ((frame & mask_bit) ? _data_high_pulse_width : _data_low_pulse_width) << 16;
+            mask_bit = static_cast<uint16_t>(mask_bit >> 1);
         }
     } else {
         for (auto& item : _dma_buffer) {
-            item = (frame & maskBit) ? _data_high_pulse_width : _data_low_pulse_width;
-            maskBit = static_cast<uint16_t>(maskBit >> 1);
+            item = (frame & mask_bit) ? _data_high_pulse_width : _data_low_pulse_width;
+            mask_bit = static_cast<uint16_t>(mask_bit >> 1);
         }
     }
     _dma_buffer[DMA_BUFFER_SIZE - 1] = 0; // zero last value,  array size is DSHOT_BIT_COUNT + 1
 
 #if defined(FRAMEWORK_RPI_PICO)
     // transfer DMA buffer to PWM
-    dma_channel_set_trans_count(_dmaChannel, DMA_BUFFER_SIZE, DONT_START_YET);
-    dma_channel_set_read_addr(_dmaChannel, &_dma_buffer[0], START_IMMEDIATELY);
+    dma_channel_set_trans_count(_dma_channel, DMA_BUFFER_SIZE, DONT_START_YET);
+    dma_channel_set_read_addr(_dma_channel, &_dma_buffer[0], START_IMMEDIATELY);
 #elif defined(FRAMEWORK_ESPIDF)
 #elif defined(FRAMEWORK_TEST)
 #else // defaults to FRAMEWORK_ARDUINO

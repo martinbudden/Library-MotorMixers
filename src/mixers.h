@@ -13,7 +13,7 @@ inline float clamp(float value, float min, float max)
 #endif
 }
 
-float mix_quad_x(std::array<float, 4>& motor_outputs, const motor_mixer_commands_t& commands, motor_mixer_parameters_t& params);
+std::array<float, 4> mix_quad_x(const motor_mixer_commands_t& commands, motor_mixer_parameters_t& params);
 float mix_hex_x (std::array<float, 6>& motor_outputs, const motor_mixer_commands_t& commands, motor_mixer_parameters_t& params);
 float mix_octo_quad_x(std::array<float, 8>& motor_outputs, const motor_mixer_commands_t& commands, motor_mixer_parameters_t& params);
 

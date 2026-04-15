@@ -60,7 +60,7 @@ protected:
     uint _pioOffset {};
 #else
     enum { START_IMMEDIATELY = true, DONT_START_YET = false };
-    uint32_t _dmaChannel {};
+    uint32_t _dma_channel {};
 #endif // LIBRARY_MOTOR_MIXERS_USE_DSHOT_RPI_PICO_PIO
 #endif
     uint32_t _data_high_pulse_width {};

@@ -125,7 +125,7 @@ Roll right              (left+  right-)  --++
 Pitch up (stick back)   (front+ back-)   -+-+
 Yaw clockwise           (CC+    CW-)     +--+
 */
-float mix_quad_x(std::array<float, 4>& motor_outputs, const motor_mixer_commands_t& commands, motor_mixer_parameters_t& params) // NOLINT(readability-function-cognitive-complexity)
+std::array<float, 4> mix_quad_x(const motor_mixer_commands_t& commands, motor_mixer_parameters_t& params) // NOLINT(readability-function-cognitive-complexity)
 {
     // NOTE: motor array indices are zero-based, whereas motor numbering in the diagram above is one-based
 
@@ -133,12 +133,15 @@ float mix_quad_x(std::array<float, 4>& motor_outputs, const motor_mixer_commands
     enum { BACK_RIGHT = 0, FRONT_RIGHT = 1, BACK_LEFT = 2, FRONT_LEFT = 3 };
 
     // calculate the motor outputs without yaw applied
-    float throttle = commands.throttle;
-    motor_outputs[BACK_RIGHT]  = throttle - commands.roll - commands.pitch; // + commands.yaw;
-    motor_outputs[FRONT_RIGHT] = throttle - commands.roll + commands.pitch; // - commands.yaw;
-    motor_outputs[BACK_LEFT]   = throttle + commands.roll - commands.pitch; // - commands.yaw;
-    motor_outputs[FRONT_LEFT]  = throttle + commands.roll + commands.pitch; // + commands.yaw;
+    const float throttle = commands.throttle;
+    std::array<float, 4> motor_outputs = {
+        throttle - commands.roll - commands.pitch, // + commands.yaw;
+        throttle - commands.roll + commands.pitch, // - commands.yaw;
+        throttle + commands.roll - commands.pitch, // - commands.yaw;
+        throttle + commands.roll + commands.pitch // + commands.yaw;
+    };
 
+    params.throttle = throttle;
     params.overshoot = 0.0F;
     params.undershoot = 0.0F;
 
@@ -171,7 +174,7 @@ float mix_quad_x(std::array<float, 4>& motor_outputs, const motor_mixer_commands
         params.overshoot = std::max(params.overshoot, motor_outputs[0] - params.motor_output_max);
         params.overshoot = std::max(params.overshoot, motor_outputs[3] - params.motor_output_max);
         if (commands.yaw + (params.undershoot - params.overshoot) > 0.0F) {
-            throttle -= (params.undershoot + params.overshoot);
+            params.throttle -= (params.undershoot + params.overshoot);
             const float yaw_delta =  (params.undershoot - params.overshoot);
             motor_outputs[BACK_RIGHT]  += yaw_delta;
             motor_outputs[FRONT_RIGHT] -= yaw_delta;
@@ -186,7 +189,7 @@ float mix_quad_x(std::array<float, 4>& motor_outputs, const motor_mixer_commands
         params.overshoot = std::max(params.overshoot, motor_outputs[1] - params.motor_output_max);
         params.overshoot = std::max(params.overshoot, motor_outputs[2] - params.motor_output_max);
         if (commands.yaw - (params.undershoot - params.overshoot) < 0.0F) {
-            throttle -= (params.undershoot + params.overshoot);
+            params.throttle -= (params.undershoot + params.overshoot);
             const float yaw_delta = -(params.undershoot - params.overshoot);
             motor_outputs[BACK_RIGHT]  += yaw_delta;
             motor_outputs[FRONT_RIGHT] -= yaw_delta;
@@ -195,8 +198,7 @@ float mix_quad_x(std::array<float, 4>& motor_outputs, const motor_mixer_commands
         }
     }
 #endif // LIBRARY_MOTOR_MIXERS_USE_NO_OVERFLOW_CHECKING_YAW)
-
-    return throttle;
+    return motor_outputs;
 }
 
 /*!

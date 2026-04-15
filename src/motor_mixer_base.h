@@ -14,6 +14,7 @@ struct motor_mixer_parameters_t {
     float motor_output_min;
     float motor_output_max;
     float max_servo_angle_radians; //! used by tricopter
+    float throttle;
     float undershoot; //! used by test code
     float overshoot; //! used by test code
 };
@@ -183,6 +184,7 @@ protected:
         .motor_output_min = 0.0F,
         .motor_output_max = 1.0F,
         .max_servo_angle_radians = 0.0F,
+        .throttle = 0.0F,
         .undershoot = 0.0F,
         .overshoot = 0.0F,
     };
