@@ -30,9 +30,9 @@ Task function for the VehicleController.
 [[noreturn]] void MotorMixerTask::task()
 {
 #if defined(FRAMEWORK_USE_FREERTOS)
-    motor_mixer_message_queue_item_t queue_item {};
+    motor_commands_t motor_commands {};
     while (true) {
-        _context.motor_mixer_message_queue.WAIT(queue_item);
+        _context.motor_mixer_message_queue.WAIT(motor_commands);
 
         // calculate timings for instrumentation
         const TickType_t tick_count = xTaskGetTickCount();
@@ -40,7 +40,7 @@ Task function for the VehicleController.
         _tick_count_previous = tick_count;
 
         const float delta_t = static_cast<float>(_tick_count_delta) * 0.001F;
-        _motor_mixer.output_to_motors(queue_item, _context.rpm_filters, delta_t, tick_count, _context.debug);
+        _motor_mixer.output_to_motors(motor_commands, _context.rpm_filters, delta_t, tick_count, _context.debug);
     }
 #else
     while (true) {}

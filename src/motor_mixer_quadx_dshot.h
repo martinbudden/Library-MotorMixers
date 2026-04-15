@@ -15,7 +15,7 @@ public:
 public:
     virtual void set_motor_config(const motor_config_t& motor_config) override;
     virtual void set_motors_reversed(bool motors_is_reversed) override;
-    virtual void output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count, Debug& debug) override;
+    virtual void output_to_motors(const motor_commands_t& motor_commands, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count, Debug& debug) override;
     virtual void rpm_filter_set_frequency_hz_iteration_step(RpmFilters* rpm_filters) override;
     virtual const dynamic_idle_controller_config_t* get_dynamic_idle_config() const override;
     virtual void set_dynamic_idle_controller_config(const dynamic_idle_controller_config_t& config) override;

@@ -162,7 +162,7 @@ void MotorMixerWingPwm::write_motor(uint8_t motor_index, float motor_output) // 
 /*!
 Calculate and output motor mix.
 */
-void MotorMixerWingPwm::output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count, Debug& debug)
+void MotorMixerWingPwm::output_to_motors(const motor_commands_t& motor_commands, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count, Debug& debug)
 {
     (void)rpm_filters;
     (void)delta_t;
@@ -177,11 +177,11 @@ void MotorMixerWingPwm::output_to_motors(const motor_mixer_message_queue_item_t&
     if (motors_is_on()) {
         // set the throttle to value returned by the mixer
         const motor_mixer_commands_t commands {
-            .throttle  = queue_item.throttle,
+            .throttle  = motor_commands.throttle,
             // scale roll, pitch, and yaw from DPS range to [-1.0F, 1.0F]
-            .roll   = queue_item.roll_dps * MIXER_OUTPUT_SCALE_FACTOR,
-            .pitch  = queue_item.pitch_dps * MIXER_OUTPUT_SCALE_FACTOR,
-            .yaw    = queue_item.yaw_dps * MIXER_OUTPUT_SCALE_FACTOR
+            .roll   = motor_commands.roll_dps * MIXER_OUTPUT_SCALE_FACTOR,
+            .pitch  = motor_commands.pitch_dps * MIXER_OUTPUT_SCALE_FACTOR,
+            .yaw    = motor_commands.yaw_dps * MIXER_OUTPUT_SCALE_FACTOR
         };
         _throttle_command = mix_wing(_outputs, commands, _mix_parameters);
     } else {

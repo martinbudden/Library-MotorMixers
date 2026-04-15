@@ -38,7 +38,7 @@ public:
     };
 #endif
 public:
-    virtual void output_to_motors(const motor_mixer_message_queue_item_t& queue_item, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count, Debug& debug) override;
+    virtual void output_to_motors(const motor_commands_t& motor_commands, RpmFilters* rpm_filters, float delta_t, uint32_t tick_count, Debug& debug) override;
     void write_motor(uint8_t motor_index, float motor_output);
 protected:
     float _pwm_scale {255.0F};
