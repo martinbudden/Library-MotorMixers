@@ -1,5 +1,7 @@
 #pragma once
 
+#include "motor_commands.h"
+
 #include <array>
 #include <cstdint>
 
@@ -16,13 +18,6 @@
 #endif
 #endif
 
-
-struct motor_commands_t {
-    float throttle;
-    float roll_dps;
-    float pitch_dps;
-    float yaw_dps;
-};
 
 class MotorMixerMessageQueue {
 public:

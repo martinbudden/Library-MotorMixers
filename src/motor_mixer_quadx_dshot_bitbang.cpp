@@ -1,6 +1,6 @@
 #include "dynamic_idle_controller.h"
 #include "mixers.h"
-#include "motor_mixer_message_queue.h"
+#include "motor_commands.h"
 #include "motor_mixer_quadx_dshot_bitbang.h"
 #include "rpm_filters.h"
 
